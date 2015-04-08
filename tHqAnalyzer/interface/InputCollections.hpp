@@ -4,14 +4,12 @@
 #include <vector>
 #include <map>
 
-#include "BoostedTTH/BoostedObjects/interface/Event.h"
+#include "tHqAnalysis/tHqObjects/interface/Event.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/MET.h"
-#include "BoostedTTH/BoostedObjects/interface/SubFilterJet.h"
-#include "BoostedTTH/BoostedObjects/interface/HEPTopJet.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 
 
@@ -50,8 +48,6 @@ struct InputCollections{
                     selectedJets(selectedJets_),
                     selectedJetsLoose(selectedJetsLoose_),
                     pfMets(pfMets_),
-                    selectedHEPTopJets(selectedHEPTopJets_),
-                    selectedSubFilterJets(selectedSubFilterJets_),
                     genParticles(genParticles_),
                     selectedGenJets(selectedGenJets_),
                     sampleType(sampleType_),
