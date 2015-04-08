@@ -30,8 +30,6 @@ struct InputCollections{
                     const std::vector<pat::Jet>&                  selectedJets_,
                     const std::vector<pat::Jet>&                  selectedJetsLoose_,
                     const std::vector<pat::MET>&                  pfMets_,
-                    const boosted::HEPTopJetCollection&           selectedHEPTopJets_,
-                    const boosted::SubFilterJetCollection&        selectedSubFilterJets_,
                     const std::vector<reco::GenParticle>&         genParticles_,
                     const std::vector<reco::GenJet>&              selectedGenJets_,
                     const SampleType                              sampleType_,
@@ -73,8 +71,6 @@ struct InputCollections{
   const std::vector<pat::Jet>&                  selectedJets;
   const std::vector<pat::Jet>&                  selectedJetsLoose;
   const std::vector<pat::MET>&                  pfMets;
-  const boosted::HEPTopJetCollection&           selectedHEPTopJets;
-  const boosted::SubFilterJetCollection&        selectedSubFilterJets;
   const std::vector<reco::GenParticle>&         genParticles;
   const std::vector<reco::GenJet>&              selectedGenJets;
   const SampleType                              sampleType;
