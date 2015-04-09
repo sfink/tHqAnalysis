@@ -38,7 +38,7 @@ void tHqEvent::ResetEvent(){
 
 
 void tHqEvent::LeptonRec(){
-  lepVecCand = BoostedUtils::GetPrimLepVec(input.selectedElectronsLoose,input.selectedMuonsLoose);
+  lepVecCand = tHqUtils::GetPrimLepVec(input.selectedElectronsLoose,input.selectedMuonsLoose);
 }
 
 
@@ -47,7 +47,7 @@ void tHqEvent::NeutrinoRec(){
   
   if(lepVecCand.Pt()<=0.001) return;
   
-  BoostedUtils::GetNuVecs(lepVecCand,metvec,nu1VecCand,nu2VecCand);
+  tHqUtils::GetNuVec(lepVecCand,metvec,nuVecCand);
 }
 
 
@@ -71,19 +71,19 @@ void tHqEvent::ak5JetsRec(){
   nCleanedBTagT = 0;
   
   for(std::vector<pat::Jet>::const_iterator itJet=input.selectedJets.begin();itJet!=input.selectedJets.end();++itJet){
-    if(lepVecCand.Pt()>0.001 && BoostedUtils::DeltaR(lepVecCand,itJet->p4())<.5) continue;
+    if(lepVecCand.Pt()>0.001 && tHqUtils::DeltaR(lepVecCand,itJet->p4())<.5) continue;
     
     nJets++;
     selectedJets.push_back(*itJet);
     cleanedak5Jets.push_back(*itJet);
   }
   for(std::vector<pat::Jet>::const_iterator itJet=selectedJets.begin();itJet!=selectedJets.end();++itJet){
-    if(BoostedUtils::PassesCSV(*itJet,'L')) nBTagL++;
-    BTagL.push_back(BoostedUtils::PassesCSV(*itJet,'L'));
-    if(BoostedUtils::PassesCSV(*itJet,'M')) nBTagM++;
-    BTagM.push_back(BoostedUtils::PassesCSV(*itJet,'M'));
-    if(BoostedUtils::PassesCSV(*itJet,'T')) nBTagT++;
-    BTagT.push_back(BoostedUtils::PassesCSV(*itJet,'T'));
+    if(tHqUtils::PassesCSV(*itJet,'L')) nBTagL++;
+    BTagL.push_back(tHqUtils::PassesCSV(*itJet,'L'));
+    if(tHqUtils::PassesCSV(*itJet,'M')) nBTagM++;
+    BTagM.push_back(tHqUtils::PassesCSV(*itJet,'M'));
+    if(tHqUtils::PassesCSV(*itJet,'T')) nBTagT++;
+    BTagT.push_back(tHqUtils::PassesCSV(*itJet,'T'));
   }
   
   nCleanedak5Jets = nJets;

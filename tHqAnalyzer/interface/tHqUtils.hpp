@@ -63,7 +63,7 @@ class tHqUtils{
     static std::vector<math::XYZTLorentzVector> GetLepVecs(const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon> selectedMuons);
     static math::XYZTLorentzVector GetPrimLepVec(const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon> selectedMuons);
     
-    static math::XYZTLorentzVector GetNuVec(const math::XYZTLorentzVector& lepvec, const TVector2& metvec); 
+    static void GetNuVec(const math::XYZTLorentzVector& lepvec, const TVector2& metvec, math::XYZTLorentzVector& nuvec); 
     
     static std::vector<math::XYZTLorentzVector> GetJetVecs(const std::vector<pat::Jet>& jets);
     
@@ -86,7 +86,7 @@ class tHqUtils{
 
 
 template <typename PATObj1, typename PATObj2> 
-PATObj1 BoostedUtils::RemoveOverlap( const std::vector<PATObj2>& other, const PATObj1& unclean ){
+PATObj1 tHqUtils::RemoveOverlap( const std::vector<PATObj2>& other, const PATObj1& unclean ){
 
   unsigned int nSources1 = unclean.numberOfSourceCandidatePtrs();
   bool hasOverlaps = false;
@@ -137,7 +137,7 @@ PATObj1 BoostedUtils::RemoveOverlap( const std::vector<PATObj2>& other, const PA
 
 
 template <typename PATObj1, typename PATObj2> 
-std::vector<PATObj1> BoostedUtils::RemoveOverlaps( const std::vector<PATObj2>& other, const std::vector<PATObj1>& unclean ){
+std::vector<PATObj1> tHqUtils::RemoveOverlaps( const std::vector<PATObj2>& other, const std::vector<PATObj1>& unclean ){
 
   std::vector<PATObj1> cleaned;
   

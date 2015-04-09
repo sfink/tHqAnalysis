@@ -389,10 +389,8 @@ math::XYZTLorentzVector tHqUtils::GetPrimLepVec(const std::vector<pat::Electron>
 }
 
 
-math::XYZTLorentzVector tHqUtils::GetNuVec(const math::XYZTLorentzVector& lepvec, const TVector2& metvec){
+void tHqUtils::GetNuVec(const math::XYZTLorentzVector& lepvec, const TVector2& metvec, math::XYZTLorentzVector& nuvec){
   
-  math::XYZTLorentzVector nu; 
-
   float nu_e  = std::sqrt(metvec.Mod2());
   float nu_px = metvec.Px();
   float nu_py = metvec.Py();
@@ -405,8 +403,8 @@ math::XYZTLorentzVector tHqUtils::GetNuVec(const math::XYZTLorentzVector& lepvec
 
   float mw  = 80.43;
 
-  float nupt  = std::sqrt((lep_px+nu_px)*(lep_px+nu_px)+
-			(lep_py+nu_py)*(lep_py+nu_py));
+  //  float nupt_temp  = std::sqrt((lep_px+nu_px)*(lep_px+nu_px)+
+  //(lep_py+nu_py)*(lep_py+nu_py));
 
   float mtsq= ((lep_pt+nu_e)*(lep_pt+nu_e) -
 	       (lep_px+nu_px)*(lep_px+nu_px) -
@@ -437,16 +435,11 @@ math::XYZTLorentzVector tHqUtils::GetNuVec(const math::XYZTLorentzVector& lepvec
   S2 = (-(A+B)*lep_pz - (A+B)*lep_e*C)/(lep_pz*lep_pz-lep_e*lep_e);
 
   float nu_pz = (std::abs(S1) < std::abs(S2)) ? S1 : S2;
+  nu_e = sqrt(metvec.Mod2()+nu_pz*nu_pz);
+//  nuvec.SetPtEtaPhiM(nupt,nueta,nuphi,0);
+  nuvec.SetPxPyPzE(nu_px,nu_py,nu_pz,nu_e);
 
-  float nupt=std::sqrt((nu_px)*(nu_px)+
-		       (nu_py)*(nu_py));
-  float nueta=nu.Eta();
-  float nuphi=nu.Phi();
-
-  nu.SetPtEtaPhiM(nupt,nueta,nuphi,0);
-
-
-  return nu;
+  return;
 }
 
 
