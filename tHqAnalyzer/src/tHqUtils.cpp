@@ -389,25 +389,64 @@ math::XYZTLorentzVector tHqUtils::GetPrimLepVec(const std::vector<pat::Electron>
 }
 
 
-void tHqUtils::GetNuVecs(const math::XYZTLorentzVector& lepvec, const TVector2& metvec, math::XYZTLorentzVector& nu1, math::XYZTLorentzVector& nu2){
+math::XYZTLorentzVector tHqUtils::GetNuVec(const math::XYZTLorentzVector& lepvec, const TVector2& metvec){
   
-  double mu = (80.4*80.4)/2 + metvec.Px()*lepvec.Px() + metvec.Py()*lepvec.Py();
-  double a = (mu*lepvec.Pz())/(lepvec.E()*lepvec.E() - lepvec.Pz()*lepvec.Pz());
-  double a2 = TMath::Power(a, 2);
-  double b = (TMath::Power(lepvec.E(), 2.)*metvec.Mod() - TMath::Power(mu, 2.)) / (TMath::Power(lepvec.E(), 2)- TMath::Power(lepvec.Pz(), 2));
-  float pz1,pz2;
-  
-  if (a2-b < 0) { 
-    pz1 = a;
-    pz2 = a;
-  } else {
-    double root = sqrt(a2-b);
-    pz1 = a + root;
-    pz2 = a - root;
+  math::XYZTLorentzVector nu; 
+
+  float nu_e  = std::sqrt(metvec.Mod2());
+  float nu_px = metvec.Px();
+  float nu_py = metvec.Py();
+
+  float lep_e  = lepvec.E();
+  float lep_pt = lepvec.Pt();
+  float lep_px = lepvec.Px();
+  float lep_py = lepvec.Py();
+  float lep_pz = lepvec.Pz();
+
+  float mw  = 80.43;
+
+  float nupt  = std::sqrt((lep_px+nu_px)*(lep_px+nu_px)+
+			(lep_py+nu_py)*(lep_py+nu_py));
+
+  float mtsq= ((lep_pt+nu_e)*(lep_pt+nu_e) -
+	       (lep_px+nu_px)*(lep_px+nu_px) -
+	       (lep_py+nu_py)*(lep_py+nu_py));
+
+  float mt  = (mtsq>0.0) ? std::sqrt(mtsq) : 0.0;
+
+  float A, B, Csq, C, S1, S2;
+  float scf(1.0);
+
+  if (mt < mw) {
+    A = mw*mw/2.0;
   }
-  
-  nu1.SetPxPyPzE(metvec.Px(),metvec.Py(),pz1,sqrt(metvec.Mod2()+pz1*pz1));
-  nu2.SetPxPyPzE(metvec.Px(),metvec.Py(),pz2,sqrt(metvec.Mod2()+pz2*pz2));
+  else {
+    A = mt*mt/2.0;
+    float k = nu_e*lep_pt - nu_px*lep_px - nu_py*lep_py;
+    if (k <0.0001) k = 0.0001;
+    scf = 0.5*(mw*mw)/k;
+    nu_px *= scf;
+    nu_py *= scf;
+    nu_e  = sqrt(nu_px*nu_px + nu_py*nu_py);
+  }
+
+  B  = nu_px*lep_px + nu_py*lep_py;
+  Csq= 1.0 + nu_e*nu_e*(lep_pz*lep_pz-lep_e*lep_e)/(A+B)/(A+B);
+  C  = (Csq>0.0) ? std::sqrt(Csq) : 0.0;
+  S1 = (-(A+B)*lep_pz + (A+B)*lep_e*C)/(lep_pz*lep_pz-lep_e*lep_e);
+  S2 = (-(A+B)*lep_pz - (A+B)*lep_e*C)/(lep_pz*lep_pz-lep_e*lep_e);
+
+  float nu_pz = (std::abs(S1) < std::abs(S2)) ? S1 : S2;
+
+  float nupt=std::sqrt((nu_px)*(nu_px)+
+		       (nu_py)*(nu_py));
+  float nueta=nu.Eta();
+  float nuphi=nu.Phi();
+
+  nu.SetPtEtaPhiM(nupt,nueta,nuphi,0);
+
+
+  return nu;
 }
 
 

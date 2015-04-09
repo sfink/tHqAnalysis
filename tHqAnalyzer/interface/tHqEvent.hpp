@@ -6,13 +6,9 @@
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/MET.h"
-#include "tHqAnalysis/tHqObjects/interface/SubFilterJet.h"
-#include "tHqAnalysis/tHqObjects/interface/HEPTopJet.h"
 
 #include "tHqAnalysis/tHqAnalyzer/interface/InputCollections.hpp"
-#include "tHqAnalysis/tHqAnalyzer/interface/BoostedUtils.hpp"
-#include "tHqAnalysis/tHqAnalyzer/interface/TopTagger.hpp"
-#include "tHqAnalysis/tHqAnalyzer/interface/HiggsTagger.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/tHqUtils.hpp"
 
 class tHqEvent{
   

@@ -19,8 +19,6 @@
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/MET.h"
-#include "tHqAnalysis/tHqObjects/interface/SubFilterJet.h"
-#include "tHqAnalysis/tHqObjects/interface/HEPTopJet.h"
 
 class tHqUtils{
   
@@ -65,7 +63,7 @@ class tHqUtils{
     static std::vector<math::XYZTLorentzVector> GetLepVecs(const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon> selectedMuons);
     static math::XYZTLorentzVector GetPrimLepVec(const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon> selectedMuons);
     
-  static void GetNuVecs(const math::XYZTLorentzVector& lepvec, const TVector2& metvec, math::XYZTLorentzVector& nu1, math::XYZTLorentzVector& nu2); // edit needed \\\\\\\\\\\\\\\\
+    static math::XYZTLorentzVector GetNuVec(const math::XYZTLorentzVector& lepvec, const TVector2& metvec); 
     
     static std::vector<math::XYZTLorentzVector> GetJetVecs(const std::vector<pat::Jet>& jets);
     
