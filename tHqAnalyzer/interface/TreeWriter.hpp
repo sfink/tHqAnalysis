@@ -6,9 +6,9 @@
 #include "TFile.h"
 #include "TTree.h"
 
-#include "BoostedTTH/BoostedAnalyzer/interface/VariableContainer.hpp"
-#include "BoostedTTH/BoostedAnalyzer/interface/InputCollections.hpp"
-#include "BoostedTTH/BoostedAnalyzer/interface/TreeProcessor.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/VariableContainer.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/InputCollections.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/TreeProcessor.hpp"
 
 /*
   The TreeWriter is used to write all the variables that are used in the MVA analysis in flat TTrees. Different Processors can be loaded that write a certain class of variables. Calculating BDT outputs and histograms from these variables will be supported soon.

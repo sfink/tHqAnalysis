@@ -1,7 +1,7 @@
 #include "DataFormats/Common/interface/Wrapper.h"
 
 //Add includes for your classes here
-#include "BoostedTTH/BoostedObjects/interface/Event.h"
+#include "tHqAnalysis/tHqObjects/interface/Event.h"
 
 #include <vector>
 

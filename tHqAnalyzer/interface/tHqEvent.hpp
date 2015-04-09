@@ -1,18 +1,18 @@
 #ifndef THQANALYZER_THQEVENT_HPP
 #define THQANALYZER_THQEVENT_HPP
 
-#include "BoostedTTH/BoostedObjects/interface/Event.h"
+#include "tHqAnalysis/tHqObjects/interface/Event.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/MET.h"
-#include "BoostedTTH/BoostedObjects/interface/SubFilterJet.h"
-#include "BoostedTTH/BoostedObjects/interface/HEPTopJet.h"
+#include "tHqAnalysis/tHqObjects/interface/SubFilterJet.h"
+#include "tHqAnalysis/tHqObjects/interface/HEPTopJet.h"
 
-#include "BoostedTTH/BoostedAnalyzer/interface/InputCollections.hpp"
-#include "BoostedTTH/BoostedAnalyzer/interface/BoostedUtils.hpp"
-#include "BoostedTTH/BoostedAnalyzer/interface/TopTagger.hpp"
-#include "BoostedTTH/BoostedAnalyzer/interface/HiggsTagger.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/InputCollections.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/BoostedUtils.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/TopTagger.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/HiggsTagger.hpp"
 
 class tHqEvent{
   

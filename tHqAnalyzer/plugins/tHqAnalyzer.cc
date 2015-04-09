@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
-// Package:    BoostedTTH/BoostedAnalyzer
+// Package:    tHqAnalysis/tHqAnalyzer
 // Class:      BoostedAnalyzer
 // 
-/**\class BoostedAnalyzer BoostedAnalyzer.cc BoostedTTH/BoostedAnalyzer/plugins/BoostedAnalyzer.cc
+/**\class BoostedAnalyzer BoostedAnalyzer.cc tHqAnalysis/tHqAnalyzer/plugins/BoostedAnalyzer.cc
 
  Description: [one line class summary]
 
@@ -41,25 +41,25 @@
 
 #include "MiniAOD/MiniAODHelper/interface/MiniAODHelper.h"
 
-#include "BoostedTTH/BoostedAnalyzer/interface/BoostedUtils.hpp"
-#include "BoostedTTH/BoostedAnalyzer/interface/InputCollections.hpp"
-#include "BoostedTTH/BoostedAnalyzer/interface/Cutflow.hpp"
-#include "BoostedTTH/BoostedAnalyzer/interface/TreeWriter.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/BoostedUtils.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/InputCollections.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/Cutflow.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/TreeWriter.hpp"
 
-#include "BoostedTTH/BoostedAnalyzer/interface/TopTagger.hpp"
-#include "BoostedTTH/BoostedAnalyzer/interface/HiggsTagger.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/TopTagger.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/HiggsTagger.hpp"
 
-#include "BoostedTTH/BoostedAnalyzer/interface/Selection.hpp"
-#include "BoostedTTH/BoostedAnalyzer/interface/LeptonSelection.hpp"
-#include "BoostedTTH/BoostedAnalyzer/interface/JetTagSelection.hpp"
-#include "BoostedTTH/BoostedAnalyzer/interface/SynchSelection.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/Selection.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/LeptonSelection.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/JetTagSelection.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/SynchSelection.hpp"
 
-#include "BoostedTTH/BoostedAnalyzer/interface/WeightProcessor.hpp"
-#include "BoostedTTH/BoostedAnalyzer/interface/MCMatchVarProcessor.hpp"
-#include "BoostedTTH/BoostedAnalyzer/interface/MVAVarProcessor.hpp"
-#include "BoostedTTH/BoostedAnalyzer/interface/BDTVarProcessor.hpp"
-#include "BoostedTTH/BoostedAnalyzer/interface/BoostedJetVarProcessor.hpp"
-#include "BoostedTTH/BoostedAnalyzer/interface/ttHVarProcessor.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/WeightProcessor.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/MCMatchVarProcessor.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/MVAVarProcessor.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/BDTVarProcessor.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/BoostedJetVarProcessor.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/ttHVarProcessor.hpp"
 
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 

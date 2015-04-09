@@ -1,4 +1,4 @@
-#include "BoostedTTH/BoostedAnalyzer/interface/TreeWriter.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/TreeWriter.hpp"
 
 using namespace std;
 
