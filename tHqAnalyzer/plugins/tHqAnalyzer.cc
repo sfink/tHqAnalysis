@@ -64,10 +64,10 @@
 // class declaration
 //
 
-class BoostedAnalyzer : public edm::EDAnalyzer {
+class tHqAnalyzer : public edm::EDAnalyzer {
    public:
-      explicit BoostedAnalyzer(const edm::ParameterSet&);
-      ~BoostedAnalyzer();
+      explicit tHqAnalyzer(const edm::ParameterSet&);
+      ~tHqAnalyzer();
 
       static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -93,7 +93,7 @@ class BoostedAnalyzer : public edm::EDAnalyzer {
   //    Cutflow cutflow;
      
       /** selections that are applied */
-      vector<Selection*> selections;
+      //vector<Selection*> selections;
       
       /** sample ID */
       int sampleID;
@@ -256,10 +256,10 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig)
     if(*itPro == "WeightProcessor") treewriter.AddTreeProcessor(new WeightProcessor());
     else if(*itPro == "MCMatchVarProcessor") treewriter.AddTreeProcessor(new MCMatchVarProcessor());
     else if(*itPro == "MVAVarProcessor") treewriter.AddTreeProcessor(new MVAVarProcessor());
-    else if(*itPro == "BoostedJetVarProcessor") treewriter.AddTreeProcessor(new BoostedJetVarProcessor());
-    else if(*itPro == "BoostedTopHiggsVarProcessor") treewriter.AddTreeProcessor(new ttHVarProcessor(BoostedRecoType::BoostedTopHiggs,"TopLikelihood","HiggsCSV","BoostedTopHiggs_"));
-    else if(*itPro == "BoostedTopVarProcessor") treewriter.AddTreeProcessor(new ttHVarProcessor(BoostedRecoType::BoostedTop,"TopLikelihood","HiggsCSV","BoostedTop_"));
-    else if(*itPro == "BoostedHiggsVarProcessor") treewriter.AddTreeProcessor(new ttHVarProcessor(BoostedRecoType::BoostedHiggs,"TopLikelihood","HiggsCSV","BoostedHiggs_"));
+    else if(*itPro == "tHqJetVarProcessor") treewriter.AddTreeProcessor(new tHqJetVarProcessor());
+    else if(*itPro == "tHqTopHiggsVarProcessor") treewriter.AddTreeProcessor(new ttHVarProcessor(tHqRecoType::tHqTopHiggs,"TopLikelihood","HiggsCSV","tHqTopHiggs_"));
+    else if(*itPro == "tHqTopVarProcessor") treewriter.AddTreeProcessor(new ttHVarProcessor(tHqRecoType::tHqTop,"TopLikelihood","HiggsCSV","tHqTop_"));
+    else if(*itPro == "tHqHiggsVarProcessor") treewriter.AddTreeProcessor(new ttHVarProcessor(tHqRecoType::tHqHiggs,"TopLikelihood","HiggsCSV","tHqHiggs_"));
     // the BDT processor rely on the variables filled py the other producers and should be added at the end
     else if(*itPro == "BDTVarProcessor") treewriter.AddTreeProcessor(new BDTVarProcessor());
     
@@ -397,7 +397,7 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   if(useFatJets){
     iEvent.getByToken( EDMHEPTopJetsToken,h_heptopjet);
     boosted::HEPTopJetCollection const &heptopjets_unsorted = *h_heptopjet;
-    heptopjets = BoostedUtils::GetSortedByPt(heptopjets_unsorted);
+    heptopjets = tHqUtils::GetSortedByPt(heptopjets_unsorted);
   }
   
   /**** GET SUBFILTERJETS ****/
@@ -406,7 +406,7 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   if(useFatJets){
     iEvent.getByToken( EDMSubFilterJetsToken,h_subfilterjet );
     boosted::SubFilterJetCollection const &subfilterjets_unsorted = *h_subfilterjet;
-    subfilterjets = BoostedUtils::GetSortedByPt(subfilterjets_unsorted);
+    subfilterjets = tHqUtils::GetSortedByPt(subfilterjets_unsorted);
   }
   
   /**** GET GENEVENTINFO ****/
@@ -428,17 +428,17 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       selectedGenJets.push_back(genjets[i]);
   }
   
-  // Fill Boosted Event Object
+  // Fill tHq Event Object
   boosted::Event event = FillEvent(iEvent,h_geneventinfo,h_beamspot,h_hcalnoisesummary,h_puinfosummary);
   
   // FIGURE OUT SAMPLE
   SampleType sampleType;
   if(isData)
     sampleType = SampleType::data;
-  else if(BoostedUtils::MCContainsTTbar(genParticles) && BoostedUtils::MCContainsHiggs(genParticles)){
+  else if(tHqUtils::MCContainsTTbar(genParticles) && tHqUtils::MCContainsHiggs(genParticles)){
     sampleType = SampleType::tth;
   }
-  else if(BoostedUtils::MCContainsTTbar(genParticles)){
+  else if(tHqUtils::MCContainsTTbar(genParticles)){
     sampleType = SampleType::tt;
   }
   else{
