@@ -43,10 +43,10 @@
 
 #include "tHqAnalysis/tHqAnalyzer/interface/tHqUtils.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/InputCollections.hpp"
-//#include "tHqAnalysis/tHqAnalyzer/interface/Cutflow.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/Cutflow.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/TreeWriter.hpp"
 
-//#include "tHqAnalysis/tHqAnalyzer/interface/Selection.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/Selection.hpp"
 //#include "tHqAnalysis/tHqAnalyzer/interface/LeptonSelection.hpp"
 //#include "tHqAnalysis/tHqAnalyzer/interface/JetTagSelection.hpp"
 //#include "tHqAnalysis/tHqAnalyzer/interface/SynchSelection.hpp"
@@ -90,10 +90,10 @@ class tHqAnalyzer : public edm::EDAnalyzer {
       TreeWriter treewriter;
       
       /** stores cutflow*/
-  //    Cutflow cutflow;
+      Cutflow cutflow;
      
       /** selections that are applied */
-      //vector<Selection*> selections;
+      vector<Selection*> selections;
       
       /** sample ID */
       int sampleID;
@@ -206,7 +206,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig)
   totalMCevents = iConfig.getParameter<int>("nMCEvents");
   isData = iConfig.getParameter<bool>("isData");
   
-  useFatJets = iConfig.getParameter<bool>("useFatJets");
+  //  useFatJets = iConfig.getParameter<bool>("useFatJets");
   disableObjectSelections = iConfig.getParameter<bool>("disableObjectSelections");
 
   string outfileName = iConfig.getParameter<std::string>("outfileName");
@@ -224,8 +224,8 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig)
   EDMElectronsToken       = consumes< std::vector<pat::Electron> >(edm::InputTag("slimmedElectrons","","PAT"));
   EDMJetsToken            = consumes< std::vector<pat::Jet> >(edm::InputTag("slimmedJets","","PAT"));
   EDMMETsToken            = consumes< std::vector<pat::MET> >(edm::InputTag("slimmedMETs","","PAT"));
-  EDMHEPTopJetsToken      = consumes< boosted::HEPTopJetCollection >(edm::InputTag("HEPTopJetsPFMatcher","heptopjets","p"));
-  EDMSubFilterJetsToken   = consumes< boosted::SubFilterJetCollection >(edm::InputTag("CA12JetsCA3FilterjetsPFMatcher","subfilterjets","p"));
+  //EDMHEPTopJetsToken      = consumes< boosted::HEPTopJetCollection >(edm::InputTag("HEPTopJetsPFMatcher","heptopjets","p"));
+  // EDMSubFilterJetsToken   = consumes< boosted::SubFilterJetCollection >(edm::InputTag("CA12JetsCA3FilterjetsPFMatcher","subfilterjets","p"));
   EDMGenInfoToken         = consumes< GenEventInfoProduct >(edm::InputTag("generator","","SIM"));
   EDMGenParticlesToken    = consumes< std::vector<reco::GenParticle> >(edm::InputTag("prunedGenParticles","","PAT"));
   EDMGenJetsToken         = consumes< std::vector<reco::GenJet> >(edm::InputTag("slimmedGenJets","","PAT"));
@@ -238,7 +238,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig)
   cutflow.AddStep("all");
   
   std::vector<std::string> selectionNames = iConfig.getParameter< std::vector<std::string> >("selectionNames");
-  for(vector<string>::const_iterator itSel = selectionNames.begin();itSel != selectionNames.end();itSel++) {
+  /*  for(vector<string>::const_iterator itSel = selectionNames.begin();itSel != selectionNames.end();itSel++) {
     
     if(*itSel == "LeptonSelection") selections.push_back(new LeptonSelection());
     else if(*itSel == "JetTagSelection") selections.push_back(new JetTagSelection());
@@ -246,12 +246,12 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig)
     else cout << "No matching selection found for: " << *itSel << endl;
     
     selections.back()->Init(iConfig,cutflow);
-  }
+    } */
   
   // INITIALIZE TREEWRITER
   treewriter.Init(outfileName);
   std::vector<std::string> processorNames = iConfig.getParameter< std::vector<std::string> >("processorNames");
-  for(vector<string>::const_iterator itPro = processorNames.begin();itPro != processorNames.end();++itPro) {
+  /*  for(vector<string>::const_iterator itPro = processorNames.begin();itPro != processorNames.end();++itPro) {
     
     if(*itPro == "WeightProcessor") treewriter.AddTreeProcessor(new WeightProcessor());
     else if(*itPro == "MCMatchVarProcessor") treewriter.AddTreeProcessor(new MCMatchVarProcessor());
@@ -264,7 +264,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig)
     else if(*itPro == "BDTVarProcessor") treewriter.AddTreeProcessor(new BDTVarProcessor());
     
     else cout << "No matching processor found for: " << *itPro << endl;    
-  }
+    } */
 }
 
 
@@ -392,22 +392,22 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::vector<pat::MET> const &pfMETs = *h_pfmet;
 
   /**** GET TOPJETS ****/
-  edm::Handle<boosted::HEPTopJetCollection> h_heptopjet;
+  /* edm::Handle<boosted::HEPTopJetCollection> h_heptopjet;
   boosted::HEPTopJetCollection heptopjets;
   if(useFatJets){
     iEvent.getByToken( EDMHEPTopJetsToken,h_heptopjet);
     boosted::HEPTopJetCollection const &heptopjets_unsorted = *h_heptopjet;
     heptopjets = tHqUtils::GetSortedByPt(heptopjets_unsorted);
-  }
+    }*/
   
   /**** GET SUBFILTERJETS ****/
-  edm::Handle<boosted::SubFilterJetCollection> h_subfilterjet;                   
+  /*  edm::Handle<boosted::SubFilterJetCollection> h_subfilterjet;                   
   boosted::SubFilterJetCollection subfilterjets;
   if(useFatJets){
     iEvent.getByToken( EDMSubFilterJetsToken,h_subfilterjet );
     boosted::SubFilterJetCollection const &subfilterjets_unsorted = *h_subfilterjet;
     subfilterjets = tHqUtils::GetSortedByPt(subfilterjets_unsorted);
-  }
+    }*/
   
   /**** GET GENEVENTINFO ****/
   edm::Handle<GenEventInfoProduct> h_geneventinfo;
@@ -461,8 +461,8 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                           selectedJets,
                           selectedJetsLoose,
                           pfMETs,
-                          heptopjets,
-                          subfilterjets,
+			  // heptopjets,
+                          //subfilterjets,
                           genParticles,
                           selectedGenJets,
                           sampleType,
@@ -482,8 +482,8 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                           pfjets,
                           pfjets,
                           pfMETs,
-                          heptopjets,
-                          subfilterjets,
+				     //heptopjets,
+				     //subfilterjets,
                           genParticles,
                           selectedGenJets,
                           sampleType,
