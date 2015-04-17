@@ -41,25 +41,22 @@
 
 #include "MiniAOD/MiniAODHelper/interface/MiniAODHelper.h"
 
-#include "tHqAnalysis/tHqAnalyzer/interface/BoostedUtils.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/tHqUtils.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/InputCollections.hpp"
-#include "tHqAnalysis/tHqAnalyzer/interface/Cutflow.hpp"
+//#include "tHqAnalysis/tHqAnalyzer/interface/Cutflow.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/TreeWriter.hpp"
 
-#include "tHqAnalysis/tHqAnalyzer/interface/TopTagger.hpp"
-#include "tHqAnalysis/tHqAnalyzer/interface/HiggsTagger.hpp"
+//#include "tHqAnalysis/tHqAnalyzer/interface/Selection.hpp"
+//#include "tHqAnalysis/tHqAnalyzer/interface/LeptonSelection.hpp"
+//#include "tHqAnalysis/tHqAnalyzer/interface/JetTagSelection.hpp"
+//#include "tHqAnalysis/tHqAnalyzer/interface/SynchSelection.hpp"
 
-#include "tHqAnalysis/tHqAnalyzer/interface/Selection.hpp"
-#include "tHqAnalysis/tHqAnalyzer/interface/LeptonSelection.hpp"
-#include "tHqAnalysis/tHqAnalyzer/interface/JetTagSelection.hpp"
-#include "tHqAnalysis/tHqAnalyzer/interface/SynchSelection.hpp"
-
-#include "tHqAnalysis/tHqAnalyzer/interface/WeightProcessor.hpp"
-#include "tHqAnalysis/tHqAnalyzer/interface/MCMatchVarProcessor.hpp"
-#include "tHqAnalysis/tHqAnalyzer/interface/MVAVarProcessor.hpp"
-#include "tHqAnalysis/tHqAnalyzer/interface/BDTVarProcessor.hpp"
-#include "tHqAnalysis/tHqAnalyzer/interface/BoostedJetVarProcessor.hpp"
-#include "tHqAnalysis/tHqAnalyzer/interface/ttHVarProcessor.hpp"
+//#include "tHqAnalysis/tHqAnalyzer/interface/WeightProcessor.hpp"
+//#include "tHqAnalysis/tHqAnalyzer/interface/MCMatchVarProcessor.hpp"
+//#include "tHqAnalysis/tHqAnalyzer/interface/MVAVarProcessor.hpp"
+//#include "tHqAnalysis/tHqAnalyzer/interface/BDTVarProcessor.hpp"
+//#include "tHqAnalysis/tHqAnalyzer/interface/BoostedJetVarProcessor.hpp"
+//#include "tHqAnalysis/tHqAnalyzer/interface/ttHVarProcessor.hpp"
 
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 
@@ -93,14 +90,8 @@ class BoostedAnalyzer : public edm::EDAnalyzer {
       TreeWriter treewriter;
       
       /** stores cutflow*/
-      Cutflow cutflow;
-      
-      /** toptagger used for selection */
-      TopTagger toptagger;
-      
-      /** toptagger used for selection */
-      HiggsTagger higgstagger;
-      
+  //    Cutflow cutflow;
+     
       /** selections that are applied */
       vector<Selection*> selections;
       
@@ -132,9 +123,6 @@ class BoostedAnalyzer : public edm::EDAnalyzer {
       /** disable some object selections for synch exe? */
       bool disableObjectSelections;
 
-       /** use fat jets? this is only possible if the miniAOD contains them */
-      bool useFatJets;
-      
       /** calculate and store systematic weights? */
       bool doSystematics;
       
@@ -174,10 +162,10 @@ class BoostedAnalyzer : public edm::EDAnalyzer {
       edm::EDGetTokenT< std::vector<pat::MET> > EDMMETsToken;
       
       /** hep top jets data access token **/
-      edm::EDGetTokenT< boosted::HEPTopJetCollection > EDMHEPTopJetsToken;
+  //      edm::EDGetTokenT< boosted::HEPTopJetCollection > EDMHEPTopJetsToken;
       
       /** subjet filterjets data access token **/
-      edm::EDGetTokenT< boosted::SubFilterJetCollection > EDMSubFilterJetsToken;
+  //      edm::EDGetTokenT< boosted::SubFilterJetCollection > EDMSubFilterJetsToken;
       
       /** gen info data access token **/
       edm::EDGetTokenT< GenEventInfoProduct > EDMGenInfoToken;
@@ -200,7 +188,7 @@ class BoostedAnalyzer : public edm::EDAnalyzer {
 //
 // constructors and destructor
 //
-BoostedAnalyzer::BoostedAnalyzer(const edm::ParameterSet& iConfig)
+tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig)
 {
 
   std::string era = iConfig.getParameter<std::string>("era");
@@ -280,7 +268,7 @@ BoostedAnalyzer::BoostedAnalyzer(const edm::ParameterSet& iConfig)
 }
 
 
-BoostedAnalyzer::~BoostedAnalyzer()
+tHqAnalyzer::~tHqAnalyzer()
 {
  
    // do anything here that needs to be done at desctruction time
@@ -295,7 +283,7 @@ BoostedAnalyzer::~BoostedAnalyzer()
 
 // ------------ method called for each event  ------------
 void
-BoostedAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   if(eventcount<10||eventcount%1000==0){
     cout << "Analyzing event " << eventcount << endl;
@@ -529,7 +517,7 @@ BoostedAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 }
 
 
-boosted::Event BoostedAnalyzer::FillEvent(const edm::Event& iEvent, const edm::Handle<GenEventInfoProduct>& genEvtInfo, const edm::Handle<reco::BeamSpot>& beamSpot, const edm::Handle<HcalNoiseSummary>& hcalNoiseSummary, const edm::Handle< std::vector<PileupSummaryInfo> >& puSummaryInfo){
+boosted::Event tHqAnalyzer::FillEvent(const edm::Event& iEvent, const edm::Handle<GenEventInfoProduct>& genEvtInfo, const edm::Handle<reco::BeamSpot>& beamSpot, const edm::Handle<HcalNoiseSummary>& hcalNoiseSummary, const edm::Handle< std::vector<PileupSummaryInfo> >& puSummaryInfo){
  
   boosted::Event event = boosted::Event();
   
@@ -602,7 +590,7 @@ boosted::Event BoostedAnalyzer::FillEvent(const edm::Event& iEvent, const edm::H
 }
 
 
-map<string,float> BoostedAnalyzer::GetWeights(const boosted::Event& event, const reco::VertexCollection& selectedPVs, const std::vector<pat::Jet>& selectedJets, const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon>& selectedMuons, const std::vector<reco::GenParticle>& genParticles){
+map<string,float> tHqAnalyzer::GetWeights(const boosted::Event& event, const reco::VertexCollection& selectedPVs, const std::vector<pat::Jet>& selectedJets, const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon>& selectedMuons, const std::vector<reco::GenParticle>& genParticles){
   map<string,float> weights;
   
   if(isData){
@@ -668,7 +656,7 @@ map<string,float> BoostedAnalyzer::GetWeights(const boosted::Event& event, const
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
-BoostedAnalyzer::beginJob()
+tHqAnalyzer::beginJob()
 {
   eventcount=0;
 
@@ -678,14 +666,14 @@ BoostedAnalyzer::beginJob()
 
 // ------------ method called once each job just after ending the event loop  ------------
 void 
-BoostedAnalyzer::endJob() 
+tHqAnalyzer::endJob() 
 {
   cutflow.Print();
 }
 // ------------ method called when starting to processes a run ------------
 // needed for the hlt_config_
 void
-BoostedAnalyzer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
+tHqAnalyzer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
 {
 std::string hltTag="HLT";
 bool hltchanged = true;
@@ -698,7 +686,7 @@ return;
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void
-BoostedAnalyzer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+tHqAnalyzer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -707,4 +695,4 @@ BoostedAnalyzer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) 
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(BoostedAnalyzer);
+DEFINE_FWK_MODULE(tHqAnalyzer);
