@@ -53,7 +53,7 @@
 
 //#include "tHqAnalysis/tHqAnalyzer/interface/WeightProcessor.hpp"
 //#include "tHqAnalysis/tHqAnalyzer/interface/MCMatchVarProcessor.hpp"
-//#include "tHqAnalysis/tHqAnalyzer/interface/MVAVarProcessor.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/MVAVarProcessor.hpp"
 //#include "tHqAnalysis/tHqAnalyzer/interface/BDTVarProcessor.hpp"
 //#include "tHqAnalysis/tHqAnalyzer/interface/BoostedJetVarProcessor.hpp"
 //#include "tHqAnalysis/tHqAnalyzer/interface/ttHVarProcessor.hpp"
@@ -251,9 +251,9 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig)
   // INITIALIZE TREEWRITER
   treewriter.Init(outfileName);
   std::vector<std::string> processorNames = iConfig.getParameter< std::vector<std::string> >("processorNames");
-  /*  for(vector<string>::const_iterator itPro = processorNames.begin();itPro != processorNames.end();++itPro) {
+  for(vector<string>::const_iterator itPro = processorNames.begin();itPro != processorNames.end();++itPro) {
     
-    if(*itPro == "WeightProcessor") treewriter.AddTreeProcessor(new WeightProcessor());
+    /* if(*itPro == "WeightProcessor") treewriter.AddTreeProcessor(new WeightProcessor());
     else if(*itPro == "MCMatchVarProcessor") treewriter.AddTreeProcessor(new MCMatchVarProcessor());
     else if(*itPro == "MVAVarProcessor") treewriter.AddTreeProcessor(new MVAVarProcessor());
     else if(*itPro == "tHqJetVarProcessor") treewriter.AddTreeProcessor(new tHqJetVarProcessor());
@@ -262,9 +262,10 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig)
     else if(*itPro == "tHqHiggsVarProcessor") treewriter.AddTreeProcessor(new ttHVarProcessor(tHqRecoType::tHqHiggs,"TopLikelihood","HiggsCSV","tHqHiggs_"));
     // the BDT processor rely on the variables filled py the other producers and should be added at the end
     else if(*itPro == "BDTVarProcessor") treewriter.AddTreeProcessor(new BDTVarProcessor());
-    
+    */
+    if(*itPro == "MVAVarProcessor") treewriter.AddTreeProcessor(new MVAVarProcessor());
     else cout << "No matching processor found for: " << *itPro << endl;    
-    } */
+    } 
 }
 
 
