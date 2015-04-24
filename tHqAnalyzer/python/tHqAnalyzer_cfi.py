@@ -16,6 +16,7 @@ tHqAnalyzer = cms.EDAnalyzer(
     disableObjectSelections = cms.bool(False), # disables selection of some objects for synch exe
     outfileName = cms.string("tHqAnalyzed"),
     selectionNames = cms.vstring("LeptonSelection"),
-    processorNames = cms.vstring("MVAVarProcessor")
+#    processorNames = cms.vstring("MVAVarProcessor","TestVarProcessor")
+    processorNames = cms.vstring("TestVarProcessor")
 #    processorNames = cms.vstring("WeightProcessor","MCMatchVarProcessor","MVAVarProcessor","tHqJetVarProcessor","tHqTopHiggsVarProcessor","tHqTopVarProcessor","tHqHiggsVarProcessor")
 )

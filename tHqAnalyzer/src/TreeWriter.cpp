@@ -21,7 +21,7 @@ void TreeWriter::Init( std::string fileName){
   outFile = new TFile( (fileName+"_Tree.root").c_str(), "RECREATE" );
   outFile->cd();
   
-  tree = new TTree("MVATree","MVATree");
+  tree = new TTree("utm","utm");
   vars = VariableContainer();
 }
 
