@@ -171,6 +171,19 @@ float tHqUtils::CosThetaCM(const math::XYZTLorentzVector& vec,const math::XYZTLo
 }
 
 
+float tHqUtils::GetMuondBetaIso(const pat::Muon& muon){
+  float iso_photon = muon.photonIso();
+  float iso_neutrals = muon.neutralHadronIso();
+  float iso_sumPUPt = muon.pfIsolationR04().sumPUPt;
+  float iso_charged = muon.chargedHadronIso();
+  float pt = muon.pt();
+
+  float iso = std::max(0.,(iso_photon+iso_neutrals-0.5*iso_sumPUPt)+iso_charged)/pt;
+
+  return iso;
+}
+
+
 std::vector<math::XYZTLorentzVector> tHqUtils::GetGenParticleVecs(const std::vector<reco::GenParticle>& genParticles){
   std::vector<math::XYZTLorentzVector> genParticleVecs;
   

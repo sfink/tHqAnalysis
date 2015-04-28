@@ -50,6 +50,7 @@ class tHqUtils{
     
     static float CosThetaStar(const math::XYZTLorentzVector& vec1, const math::XYZTLorentzVector& vec2);
     static float CosThetaCM(const math::XYZTLorentzVector& vec,const math::XYZTLorentzVector& boostVec);
+    static float GetMuondBetaIso(const pat::Muon& muon);
     
     static std::vector<math::XYZTLorentzVector> GetGenParticleVecs(const std::vector<reco::GenParticle>& genParticles);
     static bool MCContainsTTbar(const std::vector<reco::GenParticle>& genParticles);

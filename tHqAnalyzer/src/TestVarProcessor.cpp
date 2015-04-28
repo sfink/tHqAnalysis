@@ -76,7 +76,7 @@ void TestVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVars( "mupt","nlmu" );
   vars.InitVars( "mueta","nlmu" );
   vars.InitVars( "muphi","nlmu" );
-  //  vars.InitVars( "muiso","nlmu" );
+  vars.InitVars( "muiso","nlmu" );
   vars.InitVars( "mucharge","nlmu" );
 
 
@@ -84,7 +84,7 @@ void TestVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVars( "elpt","nlel" );
   vars.InitVars( "eleta","nlel" );
   vars.InitVars( "elphi","nlel" );
-  // vars.InitVars( "eliso","nlel" );
+  vars.InitVars( "eliso","nlel" );
   vars.InitVars( "elcharge","nlel" );
   
   vars.InitVar( "met" );
@@ -206,7 +206,7 @@ void TestVarProcessor::Process(const InputCollections& input,VariableContainer& 
     vars.FillVars( "mupt",iMu,itMu->pt() );
     vars.FillVars( "mueta",iMu,itMu->eta() );
     vars.FillVars( "muphi",iMu,itMu->phi() );
-    vars.FillVars( "muiso",iMu,itMu->phi() );  //FIXME
+    vars.FillVars( "muiso",iMu,tHqUtils::GetMuondBetaIso(*itMu) );  //FIXME
     vars.FillVars( "mucharge",iMu,itMu->charge() ); 
   }
   
