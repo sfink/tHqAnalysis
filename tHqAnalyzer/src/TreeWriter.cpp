@@ -9,6 +9,7 @@ TreeWriter::TreeWriter(){
 
 TreeWriter::~TreeWriter(){
   outFile->cd();
+
   tree->Write(); 
   outFile->Write();
   outFile->Close();
@@ -19,9 +20,11 @@ TreeWriter::~TreeWriter(){
 void TreeWriter::Init( std::string fileName){
   
   outFile = new TFile( (fileName+"_Tree.root").c_str(), "RECREATE" );
-  outFile->cd();
-  
-  tree = new TTree("utm","utm");
+  //  outFile->cd();
+      
+  dir = (TDirectory*) outFile->mkdir("utm");
+  dir->cd();
+  tree = new TTree("t","t");
   vars = VariableContainer();
 }
 

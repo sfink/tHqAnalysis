@@ -32,7 +32,30 @@ void TestVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVars( "jtphi","njt" );
   vars.InitVars( "jteta","njt" );
   vars.InitVars( "jtcsvt","njt" );
-  vars.InitVars( "jtflv","njt" );   //NEW 
+
+  vars.InitVars( "jtntracks","njt" );
+  vars.InitVars( "jtarea","njt" );
+  vars.InitVars( "jtpull","njt" );
+  vars.InitVars( "jtcharge","njt" );
+  vars.InitVars( "jtid","njt" );
+  vars.InitVars( "jtchhadmult","njt" ); 
+
+  vars.InitVars( "jtndaughters","njt" );
+  vars.InitVars( "jtchmult","njt" );
+  vars.InitVars( "jtnhadronfrac","njt" );
+  vars.InitVars( "jthfhadronfrac","njt" );
+  vars.InitVars( "jtjer","njt" );
+
+  vars.InitVars( "jtgenflv","njt" );
+  vars.InitVars( "jtgenpt","njt" );
+  vars.InitVars( "jtgenphi","njt" );
+  vars.InitVars( "jtgeneta","njt" );
+  vars.InitVars( "jtgene","njt" );
+
+
+
+
+
   /*
   vars.InitVar( "Evt_E_PrimaryLepton" );
   vars.InitVar( "Evt_M_PrimaryLepton" );
@@ -132,8 +155,34 @@ void TestVarProcessor::Process(const InputCollections& input,VariableContainer& 
     vars.FillVars( "jteta",iJet,itJet->eta() );
     vars.FillVars( "jtphi",iJet,itJet->phi() );
     vars.FillVars( "jtcsvt",iJet,fmax(itJet->bDiscriminator(btagger),-.1) );        
-    vars.FillVars( "jtflv",iJet,itJet->partonFlavour() );        
+
+    vars.FillVars( "jtntracks",iJet,itJet->associatedTracks().size() );
+    vars.FillVars( "jtarea",iJet,itJet->jetArea() );
+    vars.FillVars( "jtpull",iJet,itJet->associatedTracks().size() );  // to implement 
+    vars.FillVars( "jtcharge",iJet,itJet->jetCharge() );
+    vars.FillVars( "jtid",iJet,itJet->associatedTracks().size() ); //to implement
+    //    vars.FillVars( "jtndaughters",iJet,itJet.numberOfDaughters());
+    //    vars.FillVars( "jtjer",iJet,itJet.pfSpecific().mChargedHadronEnergy ); //to implement
+    vars.FillVars( "jtgenflv",iJet,itJet->partonFlavour() );        
+    /*
+    if(itJet.isPFJet()){
+      vars.FillVars( "jtchhadmult",iJet,itJet.pfSpecific().mChargedHadronEnergy );
+      vars.FillVars( "jtchmult",iJet,itJet.pfSpecific().mChargedMultiplicity );
+      vars.FillVars( "jtnhadronfrac",iJet,itJet.pfSpecific().mChargedHadronEnergy ); //to implement /missing raw e
+      vars.FillVars( "jthfhadronfrac",iJet,itJet.pfSpecific().mChargedHadronEnergy ); //to implement
+      } */
   }
+
+  
+  for(std::vector<reco::GenJet>::const_iterator itGenJet = input.selectedGenJets.begin() ; itGenJet != input.selectedGenJets.end(); ++itGenJet){
+    int iGenJet = itGenJet - input.selectedGenJets.begin();
+    
+    vars.FillVars( "jtgene",iGenJet,itGenJet->energy() );
+    vars.FillVars( "jtgenpt",iGenJet,itGenJet->pt() );
+    vars.FillVars( "jtgeneta",iGenJet,itGenJet->eta() );
+    vars.FillVars( "jtgenphi",iGenJet,itGenJet->phi() );
+  }
+
 
   math::XYZTLorentzVector primLepVec = math::XYZTLorentzVector();
   if(input.selectedElectrons.size()>0 || input.selectedMuons.size()>0){
@@ -148,6 +197,8 @@ void TestVarProcessor::Process(const InputCollections& input,VariableContainer& 
     vars.FillVars( "elpt",iEle,itEle->pt() );
     vars.FillVars( "eleta",iEle,itEle->eta() );
     vars.FillVars( "elphi",iEle,itEle->phi() ); 
+    vars.FillVars( "eliso",iEle,itEle->phi() ); //FIXME
+    vars.FillVars( "elcharge",iEle,itEle->charge() );
   }
   for(std::vector<pat::Muon>::const_iterator itMu = input.selectedMuonsLoose.begin(); itMu != input.selectedMuonsLoose.end(); ++itMu){
     int iMu = itMu - input.selectedMuonsLoose.begin();
@@ -156,7 +207,7 @@ void TestVarProcessor::Process(const InputCollections& input,VariableContainer& 
     vars.FillVars( "mueta",iMu,itMu->eta() );
     vars.FillVars( "muphi",iMu,itMu->phi() );
     vars.FillVars( "muiso",iMu,itMu->phi() );  //FIXME
-    vars.FillVars( "mucharge",iMu,itMu->phi() ); //FIXME
+    vars.FillVars( "mucharge",iMu,itMu->charge() ); 
   }
   
   vars.FillVar( "met",input.pfMets[0].pt() );

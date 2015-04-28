@@ -40,6 +40,7 @@ class TreeWriter{
     void FillTree();
     bool initialized;
     TTree* tree;
+    TDirectory* dir;
     TFile* outFile;
     VariableContainer vars;
     std::vector<TreeProcessor*> processors;
