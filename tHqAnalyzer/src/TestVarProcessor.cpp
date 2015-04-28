@@ -72,12 +72,19 @@ void TestVarProcessor::Init(const InputCollections& input,VariableContainer& var
 
 
 
-  vars.InitVars( "mue","nlmu" );
-  vars.InitVars( "mupt","nlmu" );
-  vars.InitVars( "mueta","nlmu" );
-  vars.InitVars( "muphi","nlmu" );
-  vars.InitVars( "muiso","nlmu" );
-  vars.InitVars( "mucharge","nlmu" );
+  vars.InitVars( "lmue","nlmu" );
+  vars.InitVars( "lmupt","nlmu" );
+  vars.InitVars( "lmueta","nlmu" );
+  vars.InitVars( "lmuphi","nlmu" );
+  vars.InitVars( "lmuiso","nlmu" );
+  vars.InitVars( "lmucharge","nlmu" );
+
+  vars.InitVars( "mue","nmu" );
+  vars.InitVars( "mupt","nmu" );
+  vars.InitVars( "mueta","nmu" );
+  vars.InitVars( "muphi","nmu" );
+  vars.InitVars( "muiso","nmu" );
+  vars.InitVars( "mucharge","nmu" );
 
 
   vars.InitVars( "ele","nlel" );
@@ -200,8 +207,19 @@ void TestVarProcessor::Process(const InputCollections& input,VariableContainer& 
     vars.FillVars( "eliso",iEle,itEle->phi() ); //FIXME
     vars.FillVars( "elcharge",iEle,itEle->charge() );
   }
+
   for(std::vector<pat::Muon>::const_iterator itMu = input.selectedMuonsLoose.begin(); itMu != input.selectedMuonsLoose.end(); ++itMu){
     int iMu = itMu - input.selectedMuonsLoose.begin();
+    vars.FillVars( "lmue",iMu,itMu->energy() );
+    vars.FillVars( "lmupt",iMu,itMu->pt() );
+    vars.FillVars( "lmueta",iMu,itMu->eta() );
+    vars.FillVars( "lmuphi",iMu,itMu->phi() );
+    vars.FillVars( "lmuiso",iMu,tHqUtils::GetMuondBetaIso(*itMu) );  //FIXME
+    vars.FillVars( "lmucharge",iMu,itMu->charge() ); 
+  }
+
+  for(std::vector<pat::Muon>::const_iterator itMu = input.selectedMuons.begin(); itMu != input.selectedMuons.end(); ++itMu){
+    int iMu = itMu - input.selectedMuons.begin();
     vars.FillVars( "mue",iMu,itMu->energy() );
     vars.FillVars( "mupt",iMu,itMu->pt() );
     vars.FillVars( "mueta",iMu,itMu->eta() );
