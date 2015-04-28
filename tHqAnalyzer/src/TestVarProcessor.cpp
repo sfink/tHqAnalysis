@@ -86,13 +86,19 @@ void TestVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVars( "muiso","nmu" );
   vars.InitVars( "mucharge","nmu" );
 
+  vars.InitVars( "ele","nel" );
+  vars.InitVars( "elpt","nel" );
+  vars.InitVars( "eleta","nel" );
+  vars.InitVars( "elphi","nel" );
+  vars.InitVars( "eliso","nel" );
+  vars.InitVars( "elcharge","nel" );
 
-  vars.InitVars( "ele","nlel" );
-  vars.InitVars( "elpt","nlel" );
-  vars.InitVars( "eleta","nlel" );
-  vars.InitVars( "elphi","nlel" );
-  vars.InitVars( "eliso","nlel" );
-  vars.InitVars( "elcharge","nlel" );
+  vars.InitVars( "lele","nlel" );
+  vars.InitVars( "lelpt","nlel" );
+  vars.InitVars( "leleta","nlel" );
+  vars.InitVars( "lelphi","nlel" );
+  vars.InitVars( "leliso","nlel" );
+  vars.InitVars( "lelcharge","nlel" );
   
   vars.InitVar( "met" );
   vars.InitVar( "metphi" );
@@ -198,14 +204,25 @@ void TestVarProcessor::Process(const InputCollections& input,VariableContainer& 
 
   
   // Fill Lepton Variables
-  for(std::vector<pat::Electron>::const_iterator itEle = input.selectedElectronsLoose.begin(); itEle != input.selectedElectronsLoose.end(); ++itEle){
-    int iEle = itEle - input.selectedElectronsLoose.begin();
+  for(std::vector<pat::Electron>::const_iterator itEle = input.selectedElectrons.begin(); itEle != input.selectedElectrons.end(); ++itEle){
+    int iEle = itEle - input.selectedElectrons.begin();
     vars.FillVars( "ele",iEle,itEle->energy() );
     vars.FillVars( "elpt",iEle,itEle->pt() );
     vars.FillVars( "eleta",iEle,itEle->eta() );
     vars.FillVars( "elphi",iEle,itEle->phi() ); 
-    vars.FillVars( "eliso",iEle,itEle->phi() ); //FIXME
+    vars.FillVars( "eliso",iEle,tHqUtils::GetElectronIso(*itEle) ); //FIXME
     vars.FillVars( "elcharge",iEle,itEle->charge() );
+  }
+
+  // Fill Lepton Variables
+  for(std::vector<pat::Electron>::const_iterator itEle = input.selectedElectronsLoose.begin(); itEle != input.selectedElectronsLoose.end(); ++itEle){
+    int iEle = itEle - input.selectedElectronsLoose.begin();
+    vars.FillVars( "lele",iEle,itEle->energy() );
+    vars.FillVars( "lelpt",iEle,itEle->pt() );
+    vars.FillVars( "leleta",iEle,itEle->eta() );
+    vars.FillVars( "lelphi",iEle,itEle->phi() ); 
+    vars.FillVars( "leliso",iEle,tHqUtils::GetElectronIso(*itEle) ); //FIXME
+    vars.FillVars( "lelcharge",iEle,itEle->charge() );
   }
 
   for(std::vector<pat::Muon>::const_iterator itMu = input.selectedMuonsLoose.begin(); itMu != input.selectedMuonsLoose.end(); ++itMu){

@@ -171,6 +171,19 @@ float tHqUtils::CosThetaCM(const math::XYZTLorentzVector& vec,const math::XYZTLo
 }
 
 
+float tHqUtils::GetElectronIso(const pat::Electron& elec){
+  float iso_photon = elec.photonIso();
+  float iso_neutrals = elec.neutralHadronIso();
+  float iso_charged = elec.chargedHadronIso();
+  float iso_user = elec.userIsolation("User1Iso");
+  float pt = elec.pt();
+
+  float iso = (  std::max( 0. ,  iso_photon+iso_neutrals-1.0*iso_user ) + iso_charged)   / pt;
+  
+
+  return iso;
+}
+
 float tHqUtils::GetMuondBetaIso(const pat::Muon& muon){
   float iso_photon = muon.photonIso();
   float iso_neutrals = muon.neutralHadronIso();
@@ -178,7 +191,7 @@ float tHqUtils::GetMuondBetaIso(const pat::Muon& muon){
   float iso_charged = muon.chargedHadronIso();
   float pt = muon.pt();
 
-  float iso = std::max(0.,(iso_photon+iso_neutrals-0.5*iso_sumPUPt)+iso_charged)/pt;
+  float iso = (   std::max( 0.  , iso_photon+iso_neutrals-0.5*iso_sumPUPt )   + iso_charged) / pt;
 
   return iso;
 }
