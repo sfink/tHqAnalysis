@@ -256,13 +256,16 @@ void TestVarProcessor::Process(const InputCollections& input,VariableContainer& 
 
   math::XYZTLorentzVector nuVec = math::XYZTLorentzVector();
   math::XYZTLorentzVector lepWVec = math::XYZTLorentzVector();
+  int nlepw = 0;
   if(input.selectedElectrons.size()>0 || input.selectedMuons.size()>0){
     thqev.LeptonRec();
     thqev.NeutrinoRec();
     nuVec = thqev.GetNeutrinoVec();
     lepWVec = thqev.GetWVec();
+    nlepw = 1;
   }
 
+  vars.FillVar( "nlepw", nlepw );
   vars.FillVar( "lepwpt",  lepWVec.pt()  );
   vars.FillVar( "lepweta", lepWVec.eta() );
   vars.FillVar( "lepwphi", lepWVec.phi() );
