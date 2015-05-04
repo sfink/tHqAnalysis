@@ -9,9 +9,6 @@ TestVarProcessor::~TestVarProcessor(){}
 void TestVarProcessor::Init(const InputCollections& input,VariableContainer& vars){
 
 
-
-
-
   vars.InitVar( "njt", "I");
   vars.InitVar( "njt15", "I"); 
   vars.InitVar( "nlmu", "I");
@@ -20,6 +17,8 @@ void TestVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVar( "nel", "I");
   vars.InitVar( "nvetomu", "I");
   vars.InitVar( "nvetoel", "I");
+  vars.InitVar( "nlepw", "I" );
+
 
   vars.InitVar( "nbtagl", "I");  //New btag multiplicity variables
   vars.InitVar( "nbtagm", "I");  //
@@ -100,35 +99,42 @@ void TestVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVars( "leliso","nlel" );
   vars.InitVars( "lelcharge","nlel" );
   
-  vars.InitVar( "met" );
-  vars.InitVar( "metphi" );
-  vars.InitVar( "meteta" );
+  vars.InitVar( "lepwpt" ,"F");
+  vars.InitVar( "lepweta" ,"F");
+  vars.InitVar( "lepwphi" ,"F");
+  vars.InitVar( "lepwm"   ,"F");
 
-  vars.InitVar("m3"); //new var
-  vars.InitVar("mtw"); //new var
-  vars.InitVar("sumHtTotal");
-  vars.InitVar("sumHt");
+  vars.InitVar( "met" ,"F");
+  vars.InitVar( "meteta" ,"F");
+  vars.InitVar( "metphi" ,"F");
+
+  vars.InitVar("m3" ,"F"); //new var
+  vars.InitVar("mtw" ,"F"); //new var
+  vars.InitVar("sumHtTotal" ,"F");
+  vars.InitVar("sumHt" ,"F");
  
   vars.InitVars( "jtcsvt","njt" );
  
-  vars.InitVar( "aplanarity" );
-  vars.InitVar( "sphericity" );
+  vars.InitVar( "aplanarity" ,"F");
+  vars.InitVar( "sphericity" ,"F");
    
-  vars.InitVar( "wolframh0" ); 
-  vars.InitVar( "wolframh1" );
-  vars.InitVar( "wolframh2" );
-  vars.InitVar( "wolframh3" );
-  vars.InitVar( "wolframh4" );
+  vars.InitVar( "wolframh0" ,"F"); 
+  vars.InitVar( "wolframh1" ,"F");
+  vars.InitVar( "wolframh2" ,"F");
+  vars.InitVar( "wolframh3" ,"F");
+  vars.InitVar( "wolframh4" ,"F");
 
 
-  vars.InitVar( "coststh" );
-  vars.InitVar( "costst" );
+  vars.InitVar( "coststh" ,"F");
+  vars.InitVar( "costst" ,"F");
 
   initialized=true;
 }
 
 void TestVarProcessor::Process(const InputCollections& input,VariableContainer& vars){
   if(!initialized) cerr << "tree processor not initialized" << endl;
+
+  tHqEvent thqev(input);
 
   const char* btagger="combinedInclusiveSecondaryVertexV2BJetTags";
   std::vector<pat::Jet> selectedTaggedJets;
@@ -245,9 +251,27 @@ void TestVarProcessor::Process(const InputCollections& input,VariableContainer& 
     vars.FillVars( "mucharge",iMu,itMu->charge() ); 
   }
   
+
+  // Reconstruct W 
+
+  math::XYZTLorentzVector nuVec = math::XYZTLorentzVector();
+  math::XYZTLorentzVector lepWVec = math::XYZTLorentzVector();
+  if(input.selectedElectrons.size()>0 || input.selectedMuons.size()>0){
+    thqev.LeptonRec();
+    thqev.NeutrinoRec();
+    nuVec = thqev.GetNeutrinoVec();
+    lepWVec = thqev.GetWVec();
+  }
+
+  vars.FillVar( "lepwpt",  lepWVec.pt()  );
+  vars.FillVar( "lepweta", lepWVec.eta() );
+  vars.FillVar( "lepwphi", lepWVec.phi() );
+  vars.FillVar( "lepwm",   lepWVec.M()   );
+  
+  
   vars.FillVar( "met",input.pfMets[0].pt() );
-  vars.FillVar( "metphi",input.pfMets[0].phi() );
   vars.FillVar( "meteta",input.pfMets[0].eta() );
+  vars.FillVar( "metphi",input.pfMets[0].phi() );
   
   std::vector<math::XYZTLorentzVector> jetvecs = tHqUtils::GetJetVecs(input.selectedJets);
   math::XYZTLorentzVector metvec = input.pfMets[0].p4();
@@ -331,6 +355,11 @@ void TestVarProcessor::Process(const InputCollections& input,VariableContainer& 
   tHqUtils::GetAplanaritySphericity(primLepVec, metvec, jetvecs, aplanarity, sphericity) ;
   vars.FillVar( "aplanarity", aplanarity );
   vars.FillVar( "sphericity", sphericity );
+
+  //  input.Dump();
+  vars.Dump();
+
+
   /*
   // Event Angle Variables 
   float drmax_lj=-1;

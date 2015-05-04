@@ -47,7 +47,8 @@ void tHqEvent::NeutrinoRec(){
   
   if(lepVecCand.Pt()<=0.001) return;
   
-  tHqUtils::GetNuVec(lepVecCand,metvec,nuVecCand);
+  tHqUtils::GetNuVec(lepVecCand,metvec,nuVecCand,wVecCand);
+  return;
 }
 
 
@@ -128,6 +129,10 @@ math::XYZTLorentzVector tHqEvent::GetLeptonVec(){
     
 math::XYZTLorentzVector tHqEvent::GetNeutrinoVec(){
   return nuVecCand;
+}
+
+math::XYZTLorentzVector tHqEvent::GetWVec(){
+  return wVecCand;
 }
 
 

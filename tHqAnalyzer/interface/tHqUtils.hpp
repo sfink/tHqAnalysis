@@ -66,7 +66,7 @@ class tHqUtils{
     static std::vector<math::XYZTLorentzVector> GetLepVecs(const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon> selectedMuons);
     static math::XYZTLorentzVector GetPrimLepVec(const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon> selectedMuons);
     
-    static void GetNuVec(const math::XYZTLorentzVector& lepvec, const TVector2& metvec, math::XYZTLorentzVector& nuvec); 
+    static void GetNuVec(const math::XYZTLorentzVector& lepvec, const TVector2& metvec, math::XYZTLorentzVector& nuvec, math::XYZTLorentzVector& lepwvec);
     
     static std::vector<math::XYZTLorentzVector> GetJetVecs(const std::vector<pat::Jet>& jets);
     

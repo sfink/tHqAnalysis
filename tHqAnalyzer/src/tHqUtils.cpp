@@ -196,6 +196,42 @@ float tHqUtils::GetMuondBetaIso(const pat::Muon& muon){
   return iso;
 }
 
+/*
+bool tHqUtils::checkElectronMVAIDPreselection(const pat::Electron& elec){
+  // Check preconditions for "triggering electrons" as defined in                                                                                              
+  // https://twiki.cern.ch/twiki/bin/viewauth/CMS/MultivariateElectronIdentification#Training_of_the_MVA                                                       
+
+  reco::SuperClusterRef sclRef = elec.superCluster();
+
+  const double pt = elec.pt();
+  if(fabs(sclRef->eta()) < 1.479)
+    {
+      if( elec.sigmaIetaIeta() < 0.014 &&
+          elec.hadronicOverEm();  < 0.15 &&
+          elec.dr03TkSumPt() / pt < 0.2 &&
+          elec.dr03EcalCorrected / pt < 0.2 &&
+          //    ele.dr03EcalRecHitSumEt / pt < 0.2 &&                                                                                                          
+          elec.dr03HcalTowerSumEt / pt < 0.2 && // WARNING at time of writing, recipe actually wants this non-BC value                                          
+          elec.trInnerNoOfLostHits == 0
+          ){	return true;   }
+      else return false;
+    }
+  else
+    {
+      if( elec.sigmaIetaIeta < 0.035 &&
+          elec.hadOverEm < 0.10 &&
+          elec.dr03TkSumPt / pt < 0.2 &&
+          elec.dr03EcalCorrected / pt < 0.2 &&
+          // ele.dr03EcalRecHitSumEt / pt < 0.2 &&                                                                                                             
+          elec.dr03HcalTowerSumEt / pt < 0.2 && // WARNING at time of writing, recipe actually wants this non-BC value                                          
+          elec.trInnerNoOfLostHits == 0
+          )
+        return true;
+      else return false;
+    }
+}
+*/
+
 
 std::vector<math::XYZTLorentzVector> tHqUtils::GetGenParticleVecs(const std::vector<reco::GenParticle>& genParticles){
   std::vector<math::XYZTLorentzVector> genParticleVecs;
@@ -415,7 +451,7 @@ math::XYZTLorentzVector tHqUtils::GetPrimLepVec(const std::vector<pat::Electron>
 }
 
 
-void tHqUtils::GetNuVec(const math::XYZTLorentzVector& lepvec, const TVector2& metvec, math::XYZTLorentzVector& nuvec){
+void tHqUtils::GetNuVec(const math::XYZTLorentzVector& lepvec, const TVector2& metvec, math::XYZTLorentzVector& nuvec, math::XYZTLorentzVector& lepwvec){
   
   float nu_e  = std::sqrt(metvec.Mod2());
   float nu_px = metvec.Px();
@@ -464,6 +500,8 @@ void tHqUtils::GetNuVec(const math::XYZTLorentzVector& lepvec, const TVector2& m
   nu_e = sqrt(metvec.Mod2()+nu_pz*nu_pz);
 //  nuvec.SetPtEtaPhiM(nupt,nueta,nuphi,0);
   nuvec.SetPxPyPzE(nu_px,nu_py,nu_pz,nu_e);
+  
+  lepwvec = nuvec + lepvec;
 
   return;
 }

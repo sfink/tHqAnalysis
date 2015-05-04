@@ -42,6 +42,10 @@ class tHqEvent{
     
     // Neutrino Reconstruction
     math::XYZTLorentzVector  GetNeutrinoVec();
+
+    // W Reconstruction
+    math::XYZTLorentzVector  GetWVec();
+
     
     // Anti-kt 5 Jets
     pat::JetCollection Getak5JetsAll();
@@ -70,6 +74,10 @@ class tHqEvent{
     
     // Neutrino
     math::XYZTLorentzVector nuVecCand;
+
+    // W Boson
+    math::XYZTLorentzVector wVecCand;
+
     
     // Anti-kt 5 Jets
     pat::JetCollection selectedJets;

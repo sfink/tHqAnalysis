@@ -3,6 +3,7 @@
 
 #include "tHqAnalysis/tHqAnalyzer/interface/TreeProcessor.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/tHqUtils.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/tHqEvent.hpp"
 
 class TestVarProcessor: public TreeProcessor{
   
