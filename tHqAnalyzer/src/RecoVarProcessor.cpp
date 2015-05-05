@@ -9,21 +9,21 @@ RecoVarProcessor::~RecoVarProcessor(){}
 void RecoVarProcessor::Init(const InputCollections& input,VariableContainer& vars){
 
   vars.InitVar("best_recbdtout");
-  vars.InitVar("hyp_posbdt");
-  vars.InitVar("hyp_posdR");
-  vars.InitVar("hbbm");
-  vars.InitVar("hbbpt");
-  vars.InitVar("hbbphi");
-  vars.InitVar("hbbeta");
-  vars.InitVar("hbbdr");
-  vars.InitVar("hbbjtidx");
-  vars.InitVar("topm");
-  vars.InitVar("toppt");
-  vars.InitVar("topphi");
-  vars.InitVar("topeta");
-  vars.InitVar("topjtidx");
-  vars.InitVar("ljtidx");
-  vars.InitVar("coststh_rec");
+  vars.InitVar("hyp_posbdt", "I");
+  vars.InitVar("hyp_posdR", "I");
+  vars.InitVar("hbbm", "F");
+  vars.InitVar("hbbpt", "F");
+  vars.InitVar("hbbphi", "F");
+  vars.InitVar("hbbeta", "F");
+  vars.InitVar("hbbdr", "F");
+  vars.InitVars("hbbjtidx", 3);
+  vars.InitVar("topm", "F");
+  vars.InitVar("toppt", "F");
+  vars.InitVar("topphi", "F");
+  vars.InitVar("topeta", "F");
+  vars.InitVar("topjtidx", "I");
+  vars.InitVar("ljtidx", "I");
+  vars.InitVar("coststh_rec", "F");
 
   initialized=true;
 }
