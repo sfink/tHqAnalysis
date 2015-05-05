@@ -55,6 +55,8 @@
 //#include "tHqAnalysis/tHqAnalyzer/interface/MCMatchVarProcessor.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/MVAVarProcessor.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/TestVarProcessor.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/RecoVarProcessor.hpp"
+
 //#include "tHqAnalysis/tHqAnalyzer/interface/BDTVarProcessor.hpp"
 //#include "tHqAnalysis/tHqAnalyzer/interface/BoostedJetVarProcessor.hpp"
 //#include "tHqAnalysis/tHqAnalyzer/interface/ttHVarProcessor.hpp"
@@ -265,6 +267,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig)
     else if(*itPro == "BDTVarProcessor") treewriter.AddTreeProcessor(new BDTVarProcessor());
     */
     if(*itPro == "TestVarProcessor") treewriter.AddTreeProcessor(new TestVarProcessor());
+    if(*itPro == "RecoVarProcessor") treewriter.AddTreeProcessor(new RecoVarProcessor());
     if(*itPro == "MVAVarProcessor") treewriter.AddTreeProcessor(new MVAVarProcessor());
     else cout << "No matching processor found for: " << *itPro << endl;    
     } 

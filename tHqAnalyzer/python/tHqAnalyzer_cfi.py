@@ -17,6 +17,6 @@ tHqAnalyzer = cms.EDAnalyzer(
     outfileName = cms.string("tHqAnalyzed"),
     selectionNames = cms.vstring("LeptonSelection"),
 #    processorNames = cms.vstring("MVAVarProcessor","TestVarProcessor")
-    processorNames = cms.vstring("TestVarProcessor")
+    processorNames = cms.vstring("TestVarProcessor","RecoVarProcessor")
 #    processorNames = cms.vstring("WeightProcessor","MCMatchVarProcessor","MVAVarProcessor","tHqJetVarProcessor","tHqTopHiggsVarProcessor","tHqTopVarProcessor","tHqHiggsVarProcessor")
 )
