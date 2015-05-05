@@ -19,6 +19,7 @@ class VariableContainer{
     void FillVar( TString name, float value );
     void InitVars( TString name, float defaultValue, TString nEntryVariable, int maxentries =100 );
     void InitVars( TString name, TString nEntryVariable, int maxentries=100 );
+    void InitIntVars( TString name, int defaulValue, int nEntries=100 );
     void FillVars( TString name, int index, float value ); 
     float* GetFloatVarPointer( TString name); 
     float* GetArrayVarPointer( TString name,int entry); 
@@ -46,6 +47,10 @@ class VariableContainer{
     std::map<TString,bool> arrayMapFilled;
     std::map<TString,int> maxEntriesArrays;
     std::map<TString,TString > entryVariableOf;
+    std::map<TString,Int_t*> arrayIntMap;
+    std::map<TString,Int_t> arrayIntMapDefaults;
+    std::map<TString,bool> arrayIntMapFilled;
+    std::map<TString,int> maxEntriesArraysInt;
 };
 
 #endif

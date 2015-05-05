@@ -1,4 +1,4 @@
-#include "BoostedTTH/BoostedAnalyzer/interface/VariableContainer.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/VariableContainer.hpp"
 
 using namespace std;
 
@@ -13,7 +13,7 @@ VariableContainer::~VariableContainer(){
 
 
 void VariableContainer::InitVar( TString name,float defaultValue, std::string type ) {
-  if(intMap.count(name)>0||floatMap.count(name)>0||arrayMap.count(name)>0){
+  if(intMap.count(name)>0||floatMap.count(name)>0||arrayMap.count(name)>0||arrayIntMap.count(name)>0){
     cerr << name << " already initialized!" << endl;
   }
   if(type=="F"){
@@ -32,7 +32,7 @@ void VariableContainer::InitVar( TString name,float defaultValue, std::string ty
 
 
 void VariableContainer::InitVar( TString name, std::string type ) {
-  if(intMap.count(name)>0||floatMap.count(name)>0||arrayMap.count(name)>0){
+  if(intMap.count(name)>0||floatMap.count(name)>0||arrayMap.count(name)>0|| arrayIntMap.count(name)>0){
     cerr << name << " already initialized!" << endl;
   }
 
@@ -63,7 +63,7 @@ void VariableContainer::FillVar( TString name, float value ) {
 
 
 void VariableContainer::InitVars( TString name, float defaultValue, TString nEntryVariable, int maxentries ){
-  if(intMap.count(name)>0 || floatMap.count(name)>0 || arrayMap.count(name)>0){
+  if(intMap.count(name)>0 || floatMap.count(name)>0 || arrayMap.count(name)>0 || arrayIntMap.count(name)>0){
     cerr << name << " already initialized!" << endl;
   }
 
@@ -80,15 +80,35 @@ void VariableContainer::InitVars( TString name, TString nEntryVariable, int maxe
 }
 
 
+void VariableContainer::InitIntVars( TString name, int defaultValue, int nEntries ){
+  if(intMap.count(name)>0 || floatMap.count(name)>0 || arrayMap.count(name)>0 || arrayIntMap.count(name)>0){
+    cerr << name << " already initialized!" << endl;
+  }
+
+  arrayIntMap[name] = new int[nEntries];
+  arrayIntMapDefaults[name] = defaultValue;
+  arrayIntMapFilled[name] = false;
+  maxEntriesArraysInt[name] = nEntries;
+  entryVariableOf[name] = name;
+  
+}
+
 void VariableContainer::FillVars( TString name, int index, float value ) {
-  if(arrayMap.count(name)==0){
+  if(arrayMap.count(name)==0&&arrayIntMap.count(name)==0){
     cerr << name << " does not exist!" << endl;
   }
-  else if(maxEntriesArrays[name]<index){
-    cerr << "array " << name << " is shorter than " << index << endl;
+  else if(arrayMap.count(name)==1){
+    if(maxEntriesArrays[name]<index){
+      cerr << "array " << name << " is shorter than " << index << endl;
+    }
+    else arrayMap[name][index]=value;
   }
-  else
-    arrayMap[name][index]=value;
+  else if(arrayIntMap.count(name)==1){
+    if(maxEntriesArraysInt[name]<index){
+      cerr << "array " << name << " is shorter than " << index << endl;
+    }
+     else arrayIntMap[name][index]=value;
+  }
 }
 
 
@@ -130,6 +150,21 @@ void VariableContainer::SetDefaultValues(){
     ++itAmaxEntriesArrays;
     ++itAfilled;
   }
+
+  auto itIA = arrayIntMap.begin();
+  auto itIAdefault = arrayIntMapDefaults.begin();
+  auto itIAmaxEntriesArrays = maxEntriesArraysInt.begin();
+  auto itIAfilled = arrayIntMapFilled.begin();
+  while (itIA != arrayIntMap.end()) {    
+    for(int i=0;i<itIAmaxEntriesArrays->second;++i)
+      itIA->second[i] = itIAdefault->second;
+    
+    itIAfilled->second=false;
+    ++itIA;
+    ++itIAdefault;
+    ++itIAmaxEntriesArrays;
+    ++itIAfilled;
+  }
   
 }
 
@@ -149,6 +184,11 @@ void VariableContainer::ConnectTree(TTree* tree){
   while (itA != arrayMap.end()) {
     tree->Branch(itA->first,itA->second , itA->first+"["+entryVariableOf[itA->first]+"]/F" );
     itA++;
+  }
+  auto itIA= arrayIntMap.begin();
+  while (itIA != arrayIntMap.end()) {
+    tree->Branch(itIA->first,itIA->second , itIA->first+"["+to_string(maxEntriesArraysInt[itA->first])+"]/I" );
+    itIA++;
   }
 }
 
