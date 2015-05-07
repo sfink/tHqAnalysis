@@ -16,7 +16,7 @@ void RecoVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVar("hbbphi", "F");
   vars.InitVar("hbbeta", "F");
   vars.InitVar("hbbdr", "F");
-  vars.InitIntVars("hbbjtidx", 0, 3);
+  vars.InitIntVars("hbbjtidx", -1, 3);
   vars.InitVar("topm", "F");
   vars.InitVar("toppt", "F");
   vars.InitVar("topphi", "F");
@@ -38,13 +38,14 @@ void RecoVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVar("tophadphi", "F");
   vars.InitVar("tophadeta", "F");
   vars.InitVar("tophaddr", "F");
-  vars.InitIntVars("tophadjtidx", 0, 3);
+  vars.InitIntVars("tophadjtidx", -1, 3);
   vars.InitVar("toplepm", "F");
   vars.InitVar("topleppt", "F");
   vars.InitVar("toplepphi", "F");
   vars.InitVar("toplepeta", "F");
   vars.InitVar("toplepjtidx", "I");
 
+  vars.InitVar("mlpout", "F");
 
   initialized=true;
 }

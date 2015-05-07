@@ -36,7 +36,7 @@ default['nickname'] = 'MC_Pythia_TTHbb'
 default['filenames'] = 'root://cmsxrootd.fnal.gov///store/user/shwillia/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/BoostedTTH_MiniAOD/150227_111650/0000/BoostedTTH_MiniAOD_15.root'
 default['outfilename'] = None
 default['skip'] = '0'
-default['max'] = '100'
+default['max'] = '1000'
 
 default['sampletype'] = '9125'
 default['xs'] = '248'

@@ -360,7 +360,7 @@ void TestVarProcessor::Process(const InputCollections& input,VariableContainer& 
   vars.FillVar( "sphericity", sphericity );
 
   //  input.Dump();
-  vars.Dump();
+  //  vars.Dump();
 
 
   /*
