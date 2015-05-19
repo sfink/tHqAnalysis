@@ -83,6 +83,7 @@ class tHqAnalyzer : public edm::EDAnalyzer {
       
       boosted::Event FillEvent(const edm::Event& iEvent, const edm::Handle<GenEventInfoProduct>& genEvtInfo, const edm::Handle<reco::BeamSpot>& beamSpot, const edm::Handle<HcalNoiseSummary>& hcalNoiseSummary, const edm::Handle< std::vector<PileupSummaryInfo> >& puSummaryInfo);
       map<string,float> GetWeights(const boosted::Event& event, const reco::VertexCollection& selectedPVs, const std::vector<pat::Jet>& selectedJets, const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon>& selectedMuons, const std::vector<reco::GenParticle>& genParticles);
+  bool ElectronSelection( std::vector<pat::Electron>& selectedElectrons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition);
       
       // ----------member data ---------------------------
       
@@ -512,14 +513,96 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	selected=false;
     }
   }
-  
+
   if(!selected) return;    
 
-  // WRITE TREE
-  if(disableObjectSelections)
-    treewriter.Process(unselected_input);  
-  else
-    treewriter.Process(input);  
+  bool didEleSel = ElectronSelection(selectedElectrons,input.selectedPVs[0].position());
+  if(didEleSel){ //tempfix
+  
+    // WRITE TREE
+    if(disableObjectSelections)
+      treewriter.Process(unselected_input);  
+    else
+      treewriter.Process(input);  
+  }
+}
+
+bool tHqAnalyzer::ElectronSelection( std::vector<pat::Electron>& selectedElectrons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition){
+  //-------------------------------------------------------------------------                                                                              
+  //do electrons                                                                                                                                           
+  for( std::vector<pat::Electron>::const_iterator it = selectedElectrons.begin(), ed = selectedElectrons.end(); it != ed; ++it ){
+    pat::Electron iElectron = *it;
+    bool passesKinematics=false;
+    bool inCrack=true;
+    bool passesConversion=false;
+    bool passesISO=false;
+    bool passessID=false;
+
+    //check if barrel or endcap supercluster                                                                                                             
+    double SCeta = (iElectron.superCluster().isAvailable()) ? iElectron.superCluster()->position().eta() : 99;
+    double absSCeta = fabs(SCeta);
+    bool isEB = ( absSCeta <= 1.479 );
+    bool isEE = ( absSCeta > 1.479 && absSCeta < 2.5 );
+
+    //isolation                                                                                                                                          
+    double pfIsoCharged = iElectron.pfIsolationVariables().sumChargedHadronPt;
+    double pfIsoNeutralHadron = iElectron.pfIsolationVariables().sumNeutralHadronEt;
+    double pfIsoNeutralPhoton = iElectron.pfIsolationVariables().sumPhotonEt;
+    double pfIsoSumPUPt = iElectron.pfIsolationVariables().sumPUPt;
+
+    double relIso = (pfIsoCharged + max( pfIsoNeutralHadron + pfIsoNeutralPhoton - 0.5*pfIsoSumPUPt, 0.0 ))/iElectron.pt();
+
+
+    //other stuff                                                                                                                                        
+    double full5x5_sigmaIetaIeta = iElectron.full5x5_sigmaIetaIeta();
+    double dEtaIn = fabs( iElectron.deltaEtaSuperClusterTrackAtVtx() );
+    double dPhiIn = fabs( iElectron.deltaPhiSuperClusterTrackAtVtx() );
+    double hOverE = iElectron.hcalOverEcal();
+
+    double ooEmooP = 999;
+    if( iElectron.ecalEnergy() == 0 ) ooEmooP = 1e30;
+    else if( !std::isfinite(iElectron.ecalEnergy()) ) ooEmooP = 1e30;
+    else ooEmooP = fabs(1.0/iElectron.ecalEnergy() - iElectron.eSuperClusterOverP()/iElectron.ecalEnergy() );
+
+    double d0 = 999;
+    double dZ = 999;
+    double expectedMissingInnerHits = 999;
+    if( iElectron.gsfTrack().isAvailable() ){
+      d0 = fabs(iElectron.gsfTrack()->dxy(pvposition));
+      dZ = fabs(iElectron.gsfTrack()->dz(pvposition));
+      expectedMissingInnerHits = iElectron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
+    }
+
+    //do the checks                                                                                                                                        
+    passesConversion = ( iElectron.passConversionVeto() );
+    passesKinematics = (iElectron.pt()>20 && fabs(iElectron.eta())<2.4);
+    if(iElectron.superCluster().isAvailable()){
+      inCrack = (fabs(iElectron.superCluster()->position().eta())>1.4442 && fabs(iElectron.superCluster()->position().eta())<1.5660);
+    }
+
+    //dZ and d0 cuts are different than in the posted recipe                                                                                               
+    if(isEB){
+      passessID = (full5x5_sigmaIetaIeta<0.010399 && dEtaIn<0.007641 && dPhiIn<0.032643 &&hOverE<0.060662 && d0<0.011811 && dZ<0.070775 && expectedMissingInnerHits<=1 && ooEmooP<0.153897);
+      passesISO = (relIso<0.097213);
+    }
+    else if(isEE){
+      passessID = (full5x5_sigmaIetaIeta<0.029524 && dEtaIn<0.009285 && dPhiIn<0.042447 &&hOverE<0.104263 && d0<0.051682 && dZ<0.180720 && expectedMissingInnerHits<=1 && ooEmooP<0.137468);
+      passesISO = (relIso<0.116708);
+    }
+    else{
+      passessID=false;
+      passesISO=false;
+    }
+
+    std::cout<<relIso<<" "<<isEB<<std::endl;                                                                                                            
+    std::cout<<dZ<<" "<<d0<<std::endl;                                                                                                                  
+    std::cout<<passesKinematics<<" "<<passesConversion<<" "<<passesISO<<" "<<passessID<<" "<<inCrack<<std::endl;                                        
+
+    if(passesKinematics && passesConversion && passesISO && passessID && !inCrack){
+      selectedElectrons.push_back(*it);
+    }
+  }
+  return true;
 }
 
 
@@ -699,6 +782,9 @@ tHqAnalyzer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   desc.setUnknown();
   descriptions.addDefault(desc);
 }
+
+
+
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(tHqAnalyzer);
