@@ -517,19 +517,20 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   if(!selected) return;    
 
   bool didEleSel = ElectronSelection(selectedElectrons,input.selectedPVs[0].position());
-  if(didEleSel){ //tempfix
-  
-    // WRITE TREE
-    if(disableObjectSelections)
-      treewriter.Process(unselected_input);  
-    else
-      treewriter.Process(input);  
-  }
+  if(didEleSel) didEleSel = false; 
+  // WRITE TREE
+  if(disableObjectSelections)
+    treewriter.Process(unselected_input);  
+  else
+    treewriter.Process(input);  
 }
 
 bool tHqAnalyzer::ElectronSelection( std::vector<pat::Electron>& selectedElectrons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition){
   //-------------------------------------------------------------------------                                                                              
-  //do electrons                                                                                                                                           
+  //do electrons                              
+  
+  std::vector<pat::Electron> newselectedElectrons;
+  
   for( std::vector<pat::Electron>::const_iterator it = selectedElectrons.begin(), ed = selectedElectrons.end(); it != ed; ++it ){
     pat::Electron iElectron = *it;
     bool passesKinematics=false;
@@ -594,14 +595,15 @@ bool tHqAnalyzer::ElectronSelection( std::vector<pat::Electron>& selectedElectro
       passesISO=false;
     }
 
-    std::cout<<relIso<<" "<<isEB<<std::endl;                                                                                                            
-    std::cout<<dZ<<" "<<d0<<std::endl;                                                                                                                  
-    std::cout<<passesKinematics<<" "<<passesConversion<<" "<<passesISO<<" "<<passessID<<" "<<inCrack<<std::endl;                                        
+    //    std::cout<<relIso<<" "<<isEB<<std::endl;
+    //    std::cout<<dZ<<" "<<d0<<std::endl;
+    //    std::cout<<passesKinematics<<" "<<passesConversion<<" "<<passesISO<<" "<<passessID<<" "<<inCrack<<std::endl;
 
     if(passesKinematics && passesConversion && passesISO && passessID && !inCrack){
-      selectedElectrons.push_back(*it);
+      newselectedElectrons.push_back(*it);
     }
   }
+  selectedElectrons = newselectedElectrons;
   return true;
 }
 
