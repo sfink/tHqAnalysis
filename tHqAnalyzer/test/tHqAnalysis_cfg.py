@@ -32,11 +32,11 @@ env['mcevents'] = os.getenv('MCEVENTS')
 # default variables
 default = {}
 default['nickname'] = 'MC_Pythia_TTHbb'
-#default['filenames'] = 'file:/pnfs/desy.de/cms/tier2/store/user/shwillia/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/BoostedTTH_MiniAOD/150223_082502/0000/BoostedMiniAOD_4.root'
-default['filenames'] = 'root://cmsxrootd.fnal.gov///store/user/shwillia/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/BoostedTTH_MiniAOD/150227_111650/0000/BoostedTTH_MiniAOD_15.root'
+#default['filenames'] = 'root://cmsxrootd.fnal.gov///store/user/shwillia/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/BoostedTTH_MiniAOD/150227_111650/0000/BoostedTTH_MiniAOD_15.root'
+default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/Phys14DR/TToLeptons_t-channel-CSA14_Tune4C_13TeV-aMCatNLO-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/1E2D2522-A46A-E411-9C55-002590D0AFDC.root'
 default['outfilename'] = None
 default['skip'] = '0'
-default['max'] = '1000'
+default['max'] = '-1'
 
 default['sampletype'] = '9125'
 default['xs'] = '248'

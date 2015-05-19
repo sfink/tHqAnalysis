@@ -54,7 +54,7 @@
 //#include "tHqAnalysis/tHqAnalyzer/interface/WeightProcessor.hpp"
 //#include "tHqAnalysis/tHqAnalyzer/interface/MCMatchVarProcessor.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/MVAVarProcessor.hpp"
-#include "tHqAnalysis/tHqAnalyzer/interface/TestVarProcessor.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/BaseVarProcessor.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/RecoVarProcessor.hpp"
 
 //#include "tHqAnalysis/tHqAnalyzer/interface/BDTVarProcessor.hpp"
@@ -266,7 +266,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig)
     // the BDT processor rely on the variables filled py the other producers and should be added at the end
     else if(*itPro == "BDTVarProcessor") treewriter.AddTreeProcessor(new BDTVarProcessor());
     */
-    if(*itPro == "TestVarProcessor") treewriter.AddTreeProcessor(new TestVarProcessor());
+    if(*itPro == "BaseVarProcessor") treewriter.AddTreeProcessor(new BaseVarProcessor());
     if(*itPro == "RecoVarProcessor") treewriter.AddTreeProcessor(new RecoVarProcessor());
     if(*itPro == "MVAVarProcessor") treewriter.AddTreeProcessor(new MVAVarProcessor());
     else cout << "No matching processor found for: " << *itPro << endl;    

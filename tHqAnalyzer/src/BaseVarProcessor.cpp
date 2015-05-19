@@ -1,12 +1,12 @@
-#include "tHqAnalysis/tHqAnalyzer/interface/TestVarProcessor.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/BaseVarProcessor.hpp"
 
 using namespace std;
 
-TestVarProcessor::TestVarProcessor(){}
-TestVarProcessor::~TestVarProcessor(){}
+BaseVarProcessor::BaseVarProcessor(){}
+BaseVarProcessor::~BaseVarProcessor(){}
 
 
-void TestVarProcessor::Init(const InputCollections& input,VariableContainer& vars){
+void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& vars){
 
 
   vars.InitVar( "njt", "I");
@@ -131,7 +131,7 @@ void TestVarProcessor::Init(const InputCollections& input,VariableContainer& var
   initialized=true;
 }
 
-void TestVarProcessor::Process(const InputCollections& input,VariableContainer& vars){
+void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& vars){
   if(!initialized) cerr << "tree processor not initialized" << endl;
 
   tHqEvent thqev(input);
@@ -336,7 +336,7 @@ void TestVarProcessor::Process(const InputCollections& input,VariableContainer& 
   }
   
   std::sort(csvJets.begin(),csvJets.end(),tHqUtils::FirstIsLarger);
-  //  vars.FillVar("Evt_CSV_Min",csvJets.size()>0 ? csvJets.back() : -.1);
+  //vars.FillVar("Evt_CSV_Min",csvJets.size()>0 ? csvJets.back() : -.1);
     
   // Event Shape Variables
   // Fox Wolfram Moments
