@@ -84,7 +84,7 @@ class tHqAnalyzer : public edm::EDAnalyzer {
       boosted::Event FillEvent(const edm::Event& iEvent, const edm::Handle<GenEventInfoProduct>& genEvtInfo, const edm::Handle<reco::BeamSpot>& beamSpot, const edm::Handle<HcalNoiseSummary>& hcalNoiseSummary, const edm::Handle< std::vector<PileupSummaryInfo> >& puSummaryInfo);
       map<string,float> GetWeights(const boosted::Event& event, const reco::VertexCollection& selectedPVs, const std::vector<pat::Jet>& selectedJets, const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon>& selectedMuons, const std::vector<reco::GenParticle>& genParticles);
   bool ElectronSelection( std::vector<pat::Electron>& selectedElectrons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition);
-      
+  bool MuonSelection( std::vector<pat::Muon>& selectedMuons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition);      
       // ----------member data ---------------------------
       
       /** the beanhelper is used for selections and reweighting */
@@ -518,12 +518,75 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   bool didEleSel = ElectronSelection(selectedElectrons,input.selectedPVs[0].position());
   if(didEleSel) didEleSel = false; 
+
+  //  std::cout << "Muon size before: " << selectedMuons.size() << std::endl;
+
+  bool didMuSel = MuonSelection(selectedMuons,input.selectedPVs[0].position());
+  if(didMuSel) didMuSel = false;
+  //std::cout << "Muon size after: " << selectedMuons.size() << std::endl;
   // WRITE TREE
   if(disableObjectSelections)
     treewriter.Process(unselected_input);  
   else
     treewriter.Process(input);  
 }
+
+bool tHqAnalyzer::MuonSelection( std::vector<pat::Muon>& selectedMuons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition){
+
+
+  std::vector<pat::Muon> newselectedMuons;
+  for( std::vector<pat::Muon>::const_iterator it = selectedMuons.begin(), ed = selectedMuons.end(); it != ed; ++it ){
+    pat::Muon iMuon = *it;
+    bool passesKinematics=false;
+    bool isPFandGlobal=false;
+    bool passesISO=false;
+    bool passesGlobalTrackID=false;
+    bool passesBestTrackID=false;
+    bool passesinnerTrackID=false;
+    bool passesTrackID=false;
+    bool passesID=false;
+    
+    if(iMuon.globalTrack().isAvailable()){
+    double chi2ndof = iMuon.globalTrack()->normalizedChi2();
+    int nValidHits = iMuon.globalTrack()->hitPattern().numberOfValidMuonHits();
+    passesGlobalTrackID=(chi2ndof<10.0 && nValidHits>0);
+    } 
+
+    if(iMuon.muonBestTrack().isAvailable()){
+    double d0 = fabs(iMuon.muonBestTrack()->dxy(pvposition));
+    double dZ = fabs(iMuon.muonBestTrack()->dz(pvposition));
+    passesBestTrackID=(d0<0.2 && dZ<0.5);
+    }
+
+    int nMatchedStations = iMuon.numberOfMatchedStations();
+        
+    if(iMuon.track().isAvailable()){
+    int nTrackerLayers = iMuon.track()->hitPattern().trackerLayersWithMeasurement();
+    passesTrackID=(nTrackerLayers>5);
+    }
+
+    
+    if(iMuon.innerTrack().isAvailable()){
+    int nValidPiyles = iMuon.innerTrack()->hitPattern().numberOfValidPixelHits();
+    passesinnerTrackID=(nValidPiyles>0);
+    }
+    double relIso = (iMuon.pfIsolationR04().sumChargedHadronPt + std::max( iMuon.pfIsolationR04().sumNeutralHadronEt + iMuon.pfIsolationR04().sumPhotonEt - 0.5 * iMuon.pfIsolationR04().sumPUPt,0.0)) / iMuon.pt();
+    
+    isPFandGlobal = (iMuon.isPFMuon() && iMuon.isGlobalMuon());
+    passesKinematics = (iMuon.pt()>20 && fabs(iMuon.eta())<2.4);
+    passesISO = (relIso<0.12);
+    passesID = (passesinnerTrackID && passesGlobalTrackID && passesBestTrackID && passesTrackID && nMatchedStations>1);
+    
+    if(passesKinematics && passesISO && passesID && isPFandGlobal){
+    newselectedMuons.push_back(*it);
+    }
+    else std::cout << " Bad Muon found. " << std::endl;
+  }
+  selectedMuons = newselectedMuons;
+  return 1;
+  
+}
+
 
 bool tHqAnalyzer::ElectronSelection( std::vector<pat::Electron>& selectedElectrons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition){
   //-------------------------------------------------------------------------                                                                              
@@ -602,6 +665,7 @@ bool tHqAnalyzer::ElectronSelection( std::vector<pat::Electron>& selectedElectro
     if(passesKinematics && passesConversion && passesISO && passessID && !inCrack){
       newselectedElectrons.push_back(*it);
     }
+    else std::cout << " Bad Electron found. " << std::endl;
   }
   selectedElectrons = newselectedElectrons;
   return true;
