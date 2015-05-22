@@ -83,8 +83,11 @@ class tHqAnalyzer : public edm::EDAnalyzer {
       
       boosted::Event FillEvent(const edm::Event& iEvent, const edm::Handle<GenEventInfoProduct>& genEvtInfo, const edm::Handle<reco::BeamSpot>& beamSpot, const edm::Handle<HcalNoiseSummary>& hcalNoiseSummary, const edm::Handle< std::vector<PileupSummaryInfo> >& puSummaryInfo);
       map<string,float> GetWeights(const boosted::Event& event, const reco::VertexCollection& selectedPVs, const std::vector<pat::Jet>& selectedJets, const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon>& selectedMuons, const std::vector<reco::GenParticle>& genParticles);
-  bool ElectronSelection( std::vector<pat::Electron>& selectedElectrons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition);
-  bool MuonSelection( std::vector<pat::Muon>& selectedMuons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition);      
+      std::vector<pat::Electron> ElectronSelection( std::vector<pat::Electron> selectedElectrons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition);
+      std::vector<pat::Muon> MuonSelection( std::vector<pat::Muon> selectedMuons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition);      
+     
+      
+      
       // ----------member data ---------------------------
       
       /** the beanhelper is used for selections and reweighting */
@@ -516,14 +519,9 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   if(!selected) return;    
 
-  bool didEleSel = ElectronSelection(selectedElectrons,input.selectedPVs[0].position());
-  if(didEleSel) didEleSel = false; 
+  selectedElectrons = ElectronSelection(selectedElectrons,input.selectedPVs[0].position());
+  selectedMuons = MuonSelection(selectedMuons,input.selectedPVs[0].position());
 
-  //  std::cout << "Muon size before: " << selectedMuons.size() << std::endl;
-
-  bool didMuSel = MuonSelection(selectedMuons,input.selectedPVs[0].position());
-  if(didMuSel) didMuSel = false;
-  //std::cout << "Muon size after: " << selectedMuons.size() << std::endl;
   // WRITE TREE
   if(disableObjectSelections)
     treewriter.Process(unselected_input);  
@@ -531,7 +529,7 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     treewriter.Process(input);  
 }
 
-bool tHqAnalyzer::MuonSelection( std::vector<pat::Muon>& selectedMuons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition){
+std::vector<pat::Muon> tHqAnalyzer::MuonSelection( std::vector<pat::Muon> selectedMuons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition){
 
 
   std::vector<pat::Muon> newselectedMuons;
@@ -582,13 +580,11 @@ bool tHqAnalyzer::MuonSelection( std::vector<pat::Muon>& selectedMuons, const RO
     }
     else std::cout << " Bad Muon found. " << std::endl;
   }
-  selectedMuons = newselectedMuons;
-  return 1;
-  
+  return newselectedMuons;
 }
 
 
-bool tHqAnalyzer::ElectronSelection( std::vector<pat::Electron>& selectedElectrons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition){
+std::vector<pat::Electron> tHqAnalyzer::ElectronSelection( std::vector<pat::Electron> selectedElectrons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition){
   //-------------------------------------------------------------------------                                                                              
   //do electrons                              
   
@@ -667,8 +663,232 @@ bool tHqAnalyzer::ElectronSelection( std::vector<pat::Electron>& selectedElectro
     }
     else std::cout << " Bad Electron found. " << std::endl;
   }
-  selectedElectrons = newselectedElectrons;
-  return true;
+  return newselectedElectrons;
+}
+
+
+std::vector<pat::Electron> tHqAnalyzer::JetSelection( std::vector<pat::Electron> selectedElectrons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition){
+  
+  //----------------------------------------------------------------------------------  
+  //do jets
+
+  std::vector<pat::Jet> cleanEleJets;
+  std::vector<pat::Jet> cleanMuonJets;
+  std::vector<pat::Jet> correctedJets;
+  std::vector<pat::Jet> sortedJets;
+  std::vector<pat::Jet> selectedJets;
+  std::vector<pat::Jet> taggedJets;
+
+  //first uncorrect the jets
+                                                                                                                               
+  std::vector<pat::Jet> bufferJets;
+  for( std::vector<pat::Jet>::const_iterator it = input.selectedJets.begin(), ed = input.selectedJets.end(); it != ed; ++it ){
+    pat::Jet iJet = *it;
+    double originalPt = iJet.pt();
+    //   std::cout<<iJet.currentJECLevel()<<" "<<iJet.currentJECSet()<<std::endl;
+    math::XYZTLorentzVector uncorrectedP4 = iJet.correctedP4("Uncorrected");
+    //   math::XYZTLorentzVector ALTuncorrectedP4 = iJet.correctedJet(0).p4();                                                                           
+    iJet.setP4(uncorrectedP4);
+    double uncorrectedPt = iJet.pt();
+    //   std::cout<<originalPt<<" "<<uncorrectedPt<<std::endl;                        
+    //   iJet.setP4(ALTuncorrectedP4);
+    //   uncorrectedPt = iJet.pt();
+    //   std::cout<<iJet.currentJECLevel()<<" "<<iJet.currentJECSet()<<std::endl;
+
+    std::cout<< "Original JetPt: " << originalPt<<"   -   Uncorrected JetPt: "<<uncorrectedPt<<std::endl;
+    bufferJets.push_back(iJet);
+  }
+
+
+  if(doNewCleaning){
+    //cleaning like in miniAODhelper 
+    std::cout<<"doing new cleaning"<<std::endl;
+    for( std::vector<pat::Jet>::const_iterator it = bufferJets.begin(), ed = bufferJets.end(); it != ed; ++it ){
+      //     std::cout<<it->pt()<<std::endl;
+    }
+    cleanEleJets = tHqUtils::RemoveOverlaps(selectedElectrons, bufferJets);
+    for( std::vector<pat::Jet>::const_iterator it = cleanEleJets.begin(), ed = cleanEleJets.end(); it != ed; ++it ){
+      //     std::cout<<it->pt()<<std::endl;       
+    }
+    cleanMuonJets = tHqUtils::RemoveOverlaps(selectedMuons, cleanEleJets);
+    for( std::vector<pat::Jet>::const_iterator it = cleanMuonJets.begin(), ed = cleanMuonJets.end(); it != ed; ++it ){
+      //     std::cout<<it->pt()<<std::endl;                                                                                                             
+    }
+  }
+  else{
+    //clean from electrons  
+    for(std::vector<pat::Electron>::const_iterator iEle = selectedElectrons.begin(), ed = selectedElectrons.end(); iEle != ed; ++iEle ){
+      pat::Electron Ele = *iEle;
+      double maxDeltaR=0.4;
+      double minDeltaR=maxDeltaR;
+      double dR=999.0;
+      int matchindex=-1;
+      int counter=0;
+
+      //find jet closes to electron
+      for( std::vector<pat::Jet>::const_iterator it = bufferJets.begin(), ed = bufferJets.end(); it != ed; ++it ){
+	pat::Jet iJet = *it;
+	dR = reco::deltaR(Ele.eta(), Ele.phi(), iJet.eta(), iJet.phi());
+	if(dR<minDeltaR){
+	  minDeltaR = dR;
+	  matchindex=counter;
+        }
+	counter++;
+      }
+
+      // now clean the closest jet from the electron and put it back with the rest                                                                           
+      counter=0;
+      for( std::vector<pat::Jet>::const_iterator it = bufferJets.begin(), ed = bufferJets.end(); it != ed; ++it ){
+	pat::Jet iJet = *it;
+	if(matchindex==counter){
+	  //       std::cout<<"ele jet "<<Ele.pt()<<" "<<iJet.pt()<<std::endl;
+	  //       std::cout<<"ele jet "<<Ele.energy()<<" "<<iJet.energy()<<std::endl;
+	  math::XYZTLorentzVector original = iJet.p4();
+	  original -= Ele.p4();
+	  iJet.setP4(original);
+	}
+	if(iJet.pt()>0.0 && iJet.energy()>0.0){
+	  cleanEleJets.push_back(iJet);
+	}
+	counter++;
+
+
+	//     std::cout<<Ele.eta()<<" "<<Ele.phi()<<" "<<iJet.eta()<<" "<<iJet.phi()<<std::endl;                                                                
+      }
+      bufferJets.clear();
+      for( std::vector<pat::Jet>::const_iterator it = cleanEleJets.begin(), ed = cleanEleJets.end(); it != ed; ++it ){
+	bufferJets.push_back(*it);
+      }
+      cleanEleJets.clear();
+    }
+    for( std::vector<pat::Jet>::const_iterator it = bufferJets.begin(), ed = bufferJets.end(); it != ed; ++it ){
+      cleanEleJets.push_back(*it);
+    }
+    //now we should have the jets cleaned from the electrons                                                                                                 
+    //clean from electrons                                                                                                                                   
+
+    bufferJets.clear();
+    for( std::vector<pat::Jet>::const_iterator it = cleanEleJets.begin(), ed = cleanEleJets.end(); it != ed; ++it ){
+      bufferJets.push_back(*it);
+    }
+
+    for(std::vector<pat::Muon>::const_iterator iMuon = selectedMuons.begin(), ed = selectedMuons.end(); iMuon != ed; ++iMuon ){
+      pat::Muon Muon = *iMuon;
+      double maxDeltaR=0.4;
+      double minDeltaR=maxDeltaR;
+      double dR=999.0;
+      int matchindex=-1;
+      int counter=0;
+
+      //find jet closes to muon
+
+      for( std::vector<pat::Jet>::const_iterator it = bufferJets.begin(), ed = bufferJets.end(); it != ed; ++it ){
+	pat::Jet iJet = *it;
+	dR = reco::deltaR(Muon.eta(), Muon.phi(), iJet.eta(), iJet.phi());
+	if(dR<minDeltaR){
+	  minDeltaR = dR;
+	  matchindex=counter;
+        }
+	counter++;
+      }
+      // now clean the closest jet from the muon and put it back with the rest
+      counter=0;
+      for( std::vector<pat::Jet>::const_iterator it = bufferJets.begin(), ed = bufferJets.end(); it != ed; ++it ){
+	pat::Jet iJet = *it;
+	if(matchindex==counter){
+	  //         std::cout<<"muon jet "<<Muon.pt()<<" "<<iJet.pt()<<std::endl;
+	  //         std::cout<<"muon jet "<<Muon.energy()<<" "<<iJet.energy()<<std::endl;
+
+	  math::XYZTLorentzVector original = iJet.p4();
+	  original -= Muon.p4();
+	  iJet.setP4(original);
+	}
+	if(iJet.pt()>0.0 && iJet.energy()>0.0){
+	  cleanMuonJets.push_back(iJet);
+	}
+	counter++;
+
+      }
+      bufferJets.clear();
+      for( std::vector<pat::Jet>::const_iterator it = cleanMuonJets.begin(), ed = cleanMuonJets.end(); it != ed; ++it ){
+	bufferJets.push_back(*it);
+      }
+      cleanMuonJets.clear();
+    }
+    for( std::vector<pat::Jet>::const_iterator it = bufferJets.begin(), ed = bufferJets.end(); it != ed; ++it ){
+      cleanMuonJets.push_back(*it);
+      //   std::cout<<it->pt()<<std::endl;
+    }
+  }
+  //now correct the jets again
+  //using the PHYS14_25_V2 corrections i hope :)  
+  /*  "ak4PFchsL1L2L3"*/
+
+  const JetCorrector* jetCorrector = JetCorrector::getJetCorrector("ak4PFchsL1L2L3",input.setup);
+  correctedJets.clear();
+
+  std::cout<<"setup the corrector"<<std::endl;
+  for( std::vector<pat::Jet>::const_iterator it = cleanMuonJets.begin(), ed = cleanMuonJets.end(); it != ed; ++it ){
+    pat::Jet iJet = *it;
+    double jec =1.0;
+    jec = jetCorrector->correction(iJet, input.edmevent, input.setup );
+    //   std::cout<<"uncorrected "<<jec<<" "<<iJet.pt()<<std::endl; 
+    iJet.scaleEnergy(jec);
+    //   std::cout<<"corrected "<<iJet.pt()<<std::endl;     
+    //   std::cout<<iJet.currentJECLevel()<<" "<<iJet.currentJECSet()<<" "<<std::endl;
+    
+    correctedJets.push_back(iJet);
+    //   double uncorrectedPt = iJet.pt();    
+    //   math::XYZTLorentzVector correctedP4 = iJet.correctedP4("L1FastJetL2RelativeL3Absolute","","PHYS14_25_V2");                                  
+    //   iJet.setP4(correctedP4);  
+    //   pat::Jet newJet = iJet.correctedJet("L3Absolute","none","patJetCorrFactors"); 
+    //   double correctedPt = newJet.pt();    
+    //   std::cout<<uncorrectedPt<<" "<<correctedPt<<std::endl;  
+    //   bufferJets.push_back(iJet);  
+    //   for(unsigned int i=0; i<iJet.availableJECSets().size(); i++){   
+    //     std::cout<<iJet.availableJECSets()[i]<<std::endl;   
+    //   }
+    //   for(unsigned int i=0; i<iJet.availableJECLevels().size(); i++){
+    //     std::cout<<iJet.availableJECLevels("patJetCorrFactors")[i]<<std::endl;  
+    //   } 
+  }
+
+  // std::cout<<"The Parameter Set"<<std::endl;                                                                      
+  // std::cout<<Config.dump()<<std::endl;;                                                                                                
+  //now sort the jets by pt                                                                                                               
+  
+  std::sort(correctedJets.begin(), correctedJets.end(), tHqUtils::FirstJetIsHarder);
+  // std::cout<<correctedJets.at(0).pt()<<" "<<correctedJets.at(1).pt()<<" "<<correctedJets.at(2).pt()<<std::endl; 
+  
+
+  //now select only the good jets                                                                
+                                                          
+  selectedJets.clear();
+  for( std::vector<pat::Jet>::const_iterator it = correctedJets.begin(), ed = correctedJets.end(); it != ed; ++it ){
+    pat::Jet iJet = *it;
+
+    bool isselected=false;
+    isselected=(iJet.pt()>25.0 && abs(iJet.eta())<2.4 && iJet.neutralHadronEnergyFraction()<0.99 && iJet.chargedHadronEnergyFraction()>0.0 && iJet.chargedMultiplicity()>0.0 && iJet.chargedEmEnergyFraction()<0.99 && iJet.neutralEmEnergyFraction()<0.99 && iJet.numberOfDaughters()>1 );
+    if(isselected){
+      selectedJets.push_back(iJet);
+    }
+  }
+
+  //get the btagged jets                                                                                                                                   
+  taggedJets.clear();
+  for( std::vector<pat::Jet>::const_iterator it = selectedJets.begin(), ed = selectedJets.end(); it != ed; ++it ){
+    pat::Jet iJet = *it;
+
+    bool istagged=false;
+    double workingPoint=0.814;
+    istagged=(iJet.bDiscriminator("combinedInclusiveSecondaryVertexV2BJetTags") > workingPoint);
+    if(istagged){
+      taggedJets.push_back(iJet);
+    }
+  }
+
+
+
 }
 
 
