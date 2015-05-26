@@ -85,7 +85,8 @@ class tHqAnalyzer : public edm::EDAnalyzer {
       map<string,float> GetWeights(const boosted::Event& event, const reco::VertexCollection& selectedPVs, const std::vector<pat::Jet>& selectedJets, const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon>& selectedMuons, const std::vector<reco::GenParticle>& genParticles);
       std::vector<pat::Electron> ElectronSelection( std::vector<pat::Electron> selectedElectrons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition);
       std::vector<pat::Muon> MuonSelection( std::vector<pat::Muon> selectedMuons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition);      
-     
+  std::vector<pat::Jet> JetSelection( std::vector<pat::Jet> selectedJets, std::vector<pat::Electron> selectedElectrons, std::vector<pat::Muon> selectedMuons, InputCollections input);
+      
       
       
       // ----------member data ---------------------------
@@ -381,7 +382,7 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::vector<pat::Jet> const &pfjets = *h_pfjets;
   
   //  const JetCorrector* corrector = JetCorrector::getJetCorrector( "ak4PFchsL1L2L3", iSetup );   
-  //  helper.SetJetCorrector(corrector);
+  //helper.SetJetCorrector(corrector);
   
   // Get raw jets
   std::vector<pat::Jet> rawJets = helper.GetUncorrectedJets(pfjets);
@@ -521,6 +522,7 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   selectedElectrons = ElectronSelection(selectedElectrons,input.selectedPVs[0].position());
   selectedMuons = MuonSelection(selectedMuons,input.selectedPVs[0].position());
+  selectedJets = JetSelection(selectedJets,selectedElectrons, selectedMuons, input);
 
   // WRITE TREE
   if(disableObjectSelections)
@@ -667,7 +669,7 @@ std::vector<pat::Electron> tHqAnalyzer::ElectronSelection( std::vector<pat::Elec
 }
 
 
-std::vector<pat::Electron> tHqAnalyzer::JetSelection( std::vector<pat::Electron> selectedElectrons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition){
+std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJets, std::vector<pat::Electron> selectedElectrons, std::vector<pat::Muon> selectedMuons, InputCollections input){
   
   //----------------------------------------------------------------------------------  
   //do jets
@@ -676,7 +678,7 @@ std::vector<pat::Electron> tHqAnalyzer::JetSelection( std::vector<pat::Electron>
   std::vector<pat::Jet> cleanMuonJets;
   std::vector<pat::Jet> correctedJets;
   std::vector<pat::Jet> sortedJets;
-  std::vector<pat::Jet> selectedJets;
+  //  std::vector<pat::Jet> selectedJets;
   std::vector<pat::Jet> taggedJets;
 
   //first uncorrect the jets
@@ -698,21 +700,23 @@ std::vector<pat::Electron> tHqAnalyzer::JetSelection( std::vector<pat::Electron>
     std::cout<< "Original JetPt: " << originalPt<<"   -   Uncorrected JetPt: "<<uncorrectedPt<<std::endl;
     bufferJets.push_back(iJet);
   }
-
-
+  
+  bool doNewCleaning = false;
+  
   if(doNewCleaning){
     //cleaning like in miniAODhelper 
     std::cout<<"doing new cleaning"<<std::endl;
+    std::cout<<"Number of Leptons: Muons: "<< selectedMuons.size() << "   Electrons:  " << selectedElectrons.size() << std::endl;
     for( std::vector<pat::Jet>::const_iterator it = bufferJets.begin(), ed = bufferJets.end(); it != ed; ++it ){
-      //     std::cout<<it->pt()<<std::endl;
+      std::cout<< "BufferJet pt: " << it->pt()<<std::endl;
     }
     cleanEleJets = tHqUtils::RemoveOverlaps(selectedElectrons, bufferJets);
     for( std::vector<pat::Jet>::const_iterator it = cleanEleJets.begin(), ed = cleanEleJets.end(); it != ed; ++it ){
-      //     std::cout<<it->pt()<<std::endl;       
+      std::cout<< "After electron removal: " << it->pt()<<std::endl;       
     }
     cleanMuonJets = tHqUtils::RemoveOverlaps(selectedMuons, cleanEleJets);
     for( std::vector<pat::Jet>::const_iterator it = cleanMuonJets.begin(), ed = cleanMuonJets.end(); it != ed; ++it ){
-      //     std::cout<<it->pt()<<std::endl;                                                                                                             
+      std::cout<< "After muon removal: " << it->pt()<<std::endl;                                                                                                             
     }
   }
   else{
@@ -740,6 +744,7 @@ std::vector<pat::Electron> tHqAnalyzer::JetSelection( std::vector<pat::Electron>
       counter=0;
       for( std::vector<pat::Jet>::const_iterator it = bufferJets.begin(), ed = bufferJets.end(); it != ed; ++it ){
 	pat::Jet iJet = *it;
+	std::cout<< "BufferJet pt: " << it->pt()<<std::endl;
 	if(matchindex==counter){
 	  //       std::cout<<"ele jet "<<Ele.pt()<<" "<<iJet.pt()<<std::endl;
 	  //       std::cout<<"ele jet "<<Ele.energy()<<" "<<iJet.energy()<<std::endl;
@@ -750,6 +755,7 @@ std::vector<pat::Electron> tHqAnalyzer::JetSelection( std::vector<pat::Electron>
 	if(iJet.pt()>0.0 && iJet.energy()>0.0){
 	  cleanEleJets.push_back(iJet);
 	}
+	std::cout<< "After Electron removal pt: " << iJet.pt()<<std::endl;
 	counter++;
 
 
@@ -765,7 +771,7 @@ std::vector<pat::Electron> tHqAnalyzer::JetSelection( std::vector<pat::Electron>
       cleanEleJets.push_back(*it);
     }
     //now we should have the jets cleaned from the electrons                                                                                                 
-    //clean from electrons                                                                                                                                   
+    //clean from muos                                                                                                                                   
 
     bufferJets.clear();
     for( std::vector<pat::Jet>::const_iterator it = cleanEleJets.begin(), ed = cleanEleJets.end(); it != ed; ++it ){
@@ -802,12 +808,12 @@ std::vector<pat::Electron> tHqAnalyzer::JetSelection( std::vector<pat::Electron>
 	  math::XYZTLorentzVector original = iJet.p4();
 	  original -= Muon.p4();
 	  iJet.setP4(original);
+	  std::cout<< "After Muon removal pt: " << iJet.pt()<<std::endl;
 	}
 	if(iJet.pt()>0.0 && iJet.energy()>0.0){
 	  cleanMuonJets.push_back(iJet);
 	}
 	counter++;
-
       }
       bufferJets.clear();
       for( std::vector<pat::Jet>::const_iterator it = cleanMuonJets.begin(), ed = cleanMuonJets.end(); it != ed; ++it ){
@@ -824,18 +830,18 @@ std::vector<pat::Electron> tHqAnalyzer::JetSelection( std::vector<pat::Electron>
   //using the PHYS14_25_V2 corrections i hope :)  
   /*  "ak4PFchsL1L2L3"*/
 
-  const JetCorrector* jetCorrector = JetCorrector::getJetCorrector("ak4PFchsL1L2L3",input.setup);
+    //  const JetCorrector* jetCorrector = JetCorrector::getJetCorrector("ak4PFchsL1L2L3",input.setup);
   correctedJets.clear();
 
   std::cout<<"setup the corrector"<<std::endl;
   for( std::vector<pat::Jet>::const_iterator it = cleanMuonJets.begin(), ed = cleanMuonJets.end(); it != ed; ++it ){
     pat::Jet iJet = *it;
     double jec =1.0;
-    jec = jetCorrector->correction(iJet, input.edmevent, input.setup );
-    //   std::cout<<"uncorrected "<<jec<<" "<<iJet.pt()<<std::endl; 
+    //jec = jetCorrector->correction(iJet, input.edmevent, input.setup );
+    std::cout<<"uncorrected "<<jec<<" "<<iJet.pt()<<std::endl; 
     iJet.scaleEnergy(jec);
-    //   std::cout<<"corrected "<<iJet.pt()<<std::endl;     
-    //   std::cout<<iJet.currentJECLevel()<<" "<<iJet.currentJECSet()<<" "<<std::endl;
+    std::cout<<"corrected "<<iJet.pt()<<std::endl;     
+    std::cout<<iJet.currentJECLevel()<<" "<<iJet.currentJECSet()<<" "<<std::endl;
     
     correctedJets.push_back(iJet);
     //   double uncorrectedPt = iJet.pt();    
@@ -858,7 +864,7 @@ std::vector<pat::Electron> tHqAnalyzer::JetSelection( std::vector<pat::Electron>
   //now sort the jets by pt                                                                                                               
   
   std::sort(correctedJets.begin(), correctedJets.end(), tHqUtils::FirstJetIsHarder);
-  // std::cout<<correctedJets.at(0).pt()<<" "<<correctedJets.at(1).pt()<<" "<<correctedJets.at(2).pt()<<std::endl; 
+  //  std::cout<<correctedJets.at(0).pt()<<" "<<correctedJets.at(1).pt()<<" "<<correctedJets.at(2).pt()<<std::endl; 
   
 
   //now select only the good jets                                                                
@@ -887,7 +893,7 @@ std::vector<pat::Electron> tHqAnalyzer::JetSelection( std::vector<pat::Electron>
     }
   }
 
-
+  return selectedJets;
 
 }
 
