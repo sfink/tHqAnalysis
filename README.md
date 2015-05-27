@@ -10,7 +10,7 @@ Follow These Steps:
     cd CMSSW_7_2_3/src
     cmsenv
 
-    git clone https://github.com/sfink/MiniAOD.git
+    git clone https://github.com/cms-ttH/MiniAOD.git
     git clone https://github.com/sfink/tHqAnalysis.git
     
     scram b -j 12
