@@ -697,7 +697,7 @@ std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJ
     //   uncorrectedPt = iJet.pt();
     //   std::cout<<iJet.currentJECLevel()<<" "<<iJet.currentJECSet()<<std::endl;
 
-    std::cout<< "Original JetPt: " << originalPt<<"   -   Uncorrected JetPt: "<<uncorrectedPt<<std::endl;
+    //    std::cout<< "Original JetPt: " << originalPt<<"   -   Uncorrected JetPt: "<<uncorrectedPt<<std::endl;
     bufferJets.push_back(iJet);
   }
   
@@ -705,18 +705,18 @@ std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJ
   
   if(doNewCleaning){
     //cleaning like in miniAODhelper 
-    std::cout<<"doing new cleaning"<<std::endl;
-    std::cout<<"Number of Leptons: Muons: "<< selectedMuons.size() << "   Electrons:  " << selectedElectrons.size() << std::endl;
+    //    std::cout<<"doing new cleaning"<<std::endl;
+    // std::cout<<"Number of Leptons: Muons: "<< selectedMuons.size() << "   Electrons:  " << selectedElectrons.size() << std::endl;
     for( std::vector<pat::Jet>::const_iterator it = bufferJets.begin(), ed = bufferJets.end(); it != ed; ++it ){
-      std::cout<< "BufferJet pt: " << it->pt()<<std::endl;
+      //std::cout<< "BufferJet pt: " << it->pt()<<std::endl;
     }
     cleanEleJets = tHqUtils::RemoveOverlaps(selectedElectrons, bufferJets);
     for( std::vector<pat::Jet>::const_iterator it = cleanEleJets.begin(), ed = cleanEleJets.end(); it != ed; ++it ){
-      std::cout<< "After electron removal: " << it->pt()<<std::endl;       
+      //std::cout<< "After electron removal: " << it->pt()<<std::endl;       
     }
     cleanMuonJets = tHqUtils::RemoveOverlaps(selectedMuons, cleanEleJets);
     for( std::vector<pat::Jet>::const_iterator it = cleanMuonJets.begin(), ed = cleanMuonJets.end(); it != ed; ++it ){
-      std::cout<< "After muon removal: " << it->pt()<<std::endl;                                                                                                             
+      //std::cout<< "After muon removal: " << it->pt()<<std::endl;                                                                                                             
     }
   }
   else{
@@ -744,7 +744,7 @@ std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJ
       counter=0;
       for( std::vector<pat::Jet>::const_iterator it = bufferJets.begin(), ed = bufferJets.end(); it != ed; ++it ){
 	pat::Jet iJet = *it;
-	std::cout<< "BufferJet pt: " << it->pt()<<std::endl;
+	//	std::cout<< "BufferJet pt: " << it->pt()<<std::endl;
 	if(matchindex==counter){
 	  //       std::cout<<"ele jet "<<Ele.pt()<<" "<<iJet.pt()<<std::endl;
 	  //       std::cout<<"ele jet "<<Ele.energy()<<" "<<iJet.energy()<<std::endl;
@@ -755,7 +755,7 @@ std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJ
 	if(iJet.pt()>0.0 && iJet.energy()>0.0){
 	  cleanEleJets.push_back(iJet);
 	}
-	std::cout<< "After Electron removal pt: " << iJet.pt()<<std::endl;
+	//	std::cout<< "After Electron removal pt: " << iJet.pt()<<std::endl;
 	counter++;
 
 
@@ -808,7 +808,7 @@ std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJ
 	  math::XYZTLorentzVector original = iJet.p4();
 	  original -= Muon.p4();
 	  iJet.setP4(original);
-	  std::cout<< "After Muon removal pt: " << iJet.pt()<<std::endl;
+	  //	  std::cout<< "After Muon removal pt: " << iJet.pt()<<std::endl;
 	}
 	if(iJet.pt()>0.0 && iJet.energy()>0.0){
 	  cleanMuonJets.push_back(iJet);
@@ -833,15 +833,15 @@ std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJ
     //  const JetCorrector* jetCorrector = JetCorrector::getJetCorrector("ak4PFchsL1L2L3",input.setup);
   correctedJets.clear();
 
-  std::cout<<"setup the corrector"<<std::endl;
+  //  std::cout<<"setup the corrector"<<std::endl;
   for( std::vector<pat::Jet>::const_iterator it = cleanMuonJets.begin(), ed = cleanMuonJets.end(); it != ed; ++it ){
     pat::Jet iJet = *it;
     double jec =1.0;
     //jec = jetCorrector->correction(iJet, input.edmevent, input.setup );
-    std::cout<<"uncorrected "<<jec<<" "<<iJet.pt()<<std::endl; 
+    //    std::cout<<"uncorrected "<<jec<<" "<<iJet.pt()<<std::endl; 
     iJet.scaleEnergy(jec);
-    std::cout<<"corrected "<<iJet.pt()<<std::endl;     
-    std::cout<<iJet.currentJECLevel()<<" "<<iJet.currentJECSet()<<" "<<std::endl;
+    ///    std::cout<<"corrected "<<iJet.pt()<<std::endl;     
+    //    std::cout<<iJet.currentJECLevel()<<" "<<iJet.currentJECSet()<<" "<<std::endl;
     
     correctedJets.push_back(iJet);
     //   double uncorrectedPt = iJet.pt();    
