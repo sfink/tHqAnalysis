@@ -32,6 +32,8 @@ class TreeWriter{
     void Init(std::string fileName);
     bool Process(const InputCollections& input);
     void AddTreeProcessor(TreeProcessor* processor);
+    void AddSampleInformation();
+
 
 
   private:

@@ -8,6 +8,10 @@ BaseVarProcessor::~BaseVarProcessor(){}
 
 void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& vars){
 
+  vars.InitVar( "evt", "I");
+  vars.InitVar( "run", "I"); 
+  vars.InitVar( "lbn", "I");
+  vars.InitVar( "sample", "I");
 
   vars.InitVar( "njt", "I");
   vars.InitVar( "njt15", "I"); 
@@ -135,6 +139,15 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
   if(!initialized) cerr << "tree processor not initialized" << endl;
 
   tHqEvent thqev(input);
+
+  // Fill event variables
+  
+  vars.FillVar( "evt", input.event.evt);
+  vars.FillVar( "run", input.event.run);
+  vars.FillVar( "lbn", input.event.lumiBlock);
+  vars.FillVar( "sample", input.event.sample);
+
+  // Fill btagged Jets
 
   const char* btagger="combinedInclusiveSecondaryVertexV2BJetTags";
   std::vector<pat::Jet> selectedTaggedJets;

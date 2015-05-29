@@ -53,10 +53,32 @@ bool TreeWriter::Process(const InputCollections& input) {
   }
 
   FillTree();
+
   return true;
 }
 
 
 void TreeWriter::FillTree(){
   tree->Fill();
+}
+
+
+void TreeWriter::AddSampleInformation(){
+  double ntotal = tree->GetEntries();
+  double efficiency = 1.0;
+  double kfac = 1.0;
+  double xsec = 1.0;
+
+  stringstream ss; ss<<"efficiency:"<<efficiency;
+  stringstream ss1; ss1<<"ntotal:"<<ntotal;
+  stringstream ss2; ss2<<"xsection:"<<xsec;
+  stringstream ss3; ss3<<"kfactor:"<<kfac;
+
+  
+  std::cout << "SampleInformation is called." << std::endl;
+
+  tree->GetUserInfo()->Add(new TObjString(ss.str().c_str()));
+  tree->GetUserInfo()->Add(new TObjString(ss1.str().c_str()));
+  tree->GetUserInfo()->Add(new TObjString(ss2.str().c_str()));
+  tree->GetUserInfo()->Add(new TObjString(ss3.str().c_str()));
 }

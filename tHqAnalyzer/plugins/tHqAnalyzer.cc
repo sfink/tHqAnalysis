@@ -80,7 +80,7 @@ class tHqAnalyzer : public edm::EDAnalyzer {
       virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
       virtual void endJob() override;
       virtual void beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup) override;
-      
+  
       boosted::Event FillEvent(const edm::Event& iEvent, const edm::Handle<GenEventInfoProduct>& genEvtInfo, const edm::Handle<reco::BeamSpot>& beamSpot, const edm::Handle<HcalNoiseSummary>& hcalNoiseSummary, const edm::Handle< std::vector<PileupSummaryInfo> >& puSummaryInfo);
       map<string,float> GetWeights(const boosted::Event& event, const reco::VertexCollection& selectedPVs, const std::vector<pat::Jet>& selectedJets, const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon>& selectedMuons, const std::vector<reco::GenParticle>& genParticles);
       std::vector<pat::Electron> ElectronSelection( std::vector<pat::Electron> selectedElectrons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition);
@@ -686,12 +686,12 @@ std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJ
   std::vector<pat::Jet> bufferJets;
   for( std::vector<pat::Jet>::const_iterator it = input.selectedJets.begin(), ed = input.selectedJets.end(); it != ed; ++it ){
     pat::Jet iJet = *it;
-    double originalPt = iJet.pt();
+    //    double originalPt = iJet.pt();
     //   std::cout<<iJet.currentJECLevel()<<" "<<iJet.currentJECSet()<<std::endl;
     math::XYZTLorentzVector uncorrectedP4 = iJet.correctedP4("Uncorrected");
     //   math::XYZTLorentzVector ALTuncorrectedP4 = iJet.correctedJet(0).p4();                                                                           
     iJet.setP4(uncorrectedP4);
-    double uncorrectedPt = iJet.pt();
+    //    double uncorrectedPt = iJet.pt();
     //   std::cout<<originalPt<<" "<<uncorrectedPt<<std::endl;                        
     //   iJet.setP4(ALTuncorrectedP4);
     //   uncorrectedPt = iJet.pt();
@@ -1049,6 +1049,7 @@ tHqAnalyzer::beginJob()
 void 
 tHqAnalyzer::endJob() 
 {
+  treewriter.AddSampleInformation();
   cutflow.Print();
 }
 // ------------ method called when starting to processes a run ------------
@@ -1074,8 +1075,6 @@ tHqAnalyzer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   desc.setUnknown();
   descriptions.addDefault(desc);
 }
-
-
 
 
 //define this as a plug-in
