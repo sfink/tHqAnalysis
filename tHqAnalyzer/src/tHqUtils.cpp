@@ -676,3 +676,18 @@ void tHqUtils::GetAplanaritySphericity(math::XYZTLorentzVector leptonVec, math::
 }
 
 
+bool tHqUtils::GetTriggerResponse(const std::string& targetTrigger, const edm::TriggerResults& triggerResults){
+
+  //  bool hasTriggered=false;
+
+  //  unsigned int TriggerID =  triggerResults.find(targetTrigger);
+  std::cout << targetTrigger << std::endl;
+  if(targetTrigger == "None") std::cout << "Not found" << std::endl;
+  std::cout<< triggerResults.size()<<" " <<std::endl;
+  //if( TriggerID >= triggerResults.size() ) std::cout << "ERROR" << std::endl;
+  //std::cout<< triggerResults.accept(TriggerID)<<std::endl;
+  //if( triggerResults.accept(TriggerID)) hasTriggered=true;
+  //else hasTriggered=false;
+
+  return true;
+}

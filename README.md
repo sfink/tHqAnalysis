@@ -1,7 +1,7 @@
 tHqAnalysis
 =======
 
-Framework of the tHq group of Karlsruhe, much credit from the ttH group
+Framework of the tHq group of Karlsruhe, much credit to the ttH group
 
 ## Installation
 Follow These Steps:
@@ -14,3 +14,6 @@ Follow These Steps:
     git clone https://github.com/sfink/tHqAnalysis.git
     
     scram b -j 12
+
+
+### NOTE: Conversion to CMSSW_7_4 ongoing 

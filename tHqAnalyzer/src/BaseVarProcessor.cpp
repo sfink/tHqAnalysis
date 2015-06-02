@@ -13,6 +13,10 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVar( "lbn", "I");
   vars.InitVar( "sample", "I");
 
+  vars.InitVar( "hlt_ele27_wp80", "I");
+  vars.InitVar( "hlt_isomu24_eta2p1", "I");
+  //  vars.InitVar( "hlt_isomu24", "I");
+
   vars.InitVar( "njt", "I");
   vars.InitVar( "njt15", "I"); 
   vars.InitVar( "nlmu", "I");
@@ -146,6 +150,14 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
   vars.FillVar( "run", input.event.run);
   vars.FillVar( "lbn", input.event.lumiBlock);
   vars.FillVar( "sample", input.event.sample);
+
+
+  // Triggers
+
+  vars.FillVar( "hlt_ele27_wp80", input.triggerInfo.IsTriggered("HLT_Ele27_eta2p1_WP85_Gsf_v1"));
+  vars.FillVar( "hlt_isomu24_eta2p1", input.triggerInfo.IsTriggered("HLT_IsoMu24_eta2p1_IterTrk02_v1"));
+  //  vars.FillVar( "hlt_isomu24", input.triggerInfo.IsTriggered("HLT_IsoMu24_eta2p1_IterTrk02_v1"));
+
 
   // Fill btagged Jets
 

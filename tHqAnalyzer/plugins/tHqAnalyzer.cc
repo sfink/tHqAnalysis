@@ -45,6 +45,7 @@
 #include "tHqAnalysis/tHqAnalyzer/interface/InputCollections.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/Cutflow.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/TreeWriter.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/TriggerInfo.hpp"
 
 #include "tHqAnalysis/tHqAnalyzer/interface/Selection.hpp"
 //#include "tHqAnalysis/tHqAnalyzer/interface/LeptonSelection.hpp"
@@ -99,7 +100,7 @@ class tHqAnalyzer : public edm::EDAnalyzer {
       
       /** stores cutflow*/
       Cutflow cutflow;
-     
+  
       /** selections that are applied */
       vector<Selection*> selections;
       
@@ -127,6 +128,8 @@ class tHqAnalyzer : public edm::EDAnalyzer {
        /** is analyzed sample data? */
       bool isData;
 
+       /** triggers that are checked */
+       vector<std::string> relevantTriggers;
 
       /** disable some object selections for synch exe? */
       bool disableObjectSelections;
@@ -149,7 +152,7 @@ class tHqAnalyzer : public edm::EDAnalyzer {
       
       /** trigger results data access token **/
       edm::EDGetTokenT< edm::TriggerResults > EDMTriggerResultToken;
-      HLTConfigProvider hlt_config_;
+      HLTConfigProvider hlt_config;
 
       /** beam spot data access token **/
       edm::EDGetTokenT< reco::BeamSpot > EDMBeamSpotToken;
@@ -256,6 +259,8 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig)
     selections.back()->Init(iConfig,cutflow);
     } */
   
+  relevantTriggers = iConfig.getParameter< std::vector<std::string> >("relevantTriggers");
+
   // INITIALIZE TREEWRITER
   treewriter.Init(outfileName);
   std::vector<std::string> processorNames = iConfig.getParameter< std::vector<std::string> >("processorNames");
@@ -313,9 +318,9 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.getByToken( EDMHcalNoiseToken,h_hcalnoisesummary );
   
   /**** GET TRIGGER ****/
-  edm::Handle<pat::TriggerObjectStandAloneCollection> h_selectedtrigger;
-  iEvent.getByToken( EDMSelectedTriggerToken,h_selectedtrigger );
-  pat::TriggerObjectStandAloneCollection const &selectedTrigger = *h_selectedtrigger;
+  //edm::Handle<pat::TriggerObjectStandAloneCollection> h_selectedtrigger;
+  //iEvent.getByToken( EDMSelectedTriggerToken,h_selectedtrigger );
+  //  pat::TriggerObjectStandAloneCollection const &selectedTrigger = *h_selectedtrigger;
   
   edm::Handle<edm::TriggerResults> h_triggerresults;
   iEvent.getByToken( EDMTriggerResultToken,h_triggerresults );
@@ -442,6 +447,21 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // Fill tHq Event Object
   boosted::Event event = FillEvent(iEvent,h_geneventinfo,h_beamspot,h_hcalnoisesummary,h_puinfosummary);
   
+  // Fill Trigger Info
+  map<string,bool> triggerMap;
+  for(auto name=relevantTriggers.begin(); name!=relevantTriggers.end();name++){
+    unsigned int TriggerID =  hlt_config.triggerIndex(*name);
+    if( TriggerID >= triggerResults.size() ) { 
+      std::cerr <<"triggerID > trigger results.size: "<<TriggerID<<" > "<<triggerResults.size()<<std::endl; 
+      triggerMap[*name]=false;
+    }
+    else{
+      triggerMap[*name]=triggerResults.accept(TriggerID);
+    }
+  }
+  TriggerInfo triggerInfo(triggerMap);
+
+
   // FIGURE OUT SAMPLE
   SampleType sampleType;
   if(isData)
@@ -461,9 +481,10 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // DEFINE INPUT
   InputCollections input( event,
-			  selectedTrigger,
-			  triggerResults,
-                          hlt_config_,
+			  //selectedTrigger,
+			  //triggerResults,
+                          triggerInfo,
+			  //			  hlt_config_,
 			  selectedPVs,
 			  selectedMuons,
 			  selectedMuonsLoose,
@@ -482,9 +503,10 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                           iEvent
 			  );
   InputCollections unselected_input( event,
-			  selectedTrigger,
-			  triggerResults,
-                          hlt_config_,
+				     //			  selectedTrigger,
+				     //			  triggerResults,
+			  triggerInfo,
+				     //			  hlt_config_,
 			  vtxs,
 			  muons,
 			  muons,
@@ -898,6 +920,7 @@ std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJ
 }
 
 
+
 boosted::Event tHqAnalyzer::FillEvent(const edm::Event& iEvent, const edm::Handle<GenEventInfoProduct>& genEvtInfo, const edm::Handle<reco::BeamSpot>& beamSpot, const edm::Handle<HcalNoiseSummary>& hcalNoiseSummary, const edm::Handle< std::vector<PileupSummaryInfo> >& puSummaryInfo){
  
   boosted::Event event = boosted::Event();
@@ -1059,7 +1082,7 @@ tHqAnalyzer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
 {
 std::string hltTag="HLT";
 bool hltchanged = true;
-if (!hlt_config_.init(iRun, iSetup, hltTag, hltchanged)) {
+if (!hlt_config.init(iRun, iSetup, hltTag, hltchanged)) {
 std::cout << "Warning, didn't find trigger process HLT,\t" << hltTag << std::endl;
 return;
 }
