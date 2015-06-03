@@ -40,6 +40,7 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVars( "jtphi","njt" );
   vars.InitVars( "jteta","njt" );
   vars.InitVars( "jtcsvt","njt" );
+  vars.InitVars( "jtpuid","njt" );
 
   vars.InitVars( "jtntracks","njt" );
   vars.InitVars( "jtarea","njt" );
@@ -167,7 +168,7 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
 
   // Fill btagged Jets
 
-  const char* btagger="combinedInclusiveSecondaryVertexV2BJetTags";
+  const char* btagger="pfCombinedInclusiveSecondaryVertexV2BJetTags";
   std::vector<pat::Jet> selectedTaggedJets;
   std::vector<pat::Jet> selectedTaggedJetsT;
   std::vector<pat::Jet> selectedTaggedJetsL;
@@ -206,6 +207,7 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
     vars.FillVars( "jteta",iJet,itJet->eta() );
     vars.FillVars( "jtphi",iJet,itJet->phi() );
     vars.FillVars( "jtcsvt",iJet,fmax(itJet->bDiscriminator(btagger),-.1) );        
+    vars.FillVars( "jtpuid",iJet,itJet->userFloat("pileupJetId:fullDiscriminant") );
 
     vars.FillVars( "jtntracks",iJet,itJet->associatedTracks().size() );
     vars.FillVars( "jtarea",iJet,itJet->jetArea() );
