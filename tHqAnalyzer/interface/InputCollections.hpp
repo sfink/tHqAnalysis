@@ -30,6 +30,7 @@ struct InputCollections{
                     const std::vector<pat::Electron>&             selectedElectronsLoose_,
                     const std::vector<pat::Jet>&                  selectedJets_,
                     const std::vector<pat::Jet>&                  selectedJetsLoose_,
+                    const std::vector<pat::Jet>&                  selectedPuppiJets_,
                     const std::vector<pat::MET>&                  pfMets_,
                     const std::vector<reco::GenParticle>&         genParticles_,
                     const std::vector<reco::GenJet>&              selectedGenJets_,
@@ -51,6 +52,7 @@ struct InputCollections{
                     selectedElectronsLoose(selectedElectronsLoose_),
                     selectedJets(selectedJets_),
                     selectedJetsLoose(selectedJetsLoose_),
+                    selectedPuppiJets(selectedPuppiJets_),
                     pfMets(pfMets_),
                     genParticles(genParticles_),
                     selectedGenJets(selectedGenJets_),
@@ -71,6 +73,7 @@ struct InputCollections{
   const std::vector<pat::Electron>&             selectedElectronsLoose;
   const std::vector<pat::Jet>&                  selectedJets;
   const std::vector<pat::Jet>&                  selectedJetsLoose;
+  const std::vector<pat::Jet>&                  selectedPuppiJets;
   const std::vector<pat::MET>&                  pfMets;
   const std::vector<reco::GenParticle>&         genParticles;
   const std::vector<reco::GenJet>&              selectedGenJets;

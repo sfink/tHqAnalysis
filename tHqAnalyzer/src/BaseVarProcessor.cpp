@@ -19,6 +19,7 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
 
   vars.InitVar( "njt", "I");
   vars.InitVar( "njt15", "I"); 
+  vars.InitVar( "npupjt", "I");
   vars.InitVar( "nlmu", "I");
   vars.InitVar( "nlel", "I");
   vars.InitVar( "nmu", "I");
@@ -59,6 +60,11 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVars( "jtgeneta","njt" );
   vars.InitVars( "jtgene","njt" );
 
+  vars.InitVars( "pupjte","npupjt" );
+  vars.InitVars( "pupjtpt","npupjt" );
+  vars.InitVars( "pupjtphi","npupjt" );
+  vars.InitVars( "pupjteta","npupjt" );
+  vars.InitVars( "pupjtcsvt","npupjt" );
 
 
 
@@ -185,6 +191,7 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
   vars.FillVar( "npv",input.selectedPVs.size());  
   vars.FillVar( "njt",input.selectedJets.size());
   vars.FillVar( "njt15",input.selectedJetsLoose.size());
+  vars.FillVar( "npupjt",input.selectedPuppiJets.size());
   vars.FillVar( "nel",input.selectedElectrons.size());  
   vars.FillVar( "nlel",input.selectedElectronsLoose.size());  
   vars.FillVar( "nmu",input.selectedMuons.size());  
@@ -216,6 +223,19 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
       vars.FillVars( "jthfhadronfrac",iJet,itJet.pfSpecific().mChargedHadronEnergy ); //to implement
       } */
   }
+
+  //Fill Puppi Jet variables
+
+  for(std::vector<pat::Jet>::const_iterator itJet = input.selectedPuppiJets.begin() ; itJet != input.selectedPuppiJets.end(); ++itJet){
+    int iJet = itJet - input.selectedPuppiJets.begin();
+    vars.FillVars( "pupjte",iJet,itJet->energy() );
+    vars.FillVars( "pupjtpt",iJet,itJet->pt() );
+    vars.FillVars( "pupjteta",iJet,itJet->eta() );
+    vars.FillVars( "pupjtphi",iJet,itJet->phi() );
+    vars.FillVars( "pupjtcsvt",iJet,fmax(itJet->bDiscriminator(btagger),-.1) );        
+  }
+
+
 
   
   for(std::vector<reco::GenJet>::const_iterator itGenJet = input.selectedGenJets.begin() ; itGenJet != input.selectedGenJets.end(); ++itGenJet){
