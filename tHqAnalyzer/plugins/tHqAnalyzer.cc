@@ -486,10 +486,10 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
   }
 
-  for(auto name=triggerResults.begin(); name!=triggerResults.end();name++){
+  //for(auto name=triggerResults.begin(); name!=triggerResults.end();name++){
     //    unsigned int TriggerID =  hlt_config.triggerIndex(*name);
-    std::cout << "Jo: Name: " << *name << endl;
-  }
+  //   std::cout << "Jo: Name: " << *name << endl;
+  // }
 
   TriggerInfo triggerInfo(triggerMap);
 
