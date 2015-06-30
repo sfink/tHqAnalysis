@@ -8,7 +8,7 @@ config.General.workArea = 'crab_projects'
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = '/afs/desy.de/user/f/fink/xxl/af-cms/13TeV/CMSSW_7_4_2/src/tHqAnalysis/tHqAnalyzer/test/tHqAnalysis_cfg.py'
-config.JobType.outputFiles = ['ST_tW-analyzed.root']
+config.JobType.outputFiles = ['tHqAnalyzed_Tree.root']
 
 config.section_("Data")
 config.Data.inputDataset = '/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM'
