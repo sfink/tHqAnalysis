@@ -161,8 +161,12 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
 
   // Triggers
 
-  vars.FillVar( "hlt_ele27_wp80", input.triggerInfo.IsTriggered("HLT_Ele27_eta2p1_WP85_Gsf_v1"));
-  vars.FillVar( "hlt_isomu24_eta2p1", input.triggerInfo.IsTriggered("HLT_IsoMu24_eta2p1_IterTrk02_v1"));
+  //Triggers not yet implemented, wait for correct triggers to get announced
+  vars.FillVar( "hlt_ele27_wp80", 1);
+  vars.FillVar( "hlt_isomu24_eta2p1", 1);            
+
+  //vars.FillVar( "hlt_ele27_wp80", input.triggerInfo.IsTriggered("HLT_Ele27_eta2p1_WPTight_Gsf_v1"));
+  //vars.FillVar( "hlt_isomu24_eta2p1", input.triggerInfo.IsTriggered("HLT_IsoMu24_eta2p1_v2"));
   //  vars.FillVar( "hlt_isomu24", input.triggerInfo.IsTriggered("HLT_IsoMu24_eta2p1_IterTrk02_v1"));
 
 

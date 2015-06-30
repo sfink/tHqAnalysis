@@ -264,6 +264,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig)
     selections.back()->Init(iConfig,cutflow);
     } */
   
+  
   relevantTriggers = iConfig.getParameter< std::vector<std::string> >("relevantTriggers");
 
   // INITIALIZE TREEWRITER
@@ -481,9 +482,17 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
     else{
       triggerMap[*name]=triggerResults.accept(TriggerID);
+      std::cout << "Jo: Trigger ID: " << TriggerID << "  Name: " << *name << endl;
     }
   }
+
+  for(auto name=triggerResults.begin(); name!=triggerResults.end();name++){
+    //    unsigned int TriggerID =  hlt_config.triggerIndex(*name);
+    std::cout << "Jo: Name: " << *name << endl;
+  }
+
   TriggerInfo triggerInfo(triggerMap);
+
 
 
   // FIGURE OUT SAMPLE
