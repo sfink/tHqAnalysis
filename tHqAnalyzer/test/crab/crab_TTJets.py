@@ -2,7 +2,7 @@ from WMCore.Configuration import Configuration
 config = Configuration()
 
 config.section_("General")
-config.General.requestName = 'MC_aMCatNLO_TTJets_M-125_13TeV_PHYS14_temp2'
+config.General.requestName = 'MC_aMCatNLO_TTJets_M-125_13TeV_PHYS14_synch'
 config.General.workArea = 'crab_projects'
 
 config.section_("JobType")
