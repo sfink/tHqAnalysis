@@ -6,7 +6,7 @@ tHqAnalyzer = cms.EDAnalyzer(
     LeptonSelectionNoTrigger,
     JetTagSelection,  
     relevantTriggers = cms.vstring("HLT_IsoMu24_eta2p1_IterTrk02_v1","HLT_Ele27_eta2p1_WP85_Gsf_v1"),
-    era = cms.string("2012_53x"),
+    era = cms.string("2015_74x"),
     analysisType = cms.string("LJ"),
     luminostiy = cms.double(19.7),
     sampleID = cms.int32(9125),
