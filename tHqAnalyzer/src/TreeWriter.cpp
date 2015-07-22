@@ -75,10 +75,12 @@ void TreeWriter::AddSampleInformation(){
   stringstream ss3; ss3<<"kfactor:"<<kfac;
 
   
-  std::cout << "SampleInformation is called." << std::endl;
+  std::cout << "SampleInformation is called. Tree contains " << ntotal << " Entries."  << std::endl;
 
   tree->GetUserInfo()->Add(new TObjString(ss.str().c_str()));
   tree->GetUserInfo()->Add(new TObjString(ss1.str().c_str()));
   tree->GetUserInfo()->Add(new TObjString(ss2.str().c_str()));
   tree->GetUserInfo()->Add(new TObjString(ss3.str().c_str()));
+
+  
 }

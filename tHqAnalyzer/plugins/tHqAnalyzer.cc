@@ -580,7 +580,7 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   selectedElectrons = ElectronSelection(selectedElectrons,input.selectedPVs[0].position());
   selectedMuons = MuonSelection(selectedMuons,input.selectedPVs[0].position());
   selectedJets = JetSelection(selectedJets,selectedElectrons, selectedMuons, input);
-
+  
   // WRITE TREE
   if(disableObjectSelections)
     treewriter.Process(unselected_input);  
@@ -1119,6 +1119,7 @@ tHqAnalyzer::beginJob()
 void 
 tHqAnalyzer::endJob() 
 {
+  std::cout << "Original File had " << eventcount << " Entries." << std::endl;
   treewriter.AddSampleInformation();
   cutflow.Print();
 }
