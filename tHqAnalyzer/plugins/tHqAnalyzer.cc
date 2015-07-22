@@ -366,14 +366,14 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle< std::vector<pat::Muon> > h_muons;
   iEvent.getByToken( EDMMuonsToken,h_muons );
   std::vector<pat::Muon> const &muons = *h_muons; 
-  std::vector<pat::Muon> selectedMuons = helper.GetSelectedMuons( muons, 20., muonID::muonTight );
+  std::vector<pat::Muon> selectedMuons = helper.GetSelectedMuons( muons, 15., muonID::muonTight );
   std::vector<pat::Muon> selectedMuonsLoose = helper.GetSelectedMuons( muons, 10., muonID::muonLoose );
 
   // ELECTRONS
   edm::Handle< std::vector<pat::Electron> > h_electrons;
   iEvent.getByToken( EDMElectronsToken,h_electrons );
   std::vector<pat::Electron> const &electrons = *h_electrons;
-  std::vector<pat::Electron> selectedElectrons = helper.GetSelectedElectrons( electrons, 20., electronID::electronTight );
+  std::vector<pat::Electron> selectedElectrons = helper.GetSelectedElectrons( electrons, 15., electronID::electronTight );
   std::vector<pat::Electron> selectedElectronsLoose = helper.GetSelectedElectrons( electrons, 10., electronID::electronLoose );
 
   // Leptons
@@ -410,9 +410,9 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // Apply jet corrections
   //  std::vector<pat::Jet> correctedJets = helper.GetCorrectedJets(jetsNoEle, iEvent, iSetup);
   // Get jet Collection which pass selection
-  std::vector<pat::Jet> selectedJets = helper.GetSelectedJets(jetsNoEle, 30., 2.4, jetID::jetLoose, '-' );
+  std::vector<pat::Jet> selectedJets = helper.GetSelectedJets(jetsNoEle, 20., 4.7, jetID::jetLoose, '-' );
   // Get jet Collection which pass loose selection
-  std::vector<pat::Jet> selectedJetsLoose = helper.GetSelectedJets(jetsNoEle, 20., 2.5, jetID::jetLoose, '-' );
+  std::vector<pat::Jet> selectedJetsLoose = helper.GetSelectedJets(jetsNoEle, 15., 4.7, jetID::jetLoose, '-' );
 
 
 
@@ -425,7 +425,7 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::vector<pat::Jet> puppiJetsNoEle = helper.RemoveOverlaps(selectedElectronsLoose, puppiJetsNoMu);
 
   // Get puppi jet Collection which pass selection
-  std::vector<pat::Jet> selectedPuppiJets = helper.GetSelectedJets(jetsNoEle, 30., 2.4, jetID::jetLoose, '-' );
+  std::vector<pat::Jet> selectedPuppiJets = helper.GetSelectedJets(jetsNoEle, 20., 4.7, jetID::jetLoose, '-' );
 
   /**** GET MET ****/
   edm::Handle< std::vector<pat::MET> > h_pfmet;
@@ -603,6 +603,11 @@ std::vector<pat::Muon> tHqAnalyzer::MuonSelection( std::vector<pat::Muon> select
     bool passesTrackID=false;
     bool passesID=false;
     
+    const float minPt=15;
+    const float maxEta=2.4;
+    
+
+
     if(iMuon.globalTrack().isAvailable()){
     double chi2ndof = iMuon.globalTrack()->normalizedChi2();
     int nValidHits = iMuon.globalTrack()->hitPattern().numberOfValidMuonHits();
@@ -630,7 +635,7 @@ std::vector<pat::Muon> tHqAnalyzer::MuonSelection( std::vector<pat::Muon> select
     double relIso = (iMuon.pfIsolationR04().sumChargedHadronPt + std::max( iMuon.pfIsolationR04().sumNeutralHadronEt + iMuon.pfIsolationR04().sumPhotonEt - 0.5 * iMuon.pfIsolationR04().sumPUPt,0.0)) / iMuon.pt();
     
     isPFandGlobal = (iMuon.isPFMuon() && iMuon.isGlobalMuon());
-    passesKinematics = (iMuon.pt()>20 && fabs(iMuon.eta())<2.4);
+    passesKinematics = (iMuon.pt()>minPt && fabs(iMuon.eta())<maxEta);
     passesISO = (relIso<0.12);
     passesID = (passesinnerTrackID && passesGlobalTrackID && passesBestTrackID && passesTrackID && nMatchedStations>1);
     
@@ -656,6 +661,10 @@ std::vector<pat::Electron> tHqAnalyzer::ElectronSelection( std::vector<pat::Elec
     bool passesConversion=false;
     bool passesISO=false;
     bool passessID=false;
+
+    const float minPt=15;
+    const float maxEta=2.4;
+
 
     //check if barrel or endcap supercluster                                                                                                             
     double SCeta = (iElectron.superCluster().isAvailable()) ? iElectron.superCluster()->position().eta() : 99;
@@ -694,7 +703,7 @@ std::vector<pat::Electron> tHqAnalyzer::ElectronSelection( std::vector<pat::Elec
 
     //do the checks                                                                                                                                        
     passesConversion = ( iElectron.passConversionVeto() );
-    passesKinematics = (iElectron.pt()>20 && fabs(iElectron.eta())<2.4);
+    passesKinematics = (iElectron.pt()>minPt && fabs(iElectron.eta())<maxEta);
     if(iElectron.superCluster().isAvailable()){
       inCrack = (fabs(iElectron.superCluster()->position().eta())>1.4442 && fabs(iElectron.superCluster()->position().eta())<1.5660);
     }
@@ -737,6 +746,9 @@ std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJ
   std::vector<pat::Jet> sortedJets;
   //  std::vector<pat::Jet> selectedJets;
   std::vector<pat::Jet> taggedJets;
+
+  const float minPt=15;
+  const float maxEta=4.7;
 
   //first uncorrect the jets
                                                                                                                                
@@ -931,7 +943,7 @@ std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJ
     pat::Jet iJet = *it;
 
     bool isselected=false;
-    isselected=(iJet.pt()>25.0 && abs(iJet.eta())<2.4 && iJet.neutralHadronEnergyFraction()<0.99 && iJet.chargedHadronEnergyFraction()>0.0 && iJet.chargedMultiplicity()>0.0 && iJet.chargedEmEnergyFraction()<0.99 && iJet.neutralEmEnergyFraction()<0.99 && iJet.numberOfDaughters()>1 );
+    isselected=(iJet.pt()>minPt && abs(iJet.eta())<maxEta && iJet.neutralHadronEnergyFraction()<0.99 && iJet.chargedHadronEnergyFraction()>0.0 && iJet.chargedMultiplicity()>0.0 && iJet.chargedEmEnergyFraction()<0.99 && iJet.neutralEmEnergyFraction()<0.99 && iJet.numberOfDaughters()>1 );
     if(isselected){
       selectedJets.push_back(iJet);
     }

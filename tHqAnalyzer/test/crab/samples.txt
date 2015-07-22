@@ -36,16 +36,22 @@ Number of events: 40645664
 /TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-scaledown-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM
 Number of events: 39044549
 
+ttH:
+/ttHTobb_M125_13TeV_powheg_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM
+Number of Events: 3,933,404
+
 
 DiBoson:
 /WZ_TuneCUETP8M1_13TeV-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM
 Number of events: 991232
 
-Missing: ZZ / WW
+Missing: 
+ZZ / WW
+W+Jets
+Z+Jets
+QCD 
 
+Signal
 
-ttH:
-/ttHTobb_M125_13TeV_powheg_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM
-Number of Events: 3,933,404
 
 
