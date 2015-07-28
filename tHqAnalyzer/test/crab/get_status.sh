@@ -1,0 +1,1 @@
+for i in $(find crab_projects/ -maxdepth 1 -mindepth 1 -atime -1 -type d); do crab status -d $i; done
