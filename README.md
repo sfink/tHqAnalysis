@@ -16,4 +16,4 @@ Follow These Steps:
     scram b -j 12
 
 
-### NOTE: Conversion to CMSSW_7_4 ongoing 
+### NOTE: Conversion to CMSSW_7_4 ongoing. 
