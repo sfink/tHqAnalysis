@@ -465,7 +465,7 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::vector<reco::GenJet> const &genjets = *h_genjets;
   std::vector<reco::GenJet> selectedGenJets;
   for(size_t i=0; i<genjets.size();i++){
-    if(genjets[i].pt()>30&&fabs(genjets[i].eta())<2.5)
+    if(genjets[i].pt()>10&&fabs(genjets[i].eta())<5.)
       selectedGenJets.push_back(genjets[i]);
   }
   
@@ -603,7 +603,7 @@ std::vector<pat::Muon> tHqAnalyzer::MuonSelection( std::vector<pat::Muon> select
     bool passesTrackID=false;
     bool passesID=false;
     
-    const float minPt=15;
+    const float minPt=5;
     const float maxEta=2.4;
     
 
@@ -662,7 +662,7 @@ std::vector<pat::Electron> tHqAnalyzer::ElectronSelection( std::vector<pat::Elec
     bool passesISO=false;
     bool passessID=false;
 
-    const float minPt=15;
+    const float minPt=5;
     const float maxEta=2.4;
 
 
@@ -747,8 +747,8 @@ std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJ
   //  std::vector<pat::Jet> selectedJets;
   std::vector<pat::Jet> taggedJets;
 
-  const float minPt=15;
-  const float maxEta=4.7;
+  const float minPt=10;
+  const float maxEta=5;
 
   //first uncorrect the jets
                                                                                                                                
