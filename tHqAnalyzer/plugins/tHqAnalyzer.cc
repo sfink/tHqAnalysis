@@ -169,6 +169,10 @@ class tHqAnalyzer : public edm::EDAnalyzer {
       /** jets data access token **/
       edm::EDGetTokenT< std::vector<pat::Jet> > EDMJetsToken;
 
+      /** puppi jets data access token **/
+      edm::EDGetTokenT< std::vector<pat::Jet> > EDMPuppiJetsToken;
+
+
       /** mets data access token **/
       edm::EDGetTokenT< std::vector<pat::MET> > EDMMETsToken;
       
@@ -234,6 +238,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig)
   EDMMuonsToken           = consumes< std::vector<pat::Muon> >(edm::InputTag("slimmedMuons","","PAT"));
   EDMElectronsToken       = consumes< std::vector<pat::Electron> >(edm::InputTag("slimmedElectrons","","PAT"));
   EDMJetsToken            = consumes< std::vector<pat::Jet> >(edm::InputTag("slimmedJets","","PAT"));
+  EDMPuppiJetsToken       = consumes< std::vector<pat::Jet> >(edm::InputTag("slimmedJetsPuppi","","PAT"));
   EDMMETsToken            = consumes< std::vector<pat::MET> >(edm::InputTag("slimmedMETs","","PAT"));
   //EDMHEPTopJetsToken      = consumes< boosted::HEPTopJetCollection >(edm::InputTag("HEPTopJetsPFMatcher","heptopjets","p"));
   // EDMSubFilterJetsToken   = consumes< boosted::SubFilterJetCollection >(edm::InputTag("CA12JetsCA3FilterjetsPFMatcher","subfilterjets","p"));
@@ -258,6 +263,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig)
     
     selections.back()->Init(iConfig,cutflow);
     } */
+  
   
   relevantTriggers = iConfig.getParameter< std::vector<std::string> >("relevantTriggers");
 
@@ -385,6 +391,12 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle< std::vector<pat::Jet> > h_pfjets;
   iEvent.getByToken( EDMJetsToken,h_pfjets );
   std::vector<pat::Jet> const &pfjets = *h_pfjets;
+
+  /**** GET PUPPI JETS (BECAUSE PUPPI PERFORMS BEST) ****/
+  edm::Handle< std::vector<pat::Jet> > h_pfpuppijets;
+  iEvent.getByToken( EDMPuppiJetsToken,h_pfpuppijets );
+  std::vector<pat::Jet> const &pfpuppijets = *h_pfpuppijets;
+
   
   //  const JetCorrector* corrector = JetCorrector::getJetCorrector( "ak4PFchsL1L2L3", iSetup );   
   //helper.SetJetCorrector(corrector);
@@ -401,6 +413,19 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::vector<pat::Jet> selectedJets = helper.GetSelectedJets(jetsNoEle, 30., 2.4, jetID::jetLoose, '-' );
   // Get jet Collection which pass loose selection
   std::vector<pat::Jet> selectedJetsLoose = helper.GetSelectedJets(jetsNoEle, 20., 2.5, jetID::jetLoose, '-' );
+
+
+
+
+  // Get raw puppi jets
+  std::vector<pat::Jet> rawPuppiJets = helper.GetUncorrectedJets(pfpuppijets);
+  // Clean muons from jets
+  std::vector<pat::Jet> puppiJetsNoMu = helper.RemoveOverlaps(selectedMuonsLoose, rawPuppiJets);
+  // Clean electrons from jets
+  std::vector<pat::Jet> puppiJetsNoEle = helper.RemoveOverlaps(selectedElectronsLoose, puppiJetsNoMu);
+
+  // Get puppi jet Collection which pass selection
+  std::vector<pat::Jet> selectedPuppiJets = helper.GetSelectedJets(jetsNoEle, 30., 2.4, jetID::jetLoose, '-' );
 
   /**** GET MET ****/
   edm::Handle< std::vector<pat::MET> > h_pfmet;
@@ -452,14 +477,22 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   for(auto name=relevantTriggers.begin(); name!=relevantTriggers.end();name++){
     unsigned int TriggerID =  hlt_config.triggerIndex(*name);
     if( TriggerID >= triggerResults.size() ) { 
-      std::cerr <<"triggerID > trigger results.size: "<<TriggerID<<" > "<<triggerResults.size()<<std::endl; 
+      //      std::cerr <<"triggerID > trigger results.size: "<<TriggerID<<" > "<<triggerResults.size()<<std::endl; 
       triggerMap[*name]=false;
     }
     else{
       triggerMap[*name]=triggerResults.accept(TriggerID);
+      std::cout << "Jo: Trigger ID: " << TriggerID << "  Name: " << *name << endl;
     }
   }
+
+  //for(auto name=triggerResults.begin(); name!=triggerResults.end();name++){
+    //    unsigned int TriggerID =  hlt_config.triggerIndex(*name);
+  //   std::cout << "Jo: Name: " << *name << endl;
+  // }
+
   TriggerInfo triggerInfo(triggerMap);
+
 
 
   // FIGURE OUT SAMPLE
@@ -491,6 +524,7 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 			  selectedElectrons,
                           selectedElectronsLoose,
                           selectedJets,
+			  selectedPuppiJets,
                           selectedJetsLoose,
                           pfMETs,
 			  // heptopjets,
@@ -514,6 +548,7 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                           electrons,
                           pfjets,
                           pfjets,
+			  pfpuppijets,
                           pfMETs,
 				     //heptopjets,
 				     //subfilterjets,

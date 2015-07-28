@@ -19,6 +19,7 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
 
   vars.InitVar( "njt", "I");
   vars.InitVar( "njt15", "I"); 
+  vars.InitVar( "npupjt", "I");
   vars.InitVar( "nlmu", "I");
   vars.InitVar( "nlel", "I");
   vars.InitVar( "nmu", "I");
@@ -39,6 +40,7 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVars( "jtphi","njt" );
   vars.InitVars( "jteta","njt" );
   vars.InitVars( "jtcsvt","njt" );
+  vars.InitVars( "jtpuid","njt" );
 
   vars.InitVars( "jtntracks","njt" );
   vars.InitVars( "jtarea","njt" );
@@ -59,6 +61,11 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVars( "jtgeneta","njt" );
   vars.InitVars( "jtgene","njt" );
 
+  vars.InitVars( "pupjte","npupjt" );
+  vars.InitVars( "pupjtpt","npupjt" );
+  vars.InitVars( "pupjtphi","npupjt" );
+  vars.InitVars( "pupjteta","npupjt" );
+  vars.InitVars( "pupjtcsvt","npupjt" );
 
 
 
@@ -154,14 +161,18 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
 
   // Triggers
 
-  vars.FillVar( "hlt_ele27_wp80", input.triggerInfo.IsTriggered("HLT_Ele27_eta2p1_WP85_Gsf_v1"));
-  vars.FillVar( "hlt_isomu24_eta2p1", input.triggerInfo.IsTriggered("HLT_IsoMu24_eta2p1_IterTrk02_v1"));
+  //Triggers not yet implemented, wait for correct triggers to get announced
+  vars.FillVar( "hlt_ele27_wp80", 1);
+  vars.FillVar( "hlt_isomu24_eta2p1", 1);            
+
+  //vars.FillVar( "hlt_ele27_wp80", input.triggerInfo.IsTriggered("HLT_Ele27_eta2p1_WPTight_Gsf_v1"));
+  //vars.FillVar( "hlt_isomu24_eta2p1", input.triggerInfo.IsTriggered("HLT_IsoMu24_eta2p1_v2"));
   //  vars.FillVar( "hlt_isomu24", input.triggerInfo.IsTriggered("HLT_IsoMu24_eta2p1_IterTrk02_v1"));
 
 
   // Fill btagged Jets
 
-  const char* btagger="combinedInclusiveSecondaryVertexV2BJetTags";
+  const char* btagger="pfCombinedInclusiveSecondaryVertexV2BJetTags";
   std::vector<pat::Jet> selectedTaggedJets;
   std::vector<pat::Jet> selectedTaggedJetsT;
   std::vector<pat::Jet> selectedTaggedJetsL;
@@ -185,6 +196,7 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
   vars.FillVar( "npv",input.selectedPVs.size());  
   vars.FillVar( "njt",input.selectedJets.size());
   vars.FillVar( "njt15",input.selectedJetsLoose.size());
+  vars.FillVar( "npupjt",input.selectedPuppiJets.size());
   vars.FillVar( "nel",input.selectedElectrons.size());  
   vars.FillVar( "nlel",input.selectedElectronsLoose.size());  
   vars.FillVar( "nmu",input.selectedMuons.size());  
@@ -199,6 +211,7 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
     vars.FillVars( "jteta",iJet,itJet->eta() );
     vars.FillVars( "jtphi",iJet,itJet->phi() );
     vars.FillVars( "jtcsvt",iJet,fmax(itJet->bDiscriminator(btagger),-.1) );        
+    vars.FillVars( "jtpuid",iJet,itJet->userFloat("pileupJetId:fullDiscriminant") );
 
     vars.FillVars( "jtntracks",iJet,itJet->associatedTracks().size() );
     vars.FillVars( "jtarea",iJet,itJet->jetArea() );
@@ -216,6 +229,19 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
       vars.FillVars( "jthfhadronfrac",iJet,itJet.pfSpecific().mChargedHadronEnergy ); //to implement
       } */
   }
+
+  //Fill Puppi Jet variables
+
+  for(std::vector<pat::Jet>::const_iterator itJet = input.selectedPuppiJets.begin() ; itJet != input.selectedPuppiJets.end(); ++itJet){
+    int iJet = itJet - input.selectedPuppiJets.begin();
+    vars.FillVars( "pupjte",iJet,itJet->energy() );
+    vars.FillVars( "pupjtpt",iJet,itJet->pt() );
+    vars.FillVars( "pupjteta",iJet,itJet->eta() );
+    vars.FillVars( "pupjtphi",iJet,itJet->phi() );
+    vars.FillVars( "pupjtcsvt",iJet,fmax(itJet->bDiscriminator(btagger),-.1) );        
+  }
+
+
 
   
   for(std::vector<reco::GenJet>::const_iterator itGenJet = input.selectedGenJets.begin() ; itGenJet != input.selectedGenJets.end(); ++itGenJet){
