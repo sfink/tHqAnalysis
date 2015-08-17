@@ -6,8 +6,8 @@ Framework of the tHq group of Karlsruhe, much credit to the ttH group
 ## Installation
 Follow These Steps:
 
-    cmsrel CMSSW_7_2_3
-    cd CMSSW_7_2_3/src
+    cmsrel CMSSW_7_4_2
+    cd CMSSW_7_4_2/src
     cmsenv
 
     git clone https://github.com/cms-ttH/MiniAOD.git
@@ -16,4 +16,4 @@ Follow These Steps:
     scram b -j 12
 
 
-### NOTE: Conversion to CMSSW_7_4 ongoing. 
+### NOTE: Conversion to CMSSW_7_5 ongoing. 
