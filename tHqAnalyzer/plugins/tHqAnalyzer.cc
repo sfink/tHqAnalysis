@@ -210,9 +210,6 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig)
   string analysisType = iConfig.getParameter<std::string>("analysisType");
   analysisType::analysisType iAnalysisType = analysisType::LJ;
   if(analysisType == "LJ") iAnalysisType = analysisType::LJ;
-  else if(analysisType == "DIL") iAnalysisType = analysisType::DIL;
-  else if(analysisType == "TauLJ") iAnalysisType = analysisType::TauLJ;
-  else if(analysisType == "TauDIL") iAnalysisType = analysisType::TauDIL;
   else cerr << "No matching analysis type found for: " << analysisType << endl;
   
   luminosity = iConfig.getParameter<double>("luminostiy");
