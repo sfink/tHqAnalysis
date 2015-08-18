@@ -1043,7 +1043,7 @@ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventIn
   }   // NOTE: IS THIS EVEN CORRECT?
 
 
-  double csvWgtHF, csvWgtLF, csvWgtCF;
+  //  double csvWgtHF, csvWgtLF, csvWgtCF;
 
   float xsweight = xs*luminosity/totalMCevents;
   float csvweight = 1.;

@@ -11,7 +11,7 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVar( "evt", "I");
   vars.InitVar( "run", "I"); 
   vars.InitVar( "lbn", "I");
-  vars.InitVar( "sample", "I");
+  vars.InitVar( "rho", "I");
 
   vars.InitVar( "hlt_ele27_wp80", "I");
   vars.InitVar( "hlt_isomu24_eta2p1", "I");
@@ -153,10 +153,10 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
 
   // Fill event variables
   
-  vars.FillVar( "evt", input.event.evt);
-  vars.FillVar( "run", input.event.run);
-  vars.FillVar( "lbn", input.event.lumiBlock);
-  vars.FillVar( "sample", input.event.sample);
+  vars.FillVar( "evt", input.eventInfo.evt);
+  vars.FillVar( "run", input.eventInfo.run);
+  vars.FillVar( "lbn", input.eventInfo.lumiBlock);
+  vars.FillVar( "rho", input.eventInfo.rho);
 
 
   // Triggers
@@ -323,12 +323,12 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
   vars.FillVar( "lepwm",   lepWVec.M()   );
   
   
-  vars.FillVar( "met",input.pfMets[0].pt() );
-  vars.FillVar( "meteta",input.pfMets[0].eta() );
-  vars.FillVar( "metphi",input.pfMets[0].phi() );
+  vars.FillVar( "met",input.pfMET.pt() );
+  vars.FillVar( "meteta",input.pfMET.eta() );
+  vars.FillVar( "metphi",input.pfMET.phi() );
   
   std::vector<math::XYZTLorentzVector> jetvecs = tHqUtils::GetJetVecs(input.selectedJets);
-  math::XYZTLorentzVector metvec = input.pfMets[0].p4();
+  math::XYZTLorentzVector metvec = input.pfMET.p4();
   
   // Fill M3 Variables
   float m3_helper = -1.;
@@ -351,7 +351,7 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
   // Fill MTW
   float mtw_helper = -1.;
   if(input.selectedElectrons.size()>0 || input.selectedMuons.size()>0){
-    mtw_helper = sqrt(2*(primLepVec.Pt()*input.pfMets[0].pt() - primLepVec.Px()*input.pfMets[0].px() - primLepVec.Py()*input.pfMets[0].py()));
+    mtw_helper = sqrt(2*(primLepVec.Pt()*input.pfMET.pt() - primLepVec.Px()*input.pfMET.px() - primLepVec.Py()*input.pfMET.py()));
   }
   vars.FillVar("mtw",mtw_helper);
   
@@ -368,7 +368,7 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
   for(std::vector<pat::Muon>::const_iterator itMu = input.selectedMuonsLoose.begin(); itMu != input.selectedMuonsLoose.end(); ++itMu){
     ht += itMu->pt();
   }
-  ht += input.pfMets[0].pt();
+  ht += input.pfMET.pt();
   
   vars.FillVar("sumHtTotal",ht);
   vars.FillVar("sumHt",htjets);

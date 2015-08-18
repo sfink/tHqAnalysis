@@ -40,7 +40,7 @@ struct InputCollections{
 		    //		    const GenTopEvent&                            genTopEvt_,
                     const std::vector<reco::GenJet>&              selectedGenJets_,
                     const SampleType                              sampleType_,
-                    const std::map<std::string,float>&            weights_,
+                    const std::map<std::string,float>&            weights_
                   ):
                     eventInfo(eventInfo_),
 		    triggerInfo(triggerInfo_),
