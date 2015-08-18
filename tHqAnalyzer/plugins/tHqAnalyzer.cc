@@ -241,6 +241,8 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig)
   totalMCevents = iConfig.getParameter<int>("nMCEvents");
   isData = iConfig.getParameter<bool>("isData");
   
+  useGenHadronMatch = iConfig.getParameter<bool>("useGenHadronMatch");
+
   //  useFatJets = iConfig.getParameter<bool>("useFatJets");
   disableObjectSelections = iConfig.getParameter<bool>("disableObjectSelections");
 
