@@ -1,5 +1,5 @@
 // -*- C++ -*-
-d//
+//
 // Package:    tHqAnalysis/tHqAnalyzer
 // Class:      BoostedAnalyzer
 // 
@@ -137,7 +137,10 @@ class tHqAnalyzer : public edm::EDAnalyzer {
 
       /** calculate and store systematic weights? */
       bool doSystematics;
-      
+  
+      /** use GenBmatching info? this is only possible if the miniAOD contains them */
+      bool useGenHadronMatch;
+    
       /** jet systematic that is applied (the outher systematics are done at a different place with reweighting)*/
       sysType::sysType jsystype;
       
@@ -662,7 +665,7 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   GenTopEvent genTopEvt;
   int ttid=-1;
   int ttid_full=-1;
-  bool useGenHadronMatch=1;
+
   if(!isData&&useGenHadronMatch&&foundT&&foundTbar){
 
     /**** tt+X categorization ****/
@@ -711,7 +714,9 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
   // DO REWEIGHTING
-  map<string,float> weights = GetWeights(event,selectedPVs,selectedJets,selectedElectrons,selectedMuons,genParticles);
+  map<string,float> weights = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_nominal,selectedElectrons,selectedMuons,*h_genParticles,sysType::NA);
+
+
 
   // DEFINE INPUT
   InputCollections input( event,
@@ -1241,8 +1246,7 @@ boosted::Event tHqAnalyzer::FillEvent(const edm::Event& iEvent, const edm::Handl
   return event;
 }
 
-
-map<string,float> tHqAnalyzer::GetWeights(const boosted::Event& event, const reco::VertexCollection& selectedPVs, const std::vector<pat::Jet>& selectedJets, const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon>& selectedMuons, const std::vector<reco::GenParticle>& genParticles){
+ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventInfo,const EventInfo& eventInfo, const reco::VertexCollection& selectedPVs, const std::vector<pat::Jet>& selectedJets, const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon>& selectedMuons, const std::vector<reco::GenParticle>& genParticles, sysType::sysType systype){
   map<string,float> weights;
   
   if(isData){
