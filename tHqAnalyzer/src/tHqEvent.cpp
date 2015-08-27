@@ -43,7 +43,7 @@ void tHqEvent::LeptonRec(){
 
 
 void tHqEvent::NeutrinoRec(){
-  TVector2 metvec(input.pfMets[0].px(),input.pfMets[0].py());
+  TVector2 metvec(input.pfMET.px(),input.pfMET.py());
   
   if(lepVecCand.Pt()<=0.001) return;
   
