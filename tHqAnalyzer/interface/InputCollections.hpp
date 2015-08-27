@@ -7,6 +7,7 @@
 
 #include "tHqAnalysis/tHqObjects/interface/Event.h"
 #include "tHqAnalysis/tHqAnalyzer/interface/TriggerInfo.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/GenTopEvent.hpp"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
@@ -16,6 +17,7 @@
 
 
 enum SampleType{data,tth,tt,nonttbkg};
+namespace HiggsDecay{enum HiggsDecay{NA,bb,nonbb};};
 
 struct InputCollections{
   InputCollections( const boosted::Event&                         event_,
@@ -34,6 +36,7 @@ struct InputCollections{
                     const std::vector<pat::MET>&                  pfMets_,
                     const std::vector<reco::GenParticle>&         genParticles_,
                     const std::vector<reco::GenJet>&              selectedGenJets_,
+		    const GenTopEvent&                            genTopEvt_,
                     const SampleType                              sampleType_,
                     const std::map<std::string,float>&            weights_,
 		    const edm::EventSetup&	                  setup_,
@@ -56,6 +59,7 @@ struct InputCollections{
                     pfMets(pfMets_),
                     genParticles(genParticles_),
                     selectedGenJets(selectedGenJets_),
+		    genTopEvt(genTopEvt_),
                     sampleType(sampleType_),
                     weights(weights_),
 		    setup(setup_),
@@ -77,6 +81,7 @@ struct InputCollections{
   const std::vector<pat::MET>&                  pfMets;
   const std::vector<reco::GenParticle>&         genParticles;
   const std::vector<reco::GenJet>&              selectedGenJets;
+  const GenTopEvent&                            genTopEvt;
   const SampleType                              sampleType;
   const std::map<std::string,float>&            weights;
   const edm::EventSetup& 			setup;
