@@ -1,5 +1,5 @@
 // -*- C++ -*-
-//
+d//
 // Package:    tHqAnalysis/tHqAnalyzer
 // Class:      BoostedAnalyzer
 // 
@@ -211,6 +211,7 @@ class tHqAnalyzer : public edm::EDAnalyzer {
       edm::EDGetTokenT<std::vector<int> > genCHadIndexToken;
       edm::EDGetTokenT<std::vector<reco::GenParticle> > genCHadPlusMothersToken;
       edm::EDGetTokenT<int> genTtbarIdToken;
+
 };
 
 //
@@ -239,6 +240,8 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig)
   totalMCevents = iConfig.getParameter<int>("nMCEvents");
   isData = iConfig.getParameter<bool>("isData");
   
+  useGenHadronMatch = iConfig.getParameter<bool>("useGenHadronMatch");
+
   //  useFatJets = iConfig.getParameter<bool>("useFatJets");
   disableObjectSelections = iConfig.getParameter<bool>("disableObjectSelections");
 
@@ -264,6 +267,24 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig)
   EDMGenParticlesToken    = consumes< std::vector<reco::GenParticle> >(edm::InputTag("prunedGenParticles","","PAT"));
   EDMGenJetsToken         = consumes< std::vector<reco::GenJet> >(edm::InputTag("slimmedGenJets","","PAT"));
   
+  // tt+X CATEGORIZATION data
+  genBHadJetIndexToken           = consumes<std::vector<int> >(edm::InputTag("matchGenBHadron","genBHadJetIndex",""));
+  genBHadFlavourToken            = consumes<std::vector<int> >(edm::InputTag("matchGenBHadron","genBHadFlavour",""));
+  genBHadFromTopWeakDecayToken   = consumes<std::vector<int> >(edm::InputTag("matchGenBHadron","genBHadFromTopWeakDecay",""));
+  genBHadPlusMothersToken        = consumes<std::vector<reco::GenParticle> >(edm::InputTag("matchGenBHadron","genBHadPlusMothers",""));
+  genBHadPlusMothersIndicesToken = consumes<std::vector<std::vector<int> > >(edm::InputTag("matchGenBHadron","genBHadPlusMothersIndices",""));
+  genBHadIndexToken              = consumes<std::vector<int> >(edm::InputTag("matchGenBHadron","genBHadIndex"));
+  genBHadLeptonHadronIndexToken  = consumes<std::vector<int> >(edm::InputTag("matchGenBHadron","genBHadLeptonHadronIndex",""));
+  genBHadLeptonViaTauToken       = consumes<std::vector<int> >(edm::InputTag("matchGenBHadron","genBHadLeptonViaTau",""));
+  genCHadJetIndexToken           = consumes<std::vector<int> >(edm::InputTag("matchGenCHadron","genCHadJetIndex",""));
+  genCHadFlavourToken            = consumes<std::vector<int> >(edm::InputTag("matchGenCHadron","genCHadFlavour",""));
+  genCHadFromTopWeakDecayToken   = consumes<std::vector<int> >(edm::InputTag("matchGenCHadron","genCHadFromTopWeakDecay",""));
+  genCHadBHadronIdToken          = consumes<std::vector<int> >(edm::InputTag("matchGenCHadron","genCHadBHadronId",""));
+  genCHadIndexToken              = consumes<std::vector<int> >(edm::InputTag("matchGenCHadron","genCHadIndex"));
+  genCHadPlusMothersToken        = consumes<std::vector<reco::GenParticle> >(edm::InputTag("matchGenCHadron","genCHadPlusMothers",""));
+  genTtbarIdToken                = consumes<int>              (edm::InputTag("categorizeGenTtbar","genTtbarId",""));
+
+
   // INITIALIZE MINIAOD HELPER
   helper.SetUp(era, sampleID, iAnalysisType, isData);
   
@@ -470,21 +491,33 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   
   /**** GET GENEVENTINFO ****/
   edm::Handle<GenEventInfoProduct> h_geneventinfo;
-  iEvent.getByToken( EDMGenInfoToken, h_geneventinfo );
+  if(!isData){
+    iEvent.getByToken( EDMGenInfoToken, h_geneventinfo );
+  }
   
   /**** GET GENPARTICLES ****/
   edm::Handle< std::vector<reco::GenParticle> > h_genParticles;
-  iEvent.getByToken( EDMGenParticlesToken,h_genParticles );
-  std::vector<reco::GenParticle> const &genParticles = *h_genParticles;
+  if(!isData){
+    iEvent.getByToken( EDMGenParticlesToken,h_genParticles );
+    std::vector<reco::GenParticle> const &genParticles = *h_genParticles;
+  }
+  
   
   /**** GET GENJETS ****/
   edm::Handle< std::vector<reco::GenJet> > h_genjets;
-  iEvent.getByToken( EDMGenJetsToken,h_genjets );
-  std::vector<reco::GenJet> const &genjets = *h_genjets;
   std::vector<reco::GenJet> selectedGenJets;
-  for(size_t i=0; i<genjets.size();i++){
-    if(genjets[i].pt()>10&&fabs(genjets[i].eta())<5.)
-      selectedGenJets.push_back(genjets[i]);
+  if(!isData){
+    iEvent.getByToken( EDMGenJetsToken,h_genjets );
+    std::vector<reco::GenJet> const &genjets = *h_genjets;
+    for(size_t i=0; i<genjets.size();i++){
+      if(genjets[i].pt()>10&&fabs(genjets[i].eta())<5.)
+	selectedGenJets.push_back(genjets[i]);
+    }
+    // custom genjets for tt+X categorization
+    edm::Handle< std::vector<reco::GenJet> > h_customgenjets;
+    if(!isData){
+      iEvent.getByToken( EDMCustomGenJetsToken,h_customgenjets );
+    }
   }
   
   // custom genjets for tt+X categorization
@@ -519,7 +552,7 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   TriggerInfo triggerInfo(triggerMap);
 
 
-
+  /*
   // FIGURE OUT SAMPLE
 
 
@@ -537,6 +570,73 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   else{
     sampleType = SampleType::nonttbkg;
   }
+  */
+
+  // FIGURE OUT SAMPLE
+    
+  bool foundT=false;
+  bool foundTbar=false;
+  bool foundHiggs=false;
+  if(!isData){
+    std::vector<reco::GenParticle> const &genParticles = *h_genParticles;
+    for(size_t i=0; i<genParticles.size();i++){
+      if(genParticles[i].pdgId()==6) foundT=true;
+      if(genParticles[i].pdgId()==-6) foundTbar=true;
+      if(genParticles[i].pdgId()==25){
+	foundHiggs=true;
+      }
+    }
+  }
+  
+
+  GenTopEvent genTopEvt;
+  int ttid=-1;
+  int ttid_full=-1;
+  if(!isData&&useGenHadronMatch&&foundT&&foundTbar){
+    /**** tt+X categorization ****/
+    // Reading gen jets from the event
+    // Reading B hadrons related information
+    edm::Handle<std::vector<int> > genBHadFlavour;
+    edm::Handle<std::vector<int> > genBHadJetIndex;
+    edm::Handle<std::vector<int> > genBHadFromTopWeakDecay;
+    edm::Handle<std::vector<reco::GenParticle> > genBHadPlusMothers;
+    edm::Handle<std::vector<std::vector<int> > > genBHadPlusMothersIndices;
+    edm::Handle<std::vector<reco::GenParticle> > genCHadPlusMothers;
+    edm::Handle<std::vector<int> > genBHadIndex;
+    edm::Handle<std::vector<int> > genBHadLeptonHadronIndex;
+    edm::Handle<std::vector<int> > genBHadLeptonViaTau;
+    // Reading C hadrons related information
+    edm::Handle<std::vector<int> > genCHadIndex;
+    edm::Handle<std::vector<int> > genCHadFlavour;
+    edm::Handle<std::vector<int> > genCHadJetIndex;
+    edm::Handle<std::vector<int> > genCHadFromTopWeakDecay;
+    edm::Handle<std::vector<int> > genCHadBHadronId;
+    edm::Handle<int> genTtbarId;
+    iEvent.getByToken(genCHadBHadronIdToken, genCHadBHadronId);
+    iEvent.getByToken(genBHadFlavourToken, genBHadFlavour);
+    iEvent.getByToken(genBHadJetIndexToken, genBHadJetIndex);  
+    iEvent.getByToken(genBHadFromTopWeakDecayToken, genBHadFromTopWeakDecay);  
+    iEvent.getByToken(genBHadPlusMothersToken, genBHadPlusMothers);    
+    iEvent.getByToken(genBHadPlusMothersIndicesToken, genBHadPlusMothersIndices);
+    iEvent.getByToken(genCHadPlusMothersToken, genCHadPlusMothers);    
+    iEvent.getByToken(genBHadIndexToken, genBHadIndex);
+    iEvent.getByToken(genBHadLeptonHadronIndexToken, genBHadLeptonHadronIndex);
+    iEvent.getByToken(genBHadLeptonViaTauToken, genBHadLeptonViaTau);
+    iEvent.getByToken(genCHadFlavourToken, genCHadFlavour);
+    iEvent.getByToken(genCHadJetIndexToken, genCHadJetIndex);
+    iEvent.getByToken(genCHadFromTopWeakDecayToken, genCHadFromTopWeakDecay);
+    iEvent.getByToken(genCHadIndexToken, genCHadIndex);
+    iEvent.getByToken(genTtbarIdToken, genTtbarId);
+    ttid_full = *genTtbarId;
+    ttid = ttid_full%100;
+    // fill additional jet info in genTopEvt
+    genTopEvt.FillTTxDetails(*h_customgenjets, 
+			     *genBHadIndex, *genBHadJetIndex, *genBHadFlavour, *genBHadFromTopWeakDecay, *genBHadPlusMothers, 
+			     *genCHadIndex, *genCHadJetIndex, *genCHadFlavour, *genCHadFromTopWeakDecay, *genCHadPlusMothers,
+			     *genCHadBHadronId,
+			     20,2.4); 
+
+
 
 
   bool foundT=false;
