@@ -73,16 +73,16 @@ class tHqAnalyzer : public edm::EDAnalyzer {
       static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
 
-   private:
-      virtual void beginJob() override;
-      virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
-      virtual void endJob() override;
-      virtual void beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup) override;
+private:
+  virtual void beginJob() override;
+  virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
+  virtual void endJob() override;
+  virtual void beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup) override;
   
-      boosted::Event FillEvent(const edm::Event& iEvent, const edm::Handle<GenEventInfoProduct>& genEvtInfo, const edm::Handle<reco::BeamSpot>& beamSpot, const edm::Handle<HcalNoiseSummary>& hcalNoiseSummary, const edm::Handle< std::vector<PileupSummaryInfo> >& puSummaryInfo);
-      map<string,float> GetWeights(const GenEventInfoProduct& genEventInfo, const EventInfo& eventInfo, const reco::VertexCollection& selectedPVs, const std::vector<pat::Jet>& selectedJets, const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon>& selectedMuons, const std::vector<reco::GenParticle>& genParticles, sysType::sysType systype=sysType::NA);
-      std::vector<pat::Electron> ElectronSelection( std::vector<pat::Electron> selectedElectrons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition);
-      std::vector<pat::Muon> MuonSelection( std::vector<pat::Muon> selectedMuons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition);      
+  boosted::Event FillEvent(const edm::Event& iEvent, const edm::Handle<GenEventInfoProduct>& genEvtInfo, const edm::Handle<reco::BeamSpot>& beamSpot, const edm::Handle<HcalNoiseSummary>& hcalNoiseSummary, const edm::Handle< std::vector<PileupSummaryInfo> >& puSummaryInfo);
+  map<string,float> GetWeights(const GenEventInfoProduct& genEventInfo, const EventInfo& eventInfo, const reco::VertexCollection& selectedPVs, const std::vector<pat::Jet>& selectedJets, const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon>& selectedMuons, const std::vector<reco::GenParticle>& genParticles, sysType::sysType systype=sysType::NA);
+  std::vector<pat::Electron> ElectronSelection( std::vector<pat::Electron> selectedElectrons,  const reco::VertexCollection& selectedPVs);
+  std::vector<pat::Muon> MuonSelection( std::vector<pat::Muon> selectedMuons,  const reco::VertexCollection& selectedPVs);      
   std::vector<pat::Jet> JetSelection( std::vector<pat::Jet> selectedJets, std::vector<pat::Electron> selectedElectrons, std::vector<pat::Muon> selectedMuons, InputCollections input);
       
       
@@ -417,7 +417,7 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::vector<pat::Muon> selectedMuons = helper.GetSelectedMuons( muons, 15., muonID::muonTight );
   std::vector<pat::Muon> selectedMuonsLoose = helper.GetSelectedMuons( muons, 10., muonID::muonLoose );
 
-  // ELECTRONS
+  // ELECTRONS`
   edm::Handle< std::vector<pat::Electron> > h_electrons;
   iEvent.getByToken( EDMElectronsToken,h_electrons );
   std::vector<pat::Electron> const &electrons = *h_electrons;
@@ -561,96 +561,9 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   TriggerInfo triggerInfo(triggerMap);
 
-
-  /*
+ 
   // FIGURE OUT SAMPLE
-
-
-
-
-  SampleType sampleType;
-  std::vector<reco::GenParticle> const &genParticles = *h_genParticles;
-
-  if(isData)
-    sampleType = SampleType::data;
-  else if(tHqUtils::MCContainsTTbar(genParticles) && tHqUtils::MCContainsHiggs(genParticles)){
-    sampleType = SampleType::tth;
-  }
-  else if(tHqUtils::MCContainsTTbar(genParticles)){
-    sampleType = SampleType::tt;
-  }
-  else{
-    sampleType = SampleType::nonttbkg;
-  }
-  */
-
-  // FIGURE OUT SAMPLE
-    
-  bool foundT=false;
-  bool foundTbar=false;
-  bool foundHiggs=false;
-  if(!isData){
-    std::vector<reco::GenParticle> const &genParticles = *h_genParticles;
-    for(size_t i=0; i<genParticles.size();i++){
-      if(genParticles[i].pdgId()==6) foundT=true;
-      if(genParticles[i].pdgId()==-6) foundTbar=true;
-      if(genParticles[i].pdgId()==25){
-	foundHiggs=true;
-      }
-    }
-  }
   
-
-  GenTopEvent genTopEvt;
-  int ttid=-1;
-  int ttid_full=-1;
-  if(!isData&&useGenHadronMatch&&foundT&&foundTbar){
-    /**** tt+X categorization ****/
-    // Reading gen jets from the event
-    // Reading B hadrons related information
-    edm::Handle<std::vector<int> > genBHadFlavour;
-    edm::Handle<std::vector<int> > genBHadJetIndex;
-    edm::Handle<std::vector<int> > genBHadFromTopWeakDecay;
-    edm::Handle<std::vector<reco::GenParticle> > genBHadPlusMothers;
-    edm::Handle<std::vector<std::vector<int> > > genBHadPlusMothersIndices;
-    edm::Handle<std::vector<reco::GenParticle> > genCHadPlusMothers;
-    edm::Handle<std::vector<int> > genBHadIndex;
-    edm::Handle<std::vector<int> > genBHadLeptonHadronIndex;
-    edm::Handle<std::vector<int> > genBHadLeptonViaTau;
-    // Reading C hadrons related information
-    edm::Handle<std::vector<int> > genCHadIndex;
-    edm::Handle<std::vector<int> > genCHadFlavour;
-    edm::Handle<std::vector<int> > genCHadJetIndex;
-    edm::Handle<std::vector<int> > genCHadFromTopWeakDecay;
-    edm::Handle<std::vector<int> > genCHadBHadronId;
-    edm::Handle<int> genTtbarId;
-    iEvent.getByToken(genCHadBHadronIdToken, genCHadBHadronId);
-    iEvent.getByToken(genBHadFlavourToken, genBHadFlavour);
-    iEvent.getByToken(genBHadJetIndexToken, genBHadJetIndex);  
-    iEvent.getByToken(genBHadFromTopWeakDecayToken, genBHadFromTopWeakDecay);  
-    iEvent.getByToken(genBHadPlusMothersToken, genBHadPlusMothers);    
-    iEvent.getByToken(genBHadPlusMothersIndicesToken, genBHadPlusMothersIndices);
-    iEvent.getByToken(genCHadPlusMothersToken, genCHadPlusMothers);    
-    iEvent.getByToken(genBHadIndexToken, genBHadIndex);
-    iEvent.getByToken(genBHadLeptonHadronIndexToken, genBHadLeptonHadronIndex);
-    iEvent.getByToken(genBHadLeptonViaTauToken, genBHadLeptonViaTau);
-    iEvent.getByToken(genCHadFlavourToken, genCHadFlavour);
-    iEvent.getByToken(genCHadJetIndexToken, genCHadJetIndex);
-    iEvent.getByToken(genCHadFromTopWeakDecayToken, genCHadFromTopWeakDecay);
-    iEvent.getByToken(genCHadIndexToken, genCHadIndex);
-    iEvent.getByToken(genTtbarIdToken, genTtbarId);
-    ttid_full = *genTtbarId;
-    ttid = ttid_full%100;
-    // fill additional jet info in genTopEvt
-    genTopEvt.FillTTxDetails(*h_customgenjets, 
-			     *genBHadIndex, *genBHadJetIndex, *genBHadFlavour, *genBHadFromTopWeakDecay, *genBHadPlusMothers, 
-			     *genCHadIndex, *genCHadJetIndex, *genCHadFlavour, *genCHadFromTopWeakDecay, *genCHadPlusMothers,
-			     *genCHadBHadronId,
-			     20,2.4); 
-
-
-
-
   bool foundT=false;
   bool foundTbar=false;
   bool foundHiggs=false;
@@ -720,6 +633,23 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 			     *genCHadBHadronId,
 			     20,2.4); 
   }
+  SampleType sampleType= SampleType::nonttbkg;
+  if(isData) sampleType = SampleType::data;
+  else if(foundT&&foundTbar&&foundHiggs) sampleType = SampleType::tth;
+  else if(foundT&&foundTbar){ 
+    sampleType =SampleType::ttl;
+    //if(ttid==51||ttid==52) sampleType = SampleType::ttb;
+    if(ttid==51) sampleType = SampleType::ttb;
+    else if(ttid==52) sampleType = SampleType::tt2b;
+    else if(ttid==53||ttid==54||ttid==55) sampleType = SampleType::ttbb;
+    else if(ttid==41||ttid==42) sampleType = SampleType::ttcc;
+    else if(ttid==43||ttid==44||ttid==45) sampleType = SampleType::ttcc;    
+  }
+  else if(((foundT&&!foundTbar)||(!foundT&&foundTbar))&&foundHiggs) sampleType = SampleType::thq;
+  if(!isData&&foundT&&foundTbar) {
+    // fill genTopEvt with tt(H) information
+    genTopEvt.Fill(*h_genParticles,ttid_full);
+  }
 
 
   // DO REWEIGHTING
@@ -745,8 +675,7 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 			  selectedPuppiJets,
                           selectedJetsLoose,
                           pfMETs[0],
-			  // heptopjets,
-                          //subfilterjets,
+			  genTopEvt,
                           selectedGenJets,
                           sampleType,
                           weights
@@ -762,17 +691,16 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   if(!selected) return;    
 
-  selectedElectrons = ElectronSelection(selectedElectrons,input.selectedPVs[0].position());
-  selectedMuons = MuonSelection(selectedMuons,input.selectedPVs[0].position());
+  selectedElectrons = ElectronSelection(selectedElectrons,input.selectedPVs);
+  selectedMuons = MuonSelection(selectedMuons,input.selectedPVs);
   selectedJets = JetSelection(selectedJets,selectedElectrons, selectedMuons, input);
   
   // WRITE TREE
   treewriter.Process(input);  
 }
 
-std::vector<pat::Muon> tHqAnalyzer::MuonSelection( std::vector<pat::Muon> selectedMuons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition){
 
-
+std::vector<pat::Muon> tHqAnalyzer::MuonSelection( std::vector<pat::Muon> selectedMuons,  const reco::VertexCollection& selectedPVs){
   std::vector<pat::Muon> newselectedMuons;
   for( std::vector<pat::Muon>::const_iterator it = selectedMuons.begin(), ed = selectedMuons.end(); it != ed; ++it ){
     pat::Muon iMuon = *it;
@@ -788,20 +716,20 @@ std::vector<pat::Muon> tHqAnalyzer::MuonSelection( std::vector<pat::Muon> select
     const float minPt=5;
     const float maxEta=2.4;
     
-
-
+    
+    
     if(iMuon.globalTrack().isAvailable()){
-    double chi2ndof = iMuon.globalTrack()->normalizedChi2();
-    int nValidHits = iMuon.globalTrack()->hitPattern().numberOfValidMuonHits();
-    passesGlobalTrackID=(chi2ndof<10.0 && nValidHits>0);
+      double chi2ndof = iMuon.globalTrack()->normalizedChi2();
+      int nValidHits = iMuon.globalTrack()->hitPattern().numberOfValidMuonHits();
+      passesGlobalTrackID=(chi2ndof<10.0 && nValidHits>0);
     } 
-
+    
     if(iMuon.muonBestTrack().isAvailable()){
-    double d0 = fabs(iMuon.muonBestTrack()->dxy(pvposition));
-    double dZ = fabs(iMuon.muonBestTrack()->dz(pvposition));
-    passesBestTrackID=(d0<0.2 && dZ<0.5);
+      double d0 = fabs(iMuon.muonBestTrack()->dxy(selectedPVs.at(0).position()));
+      double dZ = fabs(iMuon.muonBestTrack()->dz(selectedPVs.at(0).position()));
+      passesBestTrackID=(d0<0.2 && dZ<0.5);
     }
-
+    
     int nMatchedStations = iMuon.numberOfMatchedStations();
         
     if(iMuon.track().isAvailable()){
@@ -830,7 +758,7 @@ std::vector<pat::Muon> tHqAnalyzer::MuonSelection( std::vector<pat::Muon> select
 }
 
 
-std::vector<pat::Electron> tHqAnalyzer::ElectronSelection( std::vector<pat::Electron> selectedElectrons, const ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<double>, ROOT::Math::DefaultCoordinateSystemTag> pvposition){
+  std::vector<pat::Electron> tHqAnalyzer::ElectronSelection( std::vector<pat::Electron> selectedElectrons,  const reco::VertexCollection& selectedPVs){
   //-------------------------------------------------------------------------                                                                              
   //do electrons                              
   
@@ -878,8 +806,8 @@ std::vector<pat::Electron> tHqAnalyzer::ElectronSelection( std::vector<pat::Elec
     double dZ = 999;
     double expectedMissingInnerHits = 999;
     if( iElectron.gsfTrack().isAvailable() ){
-      d0 = fabs(iElectron.gsfTrack()->dxy(pvposition));
-      dZ = fabs(iElectron.gsfTrack()->dz(pvposition));
+      d0 = fabs(iElectron.gsfTrack()->dxy(selectedPVs.at(0).position()));
+      dZ = fabs(iElectron.gsfTrack()->dz(selectedPVs.at(0).position()));
       expectedMissingInnerHits = iElectron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
     }
 
