@@ -93,7 +93,7 @@ private:
       MiniAODHelper helper;
       
       /** Reweighter to match the PV distribution in data*/
-      HistoReweighter pvWeight;
+  //      HistoReweighter pvWeight;
 
 
       /** writes flat trees for MVA analysis */
@@ -145,6 +145,10 @@ private:
       /** pu summary data access token **/
       edm::EDGetTokenT< std::vector<PileupSummaryInfo> > EDMPUInfoToken;
       
+      /** pileup density data access token **/
+      edm::EDGetTokenT <double> EDMRhoToken;
+
+
       /** hcal noise data access token **/
       edm::EDGetTokenT< HcalNoiseSummary > EDMHcalNoiseToken;
       
@@ -154,9 +158,6 @@ private:
       /** trigger results data access token **/
       edm::EDGetTokenT< edm::TriggerResults > EDMTriggerResultToken;
       HLTConfigProvider hlt_config;
-
-      /** pileup density data access token **/
-      edm::EDGetTokenT <double> EDMRhoToken;
 
       /** beam spot data access token **/
       edm::EDGetTokenT< reco::BeamSpot > EDMBeamSpotToken;
@@ -214,7 +215,6 @@ private:
       edm::EDGetTokenT<std::vector<int> > genCHadIndexToken;
       edm::EDGetTokenT<std::vector<reco::GenParticle> > genCHadPlusMothersToken;
       edm::EDGetTokenT<int> genTtbarIdToken;
-
 };
 
 //
@@ -228,21 +228,19 @@ private:
 //
 // constructors and destructor
 //
-tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):pvWeight((tHqUtils::GetAnalyzerPath()+"/data/pvweights/PUhistos.root").c_str(),"data","mc")
-{
-
+tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig){
+  //  pvWeight = ((tHqUtils::GetAnalyzerPath()+"/data/pvweights/PUhistos.root").c_str(),"data","mc")
   std::string era = iConfig.getParameter<std::string>("era");
   string analysisType = iConfig.getParameter<std::string>("analysisType");
   analysisType::analysisType iAnalysisType = analysisType::LJ;
   if(analysisType == "LJ") iAnalysisType = analysisType::LJ;
   else cerr << "No matching analysis type found for: " << analysisType << endl;
-  
   luminosity = iConfig.getParameter<double>("luminostiy");
   sampleID = iConfig.getParameter<int>("sampleID");
   xs = iConfig.getParameter<double>("xs");
   totalMCevents = iConfig.getParameter<int>("nMCEvents");
   isData = iConfig.getParameter<bool>("isData");
-  
+
   useGenHadronMatch = iConfig.getParameter<bool>("useGenHadronMatch");
 
   //  useFatJets = iConfig.getParameter<bool>("useFatJets");
@@ -269,6 +267,8 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):pvWeight((tHqUtils::G
   EDMGenInfoToken         = consumes< GenEventInfoProduct >(edm::InputTag("generator","","SIM"));
   EDMGenParticlesToken    = consumes< std::vector<reco::GenParticle> >(edm::InputTag("prunedGenParticles","","PAT"));
   EDMGenJetsToken         = consumes< std::vector<reco::GenJet> >(edm::InputTag("slimmedGenJets","","PAT"));
+  EDMCustomGenJetsToken   = consumes< std::vector<reco::GenJet> >(edm::InputTag("ak4GenJetsCustom","",""));
+
   
   // tt+X CATEGORIZATION data
   genBHadJetIndexToken           = consumes<std::vector<int> >(edm::InputTag("matchGenBHadron","genBHadJetIndex",""));
@@ -287,10 +287,9 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):pvWeight((tHqUtils::G
   genCHadPlusMothersToken        = consumes<std::vector<reco::GenParticle> >(edm::InputTag("matchGenCHadron","genCHadPlusMothers",""));
   genTtbarIdToken                = consumes<int>              (edm::InputTag("categorizeGenTtbar","genTtbarId",""));
 
-
   // INITIALIZE MINIAOD HELPER
   helper.SetUp(era, sampleID, iAnalysisType, isData);
-  //  helper.SetJetCorrectorUncertainty();  //needed?
+  helper.SetJetCorrectorUncertainty(); 
 
   // INITIALIZE SELECTION & CUTFLOW
   cutflow.Init((outfileName+"_Cutflow.txt").c_str());
@@ -1187,7 +1186,7 @@ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventIn
   weights["Weight_CSV"] = csvweight;
   weights["Weight_PU"] = puweight;
   weights["Weight_TopPt"] = topptweight;
-  weights["Weight_PV"] = pvWeight.GetWeight(selectedPVs.size());
+  //  weights["Weight_PV"] = pvWeight.GetWeight(selectedPVs.size());
   
   
   return weights;

@@ -4,6 +4,7 @@ using namespace std;
 
 TreeWriter::TreeWriter(){
   initialized=false;
+  cout << "Tree initialized." << endl;
 }
 
 

@@ -1,5 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 import os
+from JetMETCorrections.Configuration.JetCorrectionServices_cff import *
+from JetMETCorrections.Configuration.JetCorrectionCondDB_cff import *
 
 # Set Process and Variables
 #------------------------------------------------------------------------------------------------------------------------------------
@@ -58,18 +60,38 @@ values['filenames'] = map(lambda s: s.strip('" '), values['filenames'].split(","
 
 # initialize MessageLogger and output report
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = 'PHYS14_25_V2::All'
 
-process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(False) )
+process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
+process.options.allowUnscheduled = cms.untracked.bool(True)
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(int(values['max'])))
 
 process.source = cms.Source(  "PoolSource",
                               fileNames = cms.untracked.vstring(values['filenames']),
                               skipEvents = cms.untracked.uint32(int(values['skip']))                        
+)
+
+
+
+process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
+
+process.ak4PFCHSL1Fastjet = cms.ESProducer(
+  'L1FastjetCorrectionESProducer',
+  level = cms.string('L1FastJet'),
+  algorithm = cms.string('AK4PFchs'),
+  srcRho = cms.InputTag( 'fixedGridRhoFastjetAll' )
+  )
+process.ak4PFchsL2Relative = ak4CaloL2Relative.clone( algorithm = 'AK4PFchs' )
+process.ak4PFchsL3Absolute = ak4CaloL3Absolute.clone( algorithm = 'AK4PFchs' )
+process.ak4PFchsL1L2L3 = cms.ESProducer("JetCorrectionESChain",
+  correctors = cms.vstring(
+    'ak4PFCHSL1Fastjet',
+    'ak4PFchsL2Relative',
+    'ak4PFchsL3Absolute')
 )
 
 process.load("tHqAnalysis.tHqAnalyzer.tHqAnalyzer_cfi")
