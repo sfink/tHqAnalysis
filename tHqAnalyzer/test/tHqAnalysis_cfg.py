@@ -94,6 +94,9 @@ process.ak4PFchsL1L2L3 = cms.ESProducer("JetCorrectionESChain",
     'ak4PFchsL3Absolute')
 )
 
+process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
+process.load("tHqAnalysis.tHqProducer.genHadronMatching_cfi")
+
 process.load("tHqAnalysis.tHqAnalyzer.tHqAnalyzer_cfi")
 process.tHqAnalyzer.useFatJets=False
 if values['outfilename'] is not None:
