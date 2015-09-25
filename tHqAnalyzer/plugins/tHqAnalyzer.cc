@@ -285,8 +285,10 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig){
   genCHadBHadronIdToken          = consumes<std::vector<int> >(edm::InputTag("matchGenCHadron","genCHadBHadronId",""));
   genCHadIndexToken              = consumes<std::vector<int> >(edm::InputTag("matchGenCHadron","genCHadIndex"));
   genCHadPlusMothersToken        = consumes<std::vector<reco::GenParticle> >(edm::InputTag("matchGenCHadron","genCHadPlusMothers",""));
-  genTtbarIdToken                = consumes<int>              (edm::InputTag("categorizeGenTtbar","genTtbarId",""));
 
+  std::cout << "Before consumption." << endl;
+  genTtbarIdToken                = consumes<int>              (edm::InputTag("categorizeGenTtbar","genTtbarId",""));
+  std::cout << "After consumption." << endl;
   // INITIALIZE MINIAOD HELPER
   helper.SetUp(era, sampleID, iAnalysisType, isData);
   helper.SetJetCorrectorUncertainty(); 
@@ -591,6 +593,7 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   if(!isData&&useGenHadronMatch&&foundT&&foundTbar){
 
+    std::cout << "Doing tt+X categorization" << endl;
     /**** tt+X categorization ****/
     // Reading gen jets from the event
     // Reading B hadrons related information
@@ -632,7 +635,7 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 			     *genBHadIndex, *genBHadJetIndex, *genBHadFlavour, *genBHadFromTopWeakDecay, *genBHadPlusMothers, 
 			     *genCHadIndex, *genCHadJetIndex, *genCHadFlavour, *genCHadFromTopWeakDecay, *genCHadPlusMothers,
 			     *genCHadBHadronId,
-			     20,2.4); 
+			     15,4.7); 
   }
   SampleType sampleType= SampleType::nonttbkg;
   if(isData) sampleType = SampleType::data;

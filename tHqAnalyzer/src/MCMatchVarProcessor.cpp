@@ -107,7 +107,7 @@ void MCMatchVarProcessor::Process(const InputCollections& input,VariableContaine
   
   if(!initialized) cerr << "tree processor not initialized" << endl;
   
-  /*
+  
   int iBB = 0;
   int iCC = 0;
   
@@ -119,7 +119,7 @@ void MCMatchVarProcessor::Process(const InputCollections& input,VariableContaine
   vars.FillVar( "GenEvt_I_TTPlusCC",iCC );
   vars.FillVar( "GenEvt_I_TTPlusBB",iBB );
   vars.FillVar( "GenEvt_TTxId_FromHelper",input.genTopEvt.GetTTxIdFromHelper());
-  */
+  
   
   std::vector<reco::GenParticle> tophad;
   std::vector<reco::GenParticle> whad;
@@ -147,6 +147,18 @@ void MCMatchVarProcessor::Process(const InputCollections& input,VariableContaine
     higgs=input.genTopEvt.GetHiggs();
     higgs_bs=input.genTopEvt.GetHiggsDecayProducts();
   }
+
+  std::cout << "#TopHads: " << tophad.size() << endl;
+  std::cout << "#WHads: " << whad.size() << endl;
+  std::cout << "#bHads: " << bhad.size() << endl;
+  std::cout << "#q1s: " << q1.size() << endl;
+  std::cout << "#q2s: " << q2.size() << endl;
+  std::cout << "#TopLeps: " << toplep.size() << endl;
+  std::cout << "#WLeps: " << wlep.size() << endl;
+  std::cout << "#bLeps: " << blep.size() << endl;
+  std::cout << "#leps: " << lep.size() << endl;
+  std::cout << "#nus: " << nu.size() << endl;
+
   reco::GenParticle b1;
   reco::GenParticle b2;
   reco::GenParticle decProd1;
@@ -299,6 +311,9 @@ void MCMatchVarProcessor::Process(const InputCollections& input,VariableContaine
       vars.FillVar( "GenHiggs_B2_Idx",idxb2);
     }
   }
+  
+  std::cout << "IsFilled: "<< input.genTopEvt.IsFilled() << " | TTxIsFilled: " << input.genTopEvt.TTxIsFilled() << " | IsSemiLepton: " << input.genTopEvt.IsSemiLepton() << endl;
+
   if(input.genTopEvt.IsFilled()&&input.genTopEvt.TTxIsFilled()&&input.genTopEvt.IsSemiLepton()){
     std::vector<reco::GenJet> bhad_genjet=input.genTopEvt.GetAllTopHadBGenJets();
     std::vector<reco::GenJet> blep_genjet=input.genTopEvt.GetAllTopLepBGenJets();
