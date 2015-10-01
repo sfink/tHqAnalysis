@@ -7,7 +7,7 @@ config.General.workArea = 'crab_projects'
 
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = '/afs/desy.de/user/f/fink/xxl/af-cms/13TeV/CMSSW_7_4_2/src/tHqAnalysis/tHqAnalyzer/test/tHqAnalysis_cfg.py'
+config.JobType.psetName = '/afs/desy.de/user/f/fink/xxl/af-cms/13TeV/CMSSW_7_4_6_patch6/src/tHqAnalysis/tHqAnalyzer/test/tHqAnalysis_cfg.py'
 config.JobType.outputFiles = ['tHqAnalyzed_Tree.root']
 
 config.section_("Data")
