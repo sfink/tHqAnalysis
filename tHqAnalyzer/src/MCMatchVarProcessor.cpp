@@ -75,6 +75,8 @@ void MCMatchVarProcessor::Process(const InputCollections& input,VariableContaine
   int iBB = 0;
   int iCC = 0;
   
+  std::cout << "Before filling ttx" << std::endl;
+
   if(input.sampleType == SampleType::ttbb) iBB = 3;
   if(input.sampleType == SampleType::ttb) iBB = 1;
   if(input.sampleType == SampleType::tt2b) iBB = 2;
@@ -123,6 +125,9 @@ void MCMatchVarProcessor::Process(const InputCollections& input,VariableContaine
   vars.FillVar("n_tophad", tophad.size());
   vars.FillVar("n_toplep", toplep.size());
 
+  
+
+
 
   vector<math::XYZTLorentzVector> jetvecs = tHqUtils::GetJetVecs(input.selectedJets);
 
@@ -157,7 +162,7 @@ void MCMatchVarProcessor::Process(const InputCollections& input,VariableContaine
   if(minDrTop<.25){
     vars.FillVar( "top_tbidx",idxtopb);
   }
-
+  
 
   vars.FillVar( "top_tbarpt",topbar.pt());
   vars.FillVar( "top_tbareta",topbar.eta());
@@ -189,31 +194,32 @@ void MCMatchVarProcessor::Process(const InputCollections& input,VariableContaine
     vars.FillVar( "top_tbarbidx",idxtopbarb);
   }
   
-
+  
   int idxq1=-1;
   int idxq2=-1;
   double minDrTopHadQ1 = 999;
   double minDrTopHadQ2 = 999;
   
-  for(size_t j=0; j<jetvecs.size(); j++){
-    if(tHqUtils::DeltaR(jetvecs[j],q1[0].p4())<minDrTopHadQ1){
-      idxq1 = j;
-      minDrTopHadQ1 = tHqUtils::DeltaR(jetvecs[j],q1[0].p4());
+  for(size_t i=0;i<tophad.size();i++){
+    for(size_t j=0; j<jetvecs.size(); j++){
+      if(tHqUtils::DeltaR(jetvecs[j],q1[i].p4())<minDrTopHadQ1){
+	idxq1 = j;
+	minDrTopHadQ1 = tHqUtils::DeltaR(jetvecs[j],q1[i].p4());
+      }
+      if(tHqUtils::DeltaR(jetvecs[j],q2[i].p4())<minDrTopHadQ2){
+	idxq2 = j;
+	minDrTopHadQ2 = tHqUtils::DeltaR(jetvecs[j],q2[i].p4());
+      }
     }
-    if(tHqUtils::DeltaR(jetvecs[j],q2[0].p4())<minDrTopHadQ2){
-      idxq2 = j;
-      minDrTopHadQ2 = tHqUtils::DeltaR(jetvecs[j],q2[0].p4());
+        
+    if(minDrTopHadQ1<.25){
+      vars.FillVar( "tophadq1idx",idxq1);
+    }
+    if(minDrTopHadQ2<.25){
+      vars.FillVar( "tophadq2dx",idxq2);
     }
   }
-  
-  if(minDrTopHadQ1<.25){
-    vars.FillVar( "tophadq1idx",idxq1);
-  }
-  if(minDrTopHadQ2<.25){
-    vars.FillVar( "tophadq2dx",idxq2);
-  }
-
-
+        
 
   std::cout << "IsFilled: "<< input.genTopEvt.IsFilled() << " | TTxIsFilled: " << input.genTopEvt.TTxIsFilled() << " | IsSemiLepton: " << input.genTopEvt.IsSemiLepton() << endl;
 
