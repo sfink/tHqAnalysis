@@ -51,7 +51,7 @@
 
 #include "tHqAnalysis/tHqAnalyzer/interface/Selection.hpp"
 
-//#include "tHqAnalysis/tHqAnalyzer/interface/WeightProcessor.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/WeightProcessor.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/MCMatchVarProcessor.hpp"
 
 #include "tHqAnalysis/tHqAnalyzer/interface/MVAVarProcessor.hpp"
@@ -316,8 +316,8 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig){
   std::vector<std::string> processorNames = iConfig.getParameter< std::vector<std::string> >("processorNames");
   for(vector<string>::const_iterator itPro = processorNames.begin();itPro != processorNames.end();++itPro) {
     
-    /* if(*itPro == "WeightProcessor") treewriter.AddTreeProcessor(new WeightProcessor());
-    else if(*itPro == "MCMatchVarProcessor") treewriter.AddTreeProcessor(new MCMatchVarProcessor());
+    
+    /*else if(*itPro == "MCMatchVarProcessor") treewriter.AddTreeProcessor(new MCMatchVarProcessor());
     else if(*itPro == "MVAVarProcessor") treewriter.AddTreeProcessor(new MVAVarProcessor());
     else if(*itPro == "tHqJetVarProcessor") treewriter.AddTreeProcessor(new tHqJetVarProcessor());
     else if(*itPro == "tHqTopHiggsVarProcessor") treewriter.AddTreeProcessor(new ttHVarProcessor(tHqRecoType::tHqTopHiggs,"TopLikelihood","HiggsCSV","tHqTopHiggs_"));
@@ -326,6 +326,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig){
     // the BDT processor rely on the variables filled py the other producers and should be added at the end
     else if(*itPro == "BDTVarProcessor") treewriter.AddTreeProcessor(new BDTVarProcessor());
     */
+    if(*itPro == "WeightProcessor") treewriter.AddTreeProcessor(new WeightProcessor());    
     if(*itPro == "BaseVarProcessor") treewriter.AddTreeProcessor(new BaseVarProcessor());
     if(*itPro == "RecoVarProcessor") treewriter.AddTreeProcessor(new RecoVarProcessor());
     if(*itPro == "MVAVarProcessor") treewriter.AddTreeProcessor(new MVAVarProcessor());
@@ -658,6 +659,8 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // DO REWEIGHTING
 
+
+
   map<string,float> weights = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets,selectedElectrons,selectedMuons,*h_genParticles,sysType::NA);
   map<string,float> weights_uncorrjets = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_uncorrected,selectedElectrons,selectedMuons,*h_genParticles,sysType::NA);
 
@@ -686,6 +689,7 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 			  );
        
   
+
   // DO SELECTION
   cutflow.EventSurvivedStep("all");
   bool selected=true;

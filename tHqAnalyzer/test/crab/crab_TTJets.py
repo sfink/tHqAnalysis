@@ -2,12 +2,12 @@ from WMCore.Configuration import Configuration
 config = Configuration()
 
 config.section_("General")
-config.General.requestName = 'TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8'
+config.General.requestName = 'TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_wtruthcontainer2'
 config.General.workArea = 'crab_projects'
 
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = '/afs/desy.de/user/f/fink/xxl/af-cms/13TeV/CMSSW_7_4_2/src/tHqAnalysis/tHqAnalyzer/test/tHqAnalysis_cfg.py'
+config.JobType.psetName = '/afs/desy.de/user/f/fink/xxl/af-cms/13TeV/CMSSW_7_4_6_patch6/src/tHqAnalysis/tHqAnalyzer/test/tHqAnalysis_cfg.py'
 config.JobType.outputFiles = ['tHqAnalyzed_Tree.root']
 
 config.section_("Data")

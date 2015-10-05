@@ -19,6 +19,6 @@ tHqAnalyzer = cms.EDAnalyzer(
     selectionNames = cms.vstring("LeptonSelection"),
     useGenHadronMatch = cms.bool(True),
 #    processorNames = cms.vstring("MVAVarProcessor","BaseVarProcessor")
-    processorNames = cms.vstring("BaseVarProcessor","RecoVarProcessor","MCMatchVarProcessor")
+    processorNames = cms.vstring("WeightProcessor","BaseVarProcessor","RecoVarProcessor","MCMatchVarProcessor")
 #    processorNames = cms.vstring("WeightProcessor","MCMatchVarProcessor","MVAVarProcessor","tHqJetVarProcessor","tHqTopHiggsVarProcessor","tHqTopVarProcessor","tHqHiggsVarProcessor")
 )
