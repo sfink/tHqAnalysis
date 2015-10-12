@@ -13,36 +13,54 @@ void MCMatchVarProcessor::Init(const InputCollections& input,VariableContainer& 
   vars.InitVar( "genevt_ttbb",-1,"I" );
   vars.InitVar( "genevt_ttxid",-1,"I" );
   
-  vars.InitVar( "n_tophad", -1, "I");
-  vars.InitVar( "n_toplep", -1, "I");
+  vars.InitVar( "n_tophad", 0, "I");
+  vars.InitVar( "n_toplep", 0, "I");
 
-  vars.InitVar( "n_top", -1, "I" );
+  vars.InitVar( "n_top", 0, "I" );
+  vars.InitVar( "n_topwdau", 0, "I" );
   vars.InitVar( "top_tpt",-9.,"F" );
-  vars.InitVar( "top_teta",-9.,"F" );
-  vars.InitVar( "top_tphi",-9.,"F" );
   vars.InitVar( "top_twpt",-9.,"F" );
   vars.InitVar( "top_tbpt",-9.,"F" );
-  vars.InitVars( "top_twdaupt",-9.,"n_top" );
+  vars.InitVars( "top_twdaupt",-9.,"n_topwdau" );
+ 
+  vars.InitVar( "top_teta",-9.,"F" );
   vars.InitVar( "top_tweta",-9.,"F" );
   vars.InitVar( "top_tbeta",-9.,"F" );
-  vars.InitVars( "top_twdaueta",-9.,"n_top" );
+  vars.InitVars( "top_twdaueta",-9.,"n_topwdau" );
+  
+  vars.InitVar( "top_tphi",-9.,"F" );
   vars.InitVar( "top_twphi",-9.,"F" );
   vars.InitVar( "top_tbphi",-9.,"F" );
-  vars.InitVars( "top_twdauphi",-9.,"n_top" );
+  vars.InitVars( "top_twdauphi",-9.,"n_topwdau" );
+  
+  vars.InitVar( "top_tm",-9.,"F" );
+  vars.InitVar( "top_twm",-9.,"F" );
+  vars.InitVar( "top_tbm",-9.,"F" );
+  vars.InitVars( "top_twdaum",-9.,"n_topwdau" );
+
  
-  vars.InitVar( "n_topbar",-1,"I" );
+  vars.InitVar( "n_topbar",0,"I" );
+  vars.InitVar( "n_topbarwdau",0,"I" );
   vars.InitVar( "top_tbarpt",-9.,"F" );
-  vars.InitVar( "top_tbareta",-9.,"F" );
-  vars.InitVar( "top_tbarphi",-9.,"F" );
   vars.InitVar( "top_tbarwpt",-9.,"F" );
   vars.InitVar( "top_tbarbpt",-9.,"F" );
-  vars.InitVars( "top_tbarwdaupt",-9.,"n_topbar" );
+  vars.InitVars( "top_tbarwdaupt",-9.,"n_topbarwdau" );
+  
+  vars.InitVar( "top_tbareta",-9.,"F" );
   vars.InitVar( "top_tbarweta",-9.,"F" );
   vars.InitVar( "top_tbarbeta",-9.,"F" );
-  vars.InitVars( "top_tbarwdaueta",-9.,"n_topbar" );
+  vars.InitVars( "top_tbarwdaueta",-9.,"n_topbarwdau" );
+  
+  vars.InitVar( "top_tbarphi",-9.,"F" );
   vars.InitVar( "top_tbarwphi",-9.,"F" );
   vars.InitVar( "top_tbarbphi",-9.,"F" );
-  vars.InitVars( "top_tbarwdauphi",-9.,"n_topbar" );
+  vars.InitVars( "top_tbarwdauphi",-9.,"n_topbarwdau" );
+  
+  vars.InitVar( "top_tbarm",-9.,"F" );
+  vars.InitVar( "top_tbarwm",-9.,"F" );
+  vars.InitVar( "top_tbarbm",-9.,"F" );
+  vars.InitVars( "top_tbarwdaum",-9.,"n_topbarwdau" );
+
   
   vars.InitVar( "top_tbidx",-1,"I" );
   vars.InitVar( "tophadq1idx",-1,"I" );
@@ -56,6 +74,9 @@ void MCMatchVarProcessor::Init(const InputCollections& input,VariableContainer& 
   vars.InitVars( "GenTopHad_B_GenJet_Eta",-9., "n_tophad");
   vars.InitVars( "GenTopLep_B_GenJet_Phi",-9., "n_toplep" );
   vars.InitVars( "GenTopHad_B_GenJet_Phi",-9., "n_tophad");
+  vars.InitVars( "GenTopLep_B_GenJet_M",-9., "n_toplep" );
+  vars.InitVars( "GenTopHad_B_GenJet_M",-9., "n_tophad");
+
 
   vars.InitVars( "GenTopLep_B_Hadron_Pt",-9., "n_toplep" );
   vars.InitVars( "GenTopHad_B_Hadron_Pt",-9., "n_tophad");
@@ -63,6 +84,9 @@ void MCMatchVarProcessor::Init(const InputCollections& input,VariableContainer& 
   vars.InitVars( "GenTopHad_B_Hadron_Eta",-9., "n_tophad");
   vars.InitVars( "GenTopLep_B_Hadron_Phi",-9., "n_toplep" );
   vars.InitVars( "GenTopHad_B_Hadron_Phi",-9., "n_tophad");
+  vars.InitVars( "GenTopLep_B_Hadron_M",-9., "n_toplep" );
+  vars.InitVars( "GenTopHad_B_Hadron_M",-9., "n_tophad");
+
 
   initialized = true;
 }
@@ -117,6 +141,13 @@ void MCMatchVarProcessor::Process(const InputCollections& input,VariableContaine
     toplep=input.genTopEvt.GetAllTopLeps();
     q1=input.genTopEvt.GetAllWQuarks();
     q2=input.genTopEvt.GetAllWAntiQuarks();
+
+
+   vars.FillVar("n_top", 1);
+   vars.FillVar("n_topbar", 1);
+   vars.FillVar("n_topwdau", topwdau.size());
+   vars.FillVar("n_topbarwdau", topbarwdau.size());
+   
   }
 
   std::cout << "#W from top daughters: " << topwdau.size() << endl;
@@ -130,24 +161,32 @@ void MCMatchVarProcessor::Process(const InputCollections& input,VariableContaine
 
 
   vector<math::XYZTLorentzVector> jetvecs = tHqUtils::GetJetVecs(input.selectedJets);
-
+  
   vars.FillVar( "top_tpt",top.pt());
-  vars.FillVar( "top_teta",top.eta());
-  vars.FillVar( "top_tphi",top.phi());
   vars.FillVar( "top_twpt",topw.pt());
   vars.FillVar( "top_tbpt",topb.pt());
   vars.FillVars( "top_twdaupt",0,topwdau[0].pt());
   vars.FillVars( "top_twdaupt",1,topwdau[1].pt()); //Fix 
   
+  cout << "Pt of TopDaughters: " << topwdau[0].pt() << "     "   << topwdau[1].pt() << endl;
+
+  vars.FillVar( "top_teta",top.eta());  
   vars.FillVar( "top_tweta",topw.eta());
   vars.FillVar( "top_tbeta",topb.eta());
   vars.FillVars( "top_twdaueta",0,topwdau[0].eta());
   vars.FillVars( "top_twdaueta",1,topwdau[1].eta());
   
+  vars.FillVar( "top_tphi",top.phi());
   vars.FillVar( "top_twphi",topw.phi());
   vars.FillVar( "top_tbphi",topb.phi());
   vars.FillVars( "top_twdauphi",0,topwdau[0].phi());
   vars.FillVars( "top_twdauphi",1,topwdau[1].phi());
+  
+  vars.FillVar( "top_tm",top.mass());
+  vars.FillVar( "top_twm",topw.mass());
+  vars.FillVar( "top_tbm",topb.mass());
+  vars.FillVars( "top_twdaum",0,topwdau[0].mass());
+  vars.FillVars( "top_twdaum",1,topwdau[1].mass());
   
   
   int idxtopb = -1;
@@ -165,20 +204,29 @@ void MCMatchVarProcessor::Process(const InputCollections& input,VariableContaine
   
 
   vars.FillVar( "top_tbarpt",topbar.pt());
-  vars.FillVar( "top_tbareta",topbar.eta());
-  vars.FillVar( "top_tbarphi",topbar.phi());
   vars.FillVar( "top_tbarwpt",topbarw.pt());
   vars.FillVar( "top_tbarbpt",topbarb.pt());
   vars.FillVars( "top_tbarwdaupt",0,topbarwdau[0].pt());
   vars.FillVars( "top_tbarwdaupt",1,topbarwdau[1].pt());
+
+  vars.FillVar( "top_tbareta",topbar.eta()); 
   vars.FillVar( "top_tbarweta",topbarw.eta());
   vars.FillVar( "top_tbarbeta",topbarb.eta());
   vars.FillVars( "top_tbarwdaueta",0,topbarwdau[0].eta());
   vars.FillVars( "top_tbarwdaueta",1,topbarwdau[1].eta());
+
+  vars.FillVar( "top_tbarphi",topbar.phi());
   vars.FillVar( "top_tbarwphi",topbarw.phi());
   vars.FillVar( "top_tbarbphi",topbarb.phi());
   vars.FillVars( "top_tbarwdauphi",0,topbarwdau[0].phi());
   vars.FillVars( "top_tbarwdauphi",1,topbarwdau[1].phi());
+
+  vars.FillVar( "top_tbarm",topbar.mass());
+  vars.FillVar( "top_tbarwm",topbarw.mass());
+  vars.FillVar( "top_tbarbm",topbarb.mass());
+  vars.FillVars( "top_tbarwdaum",0,topbarwdau[0].mass());
+  vars.FillVars( "top_tbarwdaum",1,topbarwdau[1].mass());
+
   
   int idxtopbarb=-1;
   
@@ -240,6 +288,8 @@ void MCMatchVarProcessor::Process(const InputCollections& input,VariableContaine
     vars.FillVar( "GenHiggs_B2_GenJet_Eta",b2_genjet.eta());
     vars.FillVar( "GenHiggs_B1_GenJet_Phi",b1_genjet.phi());
     vars.FillVar( "GenHiggs_B2_GenJet_Phi",b2_genjet.phi() );
+    vars.FillVar( "GenHiggs_B1_GenJet_M",b1_genjet.mass());
+    vars.FillVar( "GenHiggs_B2_GenJet_M",b2_genjet.mass() );
 
     vars.FillVar( "GenHiggs_B1_Hadron_Pt",b1_hadron.pt() );
     vars.FillVar( "GenHiggs_B2_Hadron_Pt",b2_hadron.pt() );
@@ -247,30 +297,38 @@ void MCMatchVarProcessor::Process(const InputCollections& input,VariableContaine
     vars.FillVar( "GenHiggs_B2_Hadron_Eta",b2_hadron.eta());
     vars.FillVar( "GenHiggs_B1_Hadron_Phi",b1_hadron.phi());
     vars.FillVar( "GenHiggs_B2_Hadron_Phi",b2_hadron.phi() );
+    vars.FillVar( "GenHiggs_B1_Hadron_M",b1_hadron.mass());
+    vars.FillVar( "GenHiggs_B2_Hadron_M",b2_hadron.mass() );
  
+
     for(uint i=0;i<bhad_genjet.size();i++){
       if(bhad_genjet[i].pt()>1){
 	vars.FillVars( "GenTopHad_B_GenJet_Pt",i,bhad_genjet[i].pt() );
 	vars.FillVars( "GenTopHad_B_GenJet_Eta",i,bhad_genjet[i].eta() );
 	vars.FillVars( "GenTopHad_B_GenJet_Phi",i,bhad_genjet[i].phi());
+	vars.FillVars( "GenTopHad_B_GenJet_M",i,bhad_genjet[i].mass());
       }
       if(bhad_hadron[i].pt()>1){
 	vars.FillVars( "GenTopHad_B_Hadron_Pt",i,bhad_hadron[i].pt() );
 	vars.FillVars( "GenTopHad_B_Hadron_Eta",i,bhad_hadron[i].eta() );
 	vars.FillVars( "GenTopHad_B_Hadron_Phi",i,bhad_hadron[i].phi());
+	vars.FillVars( "GenTopHad_B_Hadron_M",i,bhad_hadron[i].mass());
       }
     }
     
     for(uint i=0;i<blep_genjet.size();i++){
       if(blep_genjet[i].pt()>1){
-	vars.FillVars( "GenTopLep_B_GenJet_Phi",i,blep_genjet[i].phi());
 	vars.FillVars( "GenTopLep_B_GenJet_Pt",i,blep_genjet[i].pt() );
 	vars.FillVars( "GenTopLep_B_GenJet_Eta",i,blep_genjet[i].eta());
+	vars.FillVars( "GenTopLep_B_GenJet_Phi",i,blep_genjet[i].phi());
+	vars.FillVars( "GenTopLep_B_GenJet_M",i,blep_genjet[i].mass());
+
       }
       if(blep_hadron[i].pt()>1){
 	vars.FillVars( "GenTopLep_B_Hadron_Pt",i,blep_hadron[i].pt() );
 	vars.FillVars( "GenTopLep_B_Hadron_Eta",i,blep_hadron[i].eta());
 	vars.FillVars( "GenTopLep_B_Hadron_Phi",i,blep_hadron[i].phi());
+	vars.FillVars( "GenTopLep_B_Hadron_M",i,blep_hadron[i].mass());
       }
     }
   }
