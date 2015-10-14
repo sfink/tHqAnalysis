@@ -61,6 +61,7 @@ void MCMatchVarProcessor::Init(const InputCollections& input,VariableContainer& 
   vars.InitVar( "top_tbarbm",-9.,"F" );
   vars.InitVars( "top_tbarwdaum",-9.,"n_topbarwdau" );
 
+  vars.InitVar( "top_lepcharge",-9,"F" );
   
   vars.InitVar( "top_tbidx",-1,"I" );
   vars.InitVar( "tophadq1idx",-1,"I" );
@@ -122,7 +123,8 @@ void MCMatchVarProcessor::Process(const InputCollections& input,VariableContaine
 
   std::vector<reco::GenParticle> tophad;
   std::vector<reco::GenParticle> toplep;
-
+  reco::GenParticle toplep_lep;
+  
   std::vector<reco::GenParticle> q1;
   std::vector<reco::GenParticle> q2;
 
@@ -139,6 +141,7 @@ void MCMatchVarProcessor::Process(const InputCollections& input,VariableContaine
 
     tophad=input.genTopEvt.GetAllTopHads();
     toplep=input.genTopEvt.GetAllTopLeps();
+    toplep_lep=input.genTopEvt.GetLepton();
     q1=input.genTopEvt.GetAllWQuarks();
     q2=input.genTopEvt.GetAllWAntiQuarks();
 
@@ -155,10 +158,9 @@ void MCMatchVarProcessor::Process(const InputCollections& input,VariableContaine
 
   vars.FillVar("n_tophad", tophad.size());
   vars.FillVar("n_toplep", toplep.size());
-
   
-
-
+  vars.FillVar("top_lepcharge", toplep_lep.charge());
+  cout << "LepCharge: " << toplep_lep.charge() << endl;
 
   vector<math::XYZTLorentzVector> jetvecs = tHqUtils::GetJetVecs(input.selectedJets);
   
