@@ -15,6 +15,7 @@
 #include "DataFormats/PatCandidates/interface/MET.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "tHqAnalysis/tHqAnalyzer/interface/GenTopEvent.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/GentHqEvent.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/EventInfo.hpp"
 //#include "tHqAnalysis/tHqAnalyzer/interface/BoostedUtils.hpp"
 #include "MiniAOD/MiniAODHelper/interface/MiniAODHelper.h"
@@ -40,6 +41,7 @@ struct InputCollections{
                     const std::vector<pat::Jet>&                  selectedPuppiJets_,
                     const pat::MET&                               pfMET_,
 		    const GenTopEvent&                            genTopEvt_,
+                    const GentHqEvent&                            gentHqEvt_,
                     const std::vector<reco::GenJet>&              selectedGenJets_,
                     const SampleType                              sampleType_,
                     const std::map<std::string,float>&            weights_
@@ -60,6 +62,7 @@ struct InputCollections{
                     selectedPuppiJets(selectedPuppiJets_),
                     pfMET(pfMET_),
 		    genTopEvt(genTopEvt_),
+		    gentHqEvt(gentHqEvt_),
                     selectedGenJets(selectedGenJets_),
                     sampleType(sampleType_),
                     weights(weights_)
@@ -81,6 +84,7 @@ struct InputCollections{
   const std::vector<pat::Jet>&                  selectedPuppiJets;
   const pat::MET&                               pfMET;
   const GenTopEvent&                            genTopEvt;
+  const GentHqEvent&                            gentHqEvt;
   const std::vector<reco::GenJet>&              selectedGenJets;
   const SampleType                              sampleType;
   const std::map<std::string,float>&            weights;

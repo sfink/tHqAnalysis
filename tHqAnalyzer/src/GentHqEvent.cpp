@@ -26,42 +26,41 @@ void GentHqEvent::Fill(const std::vector<reco::GenParticle>& prunedGenParticles)
 
           while (goon == true){
             goon = false;
-            for (int i=0; i<top_decay_quark->numberOfDaughters();i++){
-              if (top_decay_quark->pdgId()==top_decay_quark->daughter(i)->pdgId()){
-                top_decay_quark = top_decay_quark>daughter(i);
-                goon = True;
+            for (unsigned i=0; i<top_decay_quark.numberOfDaughters();i++){
+              if (top_decay_quark.pdgId()==top_decay_quark.daughter(i)->pdgId()){
+                top_decay_quark = *(reco::GenParticle*)top_decay_quark.daughter(i);
+                goon = true;
                 break;
               }
             }
           }
-          top_decay_quark=*(reco::GenParticle*)top_decay_quark;
+          //top_decay_quark=*(reco::GenParticle*)top_decay_quark;
 	}
       }
     }
 
     // Search for W boson
 
-    if (abs(p->pdgId())==24 && p->isLastCopy){
+    if (abs(p->pdgId())==24 && p->isLastCopy()){
       wboson=*p;
       for(uint i=0;i<p->numberOfDaughters();i++){
 	if(p->pdgId()==24 && abs(p->daughter(i)->pdgId())<=16){
 
-
-	  p = p->daughter(i);
+	  W_decay_product = *(reco::GenParticle*)p->daughter(i);
 	  
 	  bool goon = true;
 
 	  while (goon == true){
 	    goon = false;
-	    for (int i=0; i<W_decay_product->numberOfDaughters();i++){
-	      if (W_decay_product->pdgId()==W_decay_product->daughter(i)->pdgId()){
-		W_decay_product = W_decay_product>daughter(i);
-		goon = True;
+	    for (unsigned i=0; i<W_decay_product.numberOfDaughters();i++){
+	      if (W_decay_product.pdgId()==W_decay_product.daughter(i)->pdgId()){
+		W_decay_product = *(reco::GenParticle*)W_decay_product.daughter(i);
+		goon = true;
 		break;
 	      }
 	    }
 	  }
-	  w_decay_products.push_back(*(reco::GenParticle*)W_decay_product);   
+	  w_decay_products.push_back((reco::GenParticle)W_decay_product);   
 	}
       }
     }
@@ -73,21 +72,21 @@ void GentHqEvent::Fill(const std::vector<reco::GenParticle>& prunedGenParticles)
       for(uint i=0;i<p->numberOfDaughters();i++){
 	if(p->pdgId()==25 && abs(p->daughter(i)->pdgId())!=25){
 	  
-	  p = p->daughter(i);
+	  H_decay_product = *(reco::GenParticle*)p->daughter(i);
 
           bool goon = true;
 
           while (goon == true){
             goon = false;
-            for (int i=0; i<H_decay_product->numberOfDaughters();i++){
-              if (H_decay_product->pdgId()==H_decay_product->daughter(i)->pdgId()){
-                H_decay_product = H_decay_product>daughter(i);
-                goon = True;
+            for (unsigned i=0; i<H_decay_product.numberOfDaughters();i++){
+              if (H_decay_product.pdgId()==H_decay_product.daughter(i)->pdgId()){
+                H_decay_product = *(reco::GenParticle*)H_decay_product.daughter(i);
+                goon = true;
                 break;
               }
             }
           }
-          higgs_decay_products.push_back(*(reco::GenParticle*)H_decay_product);
+          higgs_decay_products.push_back((reco::GenParticle)H_decay_product);
 	}
       }
     }
@@ -99,21 +98,21 @@ void GentHqEvent::Fill(const std::vector<reco::GenParticle>& prunedGenParticles)
       bool hastopmother = false;
       for(uint i=0;i<p->numberOfMothers();i++){
         if(p->mother(i)->pdgId()==6){
-          hastopmother = True;
+          hastopmother = true;
         }
       }
       
       if (!hastopmother)
-	lightquark = p;
+	lightquark = *p;
 	
       bool goon = true;
 
       while (goon == true){
 	goon = false;
-	for (int i=0; i<lightquark->numberOfDaughters();i++){
-	  if (lightquark->pdgId()==lightquark->daughter(i)->pdgId()){
-	    lightquark = lightquark->daughter(i);
-	    goon = True;
+	for (unsigned i=0; i<lightquark.numberOfDaughters();i++){
+	  if (lightquark.pdgId()==lightquark.daughter(i)->pdgId()){
+	    lightquark = *(reco::GenParticle*)lightquark.daughter(i);
+	    goon = true;
 	    break;
 	  }
 	}
@@ -122,17 +121,17 @@ void GentHqEvent::Fill(const std::vector<reco::GenParticle>& prunedGenParticles)
 
     // Search for additional b quark
 
-    if ( (p->status()== 23 ||  p->status()== 43) && abs(p->pdgId())==5 && p->pdgId()*top->pdgId()<0){
+    if ( (p->status()== 23 ||  p->status()== 43) && abs(p->pdgId())==5 && p->pdgId()*top.pdgId()<0){
       secondb=*p;
 	
       bool goon = true;
 
       while (goon == true){
 	goon = false;
-	for (int i=0; i<secondb->numberOfDaughters();i++){
-	  if (secondb->pdgId()==secondb->daughter(i)->pdgId()){
-	    secondb = secondb->daughter(i);
-	    goon = True;
+	for (unsigned i=0; i<secondb.numberOfDaughters();i++){
+	  if (secondb.pdgId()==secondb.daughter(i)->pdgId()){
+	    secondb = *(reco::GenParticle*)secondb.daughter(i);
+	    goon = true;
 	    break;
 	  }
 	}
@@ -142,12 +141,14 @@ void GentHqEvent::Fill(const std::vector<reco::GenParticle>& prunedGenParticles)
   }  if(w_decay_products.size()!=2) std::cerr << "GentHqEvent: error 2"<<std::endl;
   if(top.energy()<1||wboson.energy()<1) std::cerr << "GentHqEvent: error 3"<<std::endl;
 
+  /*
   int nquarks_from_w=0;
   for(auto p=w_decay_products.begin(); p!=w_decay_products.end();p++){
     if(abs(p->pdgId())<6) n_from_wplus++;
   }
   topIsHadronic=nquarks_from_w==2;
   isFilled=true;
+  */
 }
 
 void GentHqEvent::Print() const{

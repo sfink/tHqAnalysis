@@ -77,15 +77,15 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
   reco::GenParticle lq;
   std::vector<reco::GenParticle> Hdau;
   std::vector<reco::GenParticle> Wdau;
-  if(input.GentHqEvent.IsFilled()){
-    H=input.GentHqEvent.GetHiggs();
-    W=input.GentHqEvent.GetW();
-    t=input.GentHqEvent.GetTop();
-    btop=input.GentHqEvent.GetTopDecayQuark();
-    sb=input.GentHqEvent.GetSecondb();
-    lq=input.GentHqEvent.GetLightQuark();
-    Hdau=input.GentHqEvent.GetHiggsDecayProducts();
-    Wdau=input.GentHqEvent.GetWDecayProducts();
+  if(input.gentHqEvt.IsFilled()){
+    H=input.gentHqEvt.GetHiggs();
+    W=input.gentHqEvt.GetW();
+    t=input.gentHqEvt.GetTop();
+    btop=input.gentHqEvt.GetTopDecayQuark();
+    sb=input.gentHqEvt.GetSecondb();
+    lq=input.gentHqEvt.GetLightQuark();
+    Hdau=input.gentHqEvt.GetHiggsDecayProducts();
+    Wdau=input.gentHqEvt.GetWDecayProducts();
   }
 
   std::cout << "#Hdaus: " << Hdau.size() << endl;

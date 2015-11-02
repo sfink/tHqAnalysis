@@ -20,7 +20,6 @@ public:
   reco::GenParticle GetW() const;
   
   std::vector<reco::GenParticle> GetWDecayProducts() const;
-  std::vector<reco::GenParticle> GetHiggssDecayProducts() const;
 
   reco::GenParticle GetSecondb() const;
   reco::GenParticle GetLightQuark() const;
@@ -38,6 +37,8 @@ private:
   reco::GenParticle lightquark;
   reco::GenParticle secondb;
   reco::GenParticle top_decay_quark;
+  reco::GenParticle W_decay_product;
+  reco::GenParticle H_decay_product;
   std::vector<reco::GenParticle> w_decay_products;
   std::vector<reco::GenParticle> higgs_decay_products;
 
