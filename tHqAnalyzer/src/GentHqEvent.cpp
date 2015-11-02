@@ -26,7 +26,7 @@ void GentHqEvent::Fill(const std::vector<reco::GenParticle>& prunedGenParticles)
 
           while (goon == true){
             goon = false;
-            for (int i=0; i<top_decay_quark->numberOfDaughters()){
+            for (int i=0; i<top_decay_quark->numberOfDaughters();i++){
               if (top_decay_quark->pdgId()==top_decay_quark->daughter(i)->pdgId()){
                 top_decay_quark = top_decay_quark>daughter(i);
                 goon = True;
@@ -53,7 +53,7 @@ void GentHqEvent::Fill(const std::vector<reco::GenParticle>& prunedGenParticles)
 
 	  while (goon == true){
 	    goon = false;
-	    for (int i=0; i<W_decay_product->numberOfDaughters()){
+	    for (int i=0; i<W_decay_product->numberOfDaughters();i++){
 	      if (W_decay_product->pdgId()==W_decay_product->daughter(i)->pdgId()){
 		W_decay_product = W_decay_product>daughter(i);
 		goon = True;
@@ -79,7 +79,7 @@ void GentHqEvent::Fill(const std::vector<reco::GenParticle>& prunedGenParticles)
 
           while (goon == true){
             goon = false;
-            for (int i=0; i<H_decay_product->numberOfDaughters()){
+            for (int i=0; i<H_decay_product->numberOfDaughters();i++){
               if (H_decay_product->pdgId()==H_decay_product->daughter(i)->pdgId()){
                 H_decay_product = H_decay_product>daughter(i);
                 goon = True;
@@ -110,7 +110,7 @@ void GentHqEvent::Fill(const std::vector<reco::GenParticle>& prunedGenParticles)
 
       while (goon == true){
 	goon = false;
-	for (int i=0; i<lightquark->numberOfDaughters()){
+	for (int i=0; i<lightquark->numberOfDaughters();i++){
 	  if (lightquark->pdgId()==lightquark->daughter(i)->pdgId()){
 	    lightquark = lightquark->daughter(i);
 	    goon = True;
@@ -129,7 +129,7 @@ void GentHqEvent::Fill(const std::vector<reco::GenParticle>& prunedGenParticles)
 
       while (goon == true){
 	goon = false;
-	for (int i=0; i<secondb->numberOfDaughters()){
+	for (int i=0; i<secondb->numberOfDaughters();i++){
 	  if (secondb->pdgId()==secondb->daughter(i)->pdgId()){
 	    secondb = secondb->daughter(i);
 	    goon = True;
