@@ -12,13 +12,13 @@ public:
   void Fill(const std::vector<reco::GenParticle>& prunedGenParticles);
   
 
-  std::vector<reco::GenParticle> GetHiggsDecayProducts() const;
   bool IsFilled() const;
   reco::GenParticle GetTop() const;
   reco::GenParticle GetHiggs() const;
   reco::GenParticle GetTopDecayQuark() const;
   reco::GenParticle GetW() const;
   
+  std::vector<reco::GenParticle> GetHiggsDecayProducts() const;
   std::vector<reco::GenParticle> GetWDecayProducts() const;
 
   reco::GenParticle GetSecondb() const;

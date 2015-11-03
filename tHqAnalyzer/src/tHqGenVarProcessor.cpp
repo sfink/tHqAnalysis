@@ -9,57 +9,57 @@ tHqGenVarProcessor::~tHqGenVarProcessor (){}
 
 void tHqGenVarProcessor::Init(const InputCollections& input,VariableContainer& vars){
  
-  vars.InitVar( "Hpt",-9. );
-  vars.InitVar( "Heta",-9. );
-  vars.InitVar( "Hphi",-9. );
-  vars.InitVar( "Hm",-9. );
+  vars.InitVar( "Hpt",-9.,"F" );
+  vars.InitVar( "Heta",-9.,"F" );
+  vars.InitVar( "Hphi",-9., "F" );
+  vars.InitVar( "Hm",-9., "F" );
 
-  vars.InitVar( "Wpt",-9. );
-  vars.InitVar( "Weta",-9. );
-  vars.InitVar( "Wphi",-9. );
-  vars.InitVar( "Wm",-9. );
+  vars.InitVar( "Wpt",-9.,"F" );
+  vars.InitVar( "Weta",-9., "F" );
+  vars.InitVar( "Wphi",-9., "F" );
+  vars.InitVar( "Wm",-9., "F" );
 
-  vars.InitVar( "tpt",-9. );
-  vars.InitVar( "teta",-9. );
-  vars.InitVar( "tphi",-9. );
-  vars.InitVar( "tm",-9. );
+  vars.InitVar( "tpt",-9., "F" );
+  vars.InitVar( "teta",-9., "F" );
+  vars.InitVar( "tphi",-9., "F" );
+  vars.InitVar( "tm",-9., "F" );
 
-  vars.InitVar( "btoppt",-9. );
-  vars.InitVar( "btopeta",-9. );
-  vars.InitVar( "btopphi",-9. );
-  vars.InitVar( "btopm",-9. );
+  vars.InitVar( "btoppt",-9., "F" );
+  vars.InitVar( "btopeta",-9., "F" );
+  vars.InitVar( "btopphi",-9., "F" );
+  vars.InitVar( "btopm",-9., "F" );
 
-  vars.InitVar( "sbpt",-9. );
-  vars.InitVar( "sbeta",-9. );
-  vars.InitVar( "sbphi",-9. );
-  vars.InitVar( "sbm",-9. );
+  vars.InitVar( "sbpt",-9., "F" );
+  vars.InitVar( "sbeta",-9., "F" );
+  vars.InitVar( "sbphi",-9., "F" );
+  vars.InitVar( "sbm",-9., "F" );
 
-  vars.InitVar( "lqpt",-9. );
-  vars.InitVar( "lqeta",-9. );
-  vars.InitVar( "lqphi",-9. );
-  vars.InitVar( "lqm",-9. );
+  vars.InitVar( "lqpt",-9., "F" );
+  vars.InitVar( "lqeta",-9., "F" );
+  vars.InitVar( "lqphi",-9.,"F" );
+  vars.InitVar( "lqm",-9., "F" );
 
-  vars.InitVar( "nHdau", -9); 
+  vars.InitVar( "nHdau", -9, "I"); 
 
-  vars.InitVars( "Hdaupt",-9. , "nHdau" );
-  vars.InitVars( "Hdaueta",-9.,  "nHdau");
-  vars.InitVars( "Hdauphi",-9., "nHdau" );
-  vars.InitVars( "Hdaum",-9.,  "nHdau");
-  vars.InitVars( "Hdauid",-9.,  "nHdau");
+  vars.InitVars( "Hdaupt" , -9., "nHdau", 2 );
+  vars.InitVars( "Hdaueta", -9., "nHdau", 2 );
+  vars.InitVars( "Hdauphi", -9., "nHdau", 2 );
+  vars.InitVars( "Hdaum",   -9., "nHdau", 2 );
+  vars.InitVars( "Hdauid",  -9., "nHdau", 2 );
 
-  vars.InitVar( "nWdau", -9); 
+  vars.InitVar( "nWdau", -9, "I"); 
 
-  vars.InitVars( "Wdaupt",-9. , "nWdau" );
-  vars.InitVars( "Wdaueta",-9.,  "nWdau");
-  vars.InitVars( "Wdauphi",-9., "nWdau" );
-  vars.InitVars( "Wdaum",-9.,  "nWdau");
-  vars.InitVars( "Wdauid",-9.,  "nWdau");
+  vars.InitVars( "Wdaupt",-9. , "nWdau",2 );
+  vars.InitVars( "Wdaueta",-9.,  "nWdau",2);
+  vars.InitVars( "Wdauphi",-9., "nWdau",2 );
+  vars.InitVars( "Wdaum",-9.,  "nWdau",2);
+  vars.InitVars( "Wdauid",-9.,  "nWdau",2);
  
-  vars.InitVars( "hbbjtidx", -9, "nHdau"); 
-  vars.InitVars( "Wjtidx", -9, "nWdau"); 
-  vars.InitVar( "tjtidx", -9);
-  vars.InitVar( "lqjtidx", -9);
-  vars.InitVar( "sbjtidx", -9);
+  vars.InitVars( "Hjtidx", -9, "nHdau",2); 
+  vars.InitVars( "Wjtidx", -9, "nWdau",2); 
+  vars.InitVar( "tjtidx", -9, "I");
+  vars.InitVar( "lqjtidx", -9, "I");
+  vars.InitVar( "sbjtidx", -9, "I");
 
   initialized = true;
 }
@@ -88,7 +88,13 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
     Wdau=input.gentHqEvt.GetWDecayProducts();
   }
 
+  
+  std::cout << "Higgs pt" << H.pt() << endl;
   std::cout << "#Hdaus: " << Hdau.size() << endl;
+  std::cout << "Hdau eta: " << Hdau[0].eta() << endl;
+  std::cout << "Hdau eta: " << Hdau[1].eta() << endl;
+  std::cout << "Hdau pt: " << Hdau[0].pt() << endl;
+  std::cout << "Hdau pt: " << Hdau[1].pt() << endl;
   std::cout << "#Wdaus: " << Wdau.size() << endl;
 
   
@@ -110,6 +116,10 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
   vars.FillVar( "btopeta",btop.eta());
   vars.FillVar( "btopphi",btop.phi());
   vars.FillVar( "btopm",btop.mass());
+  vars.FillVar( "lqpt",lq.pt());
+  vars.FillVar( "lqeta",lq.eta());
+  vars.FillVar( "lqphi",lq.phi());
+  vars.FillVar( "lqm",lq.mass());
   vars.FillVar( "nHdau",Hdau.size());
   vars.FillVar( "nWdau",Wdau.size());
   for(size_t i=0;i<2;i++){
@@ -138,7 +148,7 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
     idxblep=-99;
   
   
-  vars.FillVar("btop_idx",idxblep);
+  vars.FillVar("tjtidx",idxblep);
     
     //    std::cout << "Found Jet to b from top: #" << idxblep << "  with dR= " << minDrTopLep << endl; 
   
@@ -147,10 +157,16 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
   double minDrB1 = 999;
   double minDrB2 = 999;
   
+    std::cout << "5)" << std::endl;
+
+
   for(std::vector<math::XYZTLorentzVector>::iterator itJetVec = jetvecs.begin() ; itJetVec != jetvecs.end(); ++itJetVec){
     assert(itJetVec->pt()>0);
     assert(Hdau[0].pt()>0);
     assert(Hdau[1].pt()>0);
+    
+    std::cout << "6)" << std::endl;
+
     if(tHqUtils::DeltaR(*itJetVec,Hdau[0].p4())<minDrB1){
       idxhbb[0] = itJetVec-jetvecs.begin();
       minDrB1 = tHqUtils::DeltaR(*itJetVec,Hdau[0].p4());
@@ -168,14 +184,22 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
     idxhbb[1]=-99.;
   }
   
+  std::cout << "7)" << std::endl;
+
+
+
   for (int i =0; i<2; i++)
-    vars.FillVars("hbbjtidx",i,idxhbb[i]);
+    vars.FillVars("Hjtidx",i,idxhbb[i]);
 
   int idxsb=-1;
   int idxlq=-1;
     
   double minDrSB = 999;
   double minDrLQ = 999;
+
+
+  std::cout << "8)" << std::endl;
+  
 
   for(std::vector<math::XYZTLorentzVector>::iterator itJetVec = jetvecs.begin() ; itJetVec != jetvecs.end(); ++itJetVec){
     assert(itJetVec->pt()>0);
@@ -190,6 +214,10 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
       minDrLQ = tHqUtils::DeltaR(*itJetVec,lq.p4());
     }
   }
+
+  std::cout << "8)" << std::endl;
+
+
   
   if(minDrSB>.4)
     idxsb=-99;
@@ -200,5 +228,9 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
     idxlq=-99;
   
   vars.FillVar("lqjtidx",idxlq);
+
+  std::cout << "9)" << std::endl;
+
+
 
 }

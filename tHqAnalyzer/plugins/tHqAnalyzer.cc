@@ -58,6 +58,9 @@
 #include "tHqAnalysis/tHqAnalyzer/interface/BaseVarProcessor.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/RecoVarProcessor.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/GenTopEvent.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/GentHqEvent.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/tHqGenVarProcessor.hpp"
+
 
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 
@@ -331,6 +334,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig){
     if(*itPro == "RecoVarProcessor") treewriter.AddTreeProcessor(new RecoVarProcessor());
     if(*itPro == "MVAVarProcessor") treewriter.AddTreeProcessor(new MVAVarProcessor());
     if(*itPro == "MCMatchVarProcessor") treewriter.AddTreeProcessor(new MCMatchVarProcessor());
+    if(*itPro == "tHqGenVarProcessor") treewriter.AddTreeProcessor(new tHqGenVarProcessor());
 
     else cout << "No matching processor found for: " << *itPro << endl;    
     } 
@@ -589,6 +593,7 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
   }
   GenTopEvent genTopEvt;
+  GentHqEvent gentHqEvt;
   int ttid=-1;
   int ttid_full=-1;
 
@@ -655,8 +660,10 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     // fill genTopEvt with tt(H) information
     genTopEvt.Fill(*h_genParticles,ttid_full);
   }
-
-
+  
+  if(!isData && foundHiggs)
+    gentHqEvt.Fill(*h_genParticles);
+  
   // DO REWEIGHTING
 
 
@@ -683,6 +690,7 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                           selectedJetsLoose,
                           pfMETs[0],
 			  genTopEvt,
+			  gentHqEvt,
                           selectedGenJets,
                           sampleType,
                           weights

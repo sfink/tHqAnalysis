@@ -12,143 +12,216 @@ bool GentHqEvent::IsFilled() const{
 void GentHqEvent::Fill(const std::vector<reco::GenParticle>& prunedGenParticles){
 
   for(auto p=prunedGenParticles.begin(); p!=prunedGenParticles.end(); p++){
+    GentHqEvent::PrintParticle(*p); 
+  }
+  
+  std::cout << " " << std::endl;
+  std::cout << " " << std::endl;
+
+  for(auto p=prunedGenParticles.begin(); p!=prunedGenParticles.end(); p++){
+
+    std::cout << "0)" << std::endl;
     
-
-    // Search for top quark
-
+    GentHqEvent::PrintParticle(*p);
+    // top quark
     if (abs(p->pdgId())==6 && p->isLastCopy()){
       top=*p;
-      for(uint i=0;i<p->numberOfDaughters();i++){
-	if(abs(p->daughter(i)->pdgId())<6){
-	  top_decay_quark=*(reco::GenParticle*)p->daughter(i);
+    }
+    // Higgs
+    if (abs(p->pdgId())==25 && p->isLastCopy()){
+      higgs=*p;
+    }
+    // Wboson - tricky: can also come from the Higgs decay in an inclusive sample
+    if (abs(p->pdgId())==24 && p->isLastCopy()){
 
-	  bool goon = true;
+      const reco::Candidate* temp=&(*p);
+      const reco::Candidate* mother=&(*p);
 
-          while (goon == true){
-            goon = false;
-            for (unsigned i=0; i<top_decay_quark.numberOfDaughters();i++){
-              if (top_decay_quark.pdgId()==top_decay_quark.daughter(i)->pdgId()){
-                top_decay_quark = *(reco::GenParticle*)top_decay_quark.daughter(i);
-                goon = true;
-                break;
-              }
-            }
-          }
-          //top_decay_quark=*(reco::GenParticle*)top_decay_quark;
+      bool hassamemother=true;
+      while (hassamemother) {
+	hassamemother=false;
+	for (uint m=0; m<mother->numberOfMothers();m++){
+	  if (mother->pdgId()==mother->mother(m)->pdgId()){
+	    mother = mother->mother(m);
+	    hassamemother=true;
+	    break;
+	  }
+	}
+      } 
+      bool hasnohiggsmother = false;
+      for (uint m=0; m<mother->numberOfMothers();m++){
+	if (abs(mother->mother(m)->pdgId())==25)
+	  hasnohiggsmother = false;
+      }
+      if (hasnohiggsmother)
+	wboson=*(reco::GenParticle*)temp;
+    }
+  }
+
+
+
+  std::cout << "1)" << std::endl;
+  // (b) quark from top
+  for(auto p=prunedGenParticles.begin(); p!=prunedGenParticles.end(); p++){
+    
+    if (p->statusFlags().isLastCopy() && p->statusFlags().fromHardProcess()){
+
+      const reco::Candidate* temp=&(*p);
+      const reco::Candidate* mother=&(*p);
+     
+      bool hassamemother=true;
+      while (hassamemother) {
+	hassamemother=false;
+	for (uint m=0; m<mother->numberOfMothers();m++){
+	  if (mother->pdgId()==mother->mother(m)->pdgId()){
+	    mother = mother->mother(m);
+	    hassamemother=true;
+	    break;
+	  }
+	}
+      } 
+      for (uint m=0; m<mother->numberOfMothers();m++){
+	if (abs(mother->mother(m)->pdgId())==6)
+	  top_decay_quark=*(reco::GenParticle*)temp;
+      }
+    }
+  }
+
+  std::cout << "top decay quark pt: " << top_decay_quark.pt() << std::endl;
+  std::cout << "top decay quark pt: " << top_decay_quark.pdgId() << std::endl;
+  // Higgs decay objects
+  for(auto p=prunedGenParticles.begin(); p!=prunedGenParticles.end(); p++){
+    
+    if (p->statusFlags().isLastCopy() && p->statusFlags().fromHardProcess()){
+
+      const reco::Candidate* temp=&(*p);
+      const reco::Candidate* mother=&(*p);
+
+      bool hassamemother=true;
+      while (hassamemother) {
+	hassamemother=false;
+	for (uint m=0; m<mother->numberOfMothers();m++){
+          if (mother->pdgId()==mother->mother(m)->pdgId()){
+	    mother = mother->mother(m);
+            hassamemother=true;
+            break;
+	  }
+	}
+      }
+      for (uint m=0; m<mother->numberOfMothers();m++){
+        if (abs(mother->mother(m)->pdgId())==25) {
+	    if ( higgs_decay_products.size()==2 && higgs_decay_products[0].pdgId()==21)
+	      break;
+	    higgs_decay_products.push_back(*(reco::GenParticle*)temp);
 	}
       }
     }
+  }
+  std::cout << "higgs decay quark1 pt: " << higgs_decay_products[0].pt() << std::endl;
+  std::cout << "higgs decay quark1 pt: " << higgs_decay_products[0].pdgId() << std::endl;
+  std::cout << "higgs decay quark2 pt: " << higgs_decay_products[1].pt() << std::endl;
+  std::cout << "higgs decay quark2 pt: " << higgs_decay_products[1].pdgId() << std::endl;
+  
 
-    // Search for W boson
+  // W decay objects
+  for(auto p=prunedGenParticles.begin(); p!=prunedGenParticles.end(); p++){
+    
+    if (p->statusFlags().isLastCopy() && p->statusFlags().fromHardProcess()){
 
-    if (abs(p->pdgId())==24 && p->isLastCopy()){
-      wboson=*p;
-      for(uint i=0;i<p->numberOfDaughters();i++){
-	if(p->pdgId()==24 && abs(p->daughter(i)->pdgId())<=16){
+      const reco::Candidate* temp=&(*p);
+      const reco::Candidate* mother=&(*p);
 
-	  W_decay_product = *(reco::GenParticle*)p->daughter(i);
+      bool hassamemother=true;
+      while (hassamemother) {
+	hassamemother=false;
+	for (uint m=0; m<mother->numberOfMothers();m++){
+          if (mother->pdgId()==mother->mother(m)->pdgId()){
+	    mother = mother->mother(m);
+            hassamemother=true;
+            break;
+	  }
+	}
+      }
+      for (uint m=0; m<mother->numberOfMothers();m++){
+
+        if (abs(mother->mother(m)->pdgId())==24 ){
 	  
-	  bool goon = true;
-
-	  while (goon == true){
-	    goon = false;
-	    for (unsigned i=0; i<W_decay_product.numberOfDaughters();i++){
-	      if (W_decay_product.pdgId()==W_decay_product.daughter(i)->pdgId()){
-		W_decay_product = *(reco::GenParticle*)W_decay_product.daughter(i);
-		goon = true;
+	  
+	  const reco::Candidate* mother_W = &(*(reco::GenParticle*)mother->mother(m));
+	  
+	  bool hassamemother=true;
+	  while (hassamemother) {
+	    hassamemother=false;
+	    for (uint m=0; m<mother_W->numberOfMothers();m++){
+	      if (mother_W->pdgId()==mother_W->mother(m)->pdgId()){
+		mother_W = mother_W->mother(m);
+		hassamemother=true;
 		break;
 	      }
 	    }
+	  } 
+      
+	  bool isnotfromhiggstoww = true;
+	  for (uint m=0; m<mother_W->numberOfMothers();m++){
+	    if (abs(mother_W->mother(m)->pdgId())==25)
+	      isnotfromhiggstoww = false;
 	  }
-	  w_decay_products.push_back((reco::GenParticle)W_decay_product);   
-	}
-      }
-    }
-
-    // Search for Higgs boson
-
-    if (abs(p->pdgId())==25 && p->isLastCopy()){
-      higgs=*p;
-      for(uint i=0;i<p->numberOfDaughters();i++){
-	if(p->pdgId()==25 && abs(p->daughter(i)->pdgId())!=25){
 	  
-	  H_decay_product = *(reco::GenParticle*)p->daughter(i);
-
-          bool goon = true;
-
-          while (goon == true){
-            goon = false;
-            for (unsigned i=0; i<H_decay_product.numberOfDaughters();i++){
-              if (H_decay_product.pdgId()==H_decay_product.daughter(i)->pdgId()){
-                H_decay_product = *(reco::GenParticle*)H_decay_product.daughter(i);
-                goon = true;
-                break;
-              }
-            }
-          }
-          higgs_decay_products.push_back((reco::GenParticle)H_decay_product);
+	  if (isnotfromhiggstoww)
+	    w_decay_products.push_back(*(reco::GenParticle*)temp);
 	}
       }
     }
+  }
 
-    // Search for light quark
 
-    if (abs(p->pdgId())<5 && p->status()==23){
+  std::cout << "w decay quark1 pt: " << w_decay_products[0].pt() << std::endl;
+  std::cout << "w decay quark1 pt: " << w_decay_products[0].pdgId() << std::endl;
+  std::cout << "w decay quark2 pt: " << w_decay_products[1].pt() << std::endl;
+  std::cout << "w decay quark2 pt: " << w_decay_products[1].pdgId() << std::endl;
+
+  // light quark
+  for(auto p=prunedGenParticles.begin(); p!=prunedGenParticles.end(); p++){
+    
+    if (std::abs(p->pdgId())<5 && p->statusFlags().isLastCopy() && p->statusFlags().fromHardProcess()){
+
+      if (p->pt()!=top_decay_quark.pt())
+	lightquark=*p;
       
-      bool hastopmother = false;
-      for(uint i=0;i<p->numberOfMothers();i++){
-        if(p->mother(i)->pdgId()==6){
-          hastopmother = true;
-        }
-      }
+    }
+  }
+
+  std::cout << "light quark pt: " << lightquark.pt() << std::endl;
+  std::cout << "light quark pt: " << lightquark.pdgId() << std::endl;
+
+
+  // second b quark
+  for(auto p=prunedGenParticles.begin(); p!=prunedGenParticles.end(); p++){
+    
+    if (p->pdgId()*(-1)==top_decay_quark.pdgId() && p->statusFlags().isLastCopy() && p->statusFlags().fromHardProcess()){
+
+      if (p->pt()!=higgs_decay_products[0].pt() && p->pt()!=higgs_decay_products[1].pt())
+	secondb=*p;
       
-      if (!hastopmother)
-	lightquark = *p;
-	
-      bool goon = true;
-
-      while (goon == true){
-	goon = false;
-	for (unsigned i=0; i<lightquark.numberOfDaughters();i++){
-	  if (lightquark.pdgId()==lightquark.daughter(i)->pdgId()){
-	    lightquark = *(reco::GenParticle*)lightquark.daughter(i);
-	    goon = true;
-	    break;
-	  }
-	}
-      }
     }
+  }
 
-    // Search for additional b quark
+  std::cout << "add b quark pt: " << secondb.pt() << std::endl;
+  std::cout << "add b quark pt: " << secondb.pdgId() << std::endl;
 
-    if ( (p->status()== 23 ||  p->status()== 43) && abs(p->pdgId())==5 && p->pdgId()*top.pdgId()<0){
-      secondb=*p;
-	
-      bool goon = true;
 
-      while (goon == true){
-	goon = false;
-	for (unsigned i=0; i<secondb.numberOfDaughters();i++){
-	  if (secondb.pdgId()==secondb.daughter(i)->pdgId()){
-	    secondb = *(reco::GenParticle*)secondb.daughter(i);
-	    goon = true;
-	    break;
-	  }
-	}
-      }
-    }
+
+  std::cout << "size W: " << w_decay_products.size() << std::endl;
+  std::cout << "size H: " << higgs_decay_products.size() << std::endl;
+
+  if (higgs_decay_products.size()!=2)
+    std::cout << "OMG" << std::endl;
     //    if (abs(p->pdgId())<5 && p->fromHardProcess() && isLastCopy())
-  }  if(w_decay_products.size()!=2) std::cerr << "GentHqEvent: error 2"<<std::endl;
+  if(w_decay_products.size()!=2) std::cerr << "GentHqEvent: error 2"<<std::endl;
   if(top.energy()<1||wboson.energy()<1) std::cerr << "GentHqEvent: error 3"<<std::endl;
 
-  /*
-  int nquarks_from_w=0;
-  for(auto p=w_decay_products.begin(); p!=w_decay_products.end();p++){
-    if(abs(p->pdgId())<6) n_from_wplus++;
-  }
-  topIsHadronic=nquarks_from_w==2;
   isFilled=true;
-  */
+
 }
 
 void GentHqEvent::Print() const{
@@ -158,7 +231,7 @@ void GentHqEvent::Print() const{
 }
 
 void GentHqEvent::PrintParticle(reco::GenParticle p) const{
-  std::cout << "pdgId: " << p.pdgId() << ", pt: " << p.pt() << ", eta: " << p.eta() << ", phi: " << p.phi() << std::endl;
+  std::cout << "pdgId: " << p.pdgId() << ", pt: " << p.pt() << ", eta: " << p.eta() << ", phi: " << p.phi() << ", status:" << p.status() << std::endl;
 }
 void GentHqEvent::PrintParticles(std::vector<reco::GenParticle> ps) const{
   for(auto p=ps.begin();p!=ps.end();p++){
