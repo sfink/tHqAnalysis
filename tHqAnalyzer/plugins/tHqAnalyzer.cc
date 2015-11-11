@@ -35,6 +35,8 @@
 
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 #include "DataFormats/METReco/interface/HcalNoiseSummary.h"
 
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
@@ -83,7 +85,8 @@ private:
   virtual void beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup) override;
   
   boosted::Event FillEvent(const edm::Event& iEvent, const edm::Handle<GenEventInfoProduct>& genEvtInfo, const edm::Handle<reco::BeamSpot>& beamSpot, const edm::Handle<HcalNoiseSummary>& hcalNoiseSummary, const edm::Handle< std::vector<PileupSummaryInfo> >& puSummaryInfo);
-  map<string,float> GetWeights(const GenEventInfoProduct& genEventInfo, const EventInfo& eventInfo, const reco::VertexCollection& selectedPVs, const std::vector<pat::Jet>& selectedJets, const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon>& selectedMuons, const std::vector<reco::GenParticle>& genParticles, sysType::sysType systype=sysType::NA);
+  map<string,float> GetWeights(const GenEventInfoProduct& genEventInfo, const EventInfo& eventInfo, const reco::VertexCollection& selectedPVs, const std::vector<pat::Jet>& selectedJets, const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon>& selectedMuons, const std::vector<reco::GenParticle>& genParticles, sysType::sysType systype=sysType::NA);//, edm::Run const& iRun);
+  void GetSystWeights(const LHEEventProduct& LHEEvent, vector<string>weight_syst_id, vector<float>weight_syst, float Weight_orig);
   std::vector<pat::Electron> ElectronSelection( std::vector<pat::Electron> selectedElectrons,  const reco::VertexCollection& selectedPVs);
   std::vector<pat::Muon> MuonSelection( std::vector<pat::Muon> selectedMuons,  const reco::VertexCollection& selectedPVs);      
   std::vector<pat::Jet> JetSelection( std::vector<pat::Jet> selectedJets, std::vector<pat::Electron> selectedElectrons, std::vector<pat::Muon> selectedMuons, InputCollections input);
@@ -192,6 +195,9 @@ private:
       
       /** gen info data access token **/
       edm::EDGetTokenT< GenEventInfoProduct > EDMGenInfoToken;
+
+      /** gen info data access token **/
+      edm::EDGetTokenT< LHEEventProduct > EDMLHEEventToken;
       
       /** gen particles data access token **/
       edm::EDGetTokenT< std::vector<reco::GenParticle> > EDMGenParticlesToken;
@@ -268,6 +274,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig){
   //EDMHEPTopJetsToken      = consumes< boosted::HEPTopJetCollection >(edm::InputTag("HEPTopJetsPFMatcher","heptopjets","p"));
   // EDMSubFilterJetsToken   = consumes< boosted::SubFilterJetCollection >(edm::InputTag("CA12JetsCA3FilterjetsPFMatcher","subfilterjets","p"));
   EDMGenInfoToken         = consumes< GenEventInfoProduct >(edm::InputTag("generator","","SIM"));
+  EDMLHEEventToken         = consumes< LHEEventProduct >(edm::InputTag("source","","LHEFile"));
   EDMGenParticlesToken    = consumes< std::vector<reco::GenParticle> >(edm::InputTag("prunedGenParticles","","PAT"));
   EDMGenJetsToken         = consumes< std::vector<reco::GenJet> >(edm::InputTag("slimmedGenJets","","PAT"));
   EDMCustomGenJetsToken   = consumes< std::vector<reco::GenJet> >(edm::InputTag("ak4GenJetsCustom","",""));
@@ -518,6 +525,10 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<GenEventInfoProduct> h_geneventinfo;
   if(!isData) iEvent.getByToken( EDMGenInfoToken, h_geneventinfo );
 
+  /**** GET LHEINFO ****/
+  edm::Handle<LHEEventProduct> h_lheeventinfo;
+  if(!isData) iEvent.getByToken( EDMLHEEventToken, h_lheeventinfo );
+
   
   /**** GET GENPARTICLES ****/
   
@@ -670,8 +681,28 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   map<string,float> weights = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets,selectedElectrons,selectedMuons,*h_genParticles,sysType::NA);
   map<string,float> weights_uncorrjets = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_uncorrected,selectedElectrons,selectedMuons,*h_genParticles,sysType::NA);
+  
+  vector<string> syst_weights_id;
+  string weights_syst_id[800];
+  vector<float> syst_weights;
+  float weights_syst[800];
 
-  // DEFINE INPUT
+  float Weight_orig=1;
+
+  GetSystWeights(*h_lheeventinfo,syst_weights_id,syst_weights,Weight_orig);
+
+
+  std::cout << "Weight_orig: " << Weight_orig << std::endl;
+
+  for (size_t i=0;i<syst_weights.size();i++){
+    weights_syst[i]=syst_weights[i];
+    weights_syst_id[i]=syst_weights_id[i];
+  }
+
+  std::cout << weights_syst[0];
+  std::cout << weights_syst_id[0];
+
+  // Define INPUT
   InputCollections input( eventInfo,
 			  //selectedTrigger,
 			  //triggerResults,
@@ -693,8 +724,13 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 			  gentHqEvt,
                           selectedGenJets,
                           sampleType,
-                          weights
+                          weights,
+			  Weight_orig
 			  );
+			  //			  weights_syst_id,
+			  //			  weights_syst,
+			  //Weight_orig
+			  //);
        
   
 
@@ -1162,11 +1198,13 @@ boosted::Event tHqAnalyzer::FillEvent(const edm::Event& iEvent, const edm::Handl
       }
     }
   }
+
+
   
   return event;
 }
 
-map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventInfo,const EventInfo& eventInfo, const reco::VertexCollection& selectedPVs, const std::vector<pat::Jet>& selectedJets, const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon>& selectedMuons, const std::vector<reco::GenParticle>& genParticles, sysType::sysType systype){
+map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventInfo,const EventInfo& eventInfo, const reco::VertexCollection& selectedPVs, const std::vector<pat::Jet>& selectedJets, const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon>& selectedMuons, const std::vector<reco::GenParticle>& genParticles, sysType::sysType systype){//, edm::Run const& iRun){
   
   map<string,float> weights;
   
@@ -1183,9 +1221,11 @@ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventIn
   float weight = 1.;
   assert(genEventInfo.weights().size()<=1); // before we multiply any weights we should understand what they mean
   for(size_t i=0;i<genEventInfo.weights().size();i++){
+    
     weight *= (genEventInfo.weights()[i]>0 ? 1.: -1.); // overwrite intransparent MC weights, use \pm 1 instead
   }   // NOTE: IS THIS EVEN CORRECT?
 
+  weight = genEventInfo.weight();
 
   //  double csvWgtHF, csvWgtLF, csvWgtCF;
 
@@ -1197,16 +1237,50 @@ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventIn
   // ADD CSV WEIGHTS HERE OR SEPARATLY?
 
 
-  weight *= xsweight*csvweight*puweight*topptweight;
+  //weight *= xsweight*csvweight*puweight*topptweight;
   weights["Weight"] = weight;
   weights["Weight_XS"] = xsweight;
   weights["Weight_CSV"] = csvweight;
   weights["Weight_PU"] = puweight;
   weights["Weight_TopPt"] = topptweight;
   //  weights["Weight_PV"] = pvWeight.GetWeight(selectedPVs.size());
+
+  
   
   
   return weights;
+}
+
+
+
+// Systematic weights
+float tHqAnalyzer::GetSystWeights(const LHEEventProduct&  LHEEvent, vector<string>weight_syst_id, vector<float>weight_syst, float Weight_orig ){
+
+  //  map<string,float> syst_weights;
+  
+  //  syst_weights["Weight_orig"] = LHEEvent.originalXWGTUP();
+
+  
+
+  Weight_orig = LHEEvent.originalXWGTUP();
+
+  //cout << "lalala " << LHEEvent.weights().size() <<endl;
+  //cout << "lululu " << LHEEvent.weights()[491].id.c_str() <<endl;
+  cout << "original weight:" << LHEEvent.originalXWGTUP() << endl;
+  cout << "Weight_orig2:" << Weight_orig << endl;
+
+  for (size_t i=0; i<LHEEvent.weights().size();i++){ 
+
+    weight_syst_id.push_back(LHEEvent.weights()[i].id.c_str());
+    weight_syst.push_back(LHEEvent.weights()[i].wgt);
+  }
+  //  for (size_t i=0;i<LHEEvent.weights().size();i++){
+  // cout << "weight id i: " << LHEEvent.weights()[i].c_str() << endl;
+  // }
+
+  //  return syst_weights;
+
+
 }
 
 
@@ -1233,6 +1307,7 @@ tHqAnalyzer::endJob()
 void
 tHqAnalyzer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
 {
+
   std::string hltTag="HLT";
   bool hltchanged = true;
   if (!hlt_config.init(iRun, iSetup, hltTag, hltchanged)) {

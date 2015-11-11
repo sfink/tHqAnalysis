@@ -12,6 +12,9 @@ void WeightProcessor::Init(const InputCollections& input,VariableContainer& vars
     vars.InitVar(it->first);  
   }
 
+
+  vars.InitVar( "Weight_orig",1.,"F" );
+
   initialized=true;
 }
 
@@ -21,5 +24,9 @@ void WeightProcessor::Process(const InputCollections& input,VariableContainer& v
   for (auto it=input.weights.begin(); it!=input.weights.end(); ++it){
     vars.FillVar( it->first,it->second);  
   }
-  cout << "%%%%%%%%%%%%%%%%%%%%%%%%% /n Lalalala Filling tha weights" << endl;
+  
+  vars.FillVar("Weight_orig",input.Weight_orig);
+
+  cout << "%%%%%%%%%%%%%%%%%%%%%%%%% /n Filling tha weights" << endl;
 }
+

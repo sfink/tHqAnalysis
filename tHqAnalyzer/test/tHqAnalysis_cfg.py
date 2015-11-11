@@ -40,11 +40,11 @@ default['nickname'] = 'Lalala'
 default['filenames'] = 'file:/nfs/dust/cms/user/bmaier/CMSSW_7_4_6_patch6/src/tHqAnalysis/06249A8D-FE54-E511-825E-008CFA1111EC.root'
 default['outfilename'] = None
 default['skip'] = '0'
-default['max'] = '1000'
+default['max'] = '100'
 
 default['sampletype'] = '9125'
 default['xs'] = '248'
-default['mcevents'] = '25000000'
+default['mcevents'] = '3500000'
 
 # fill in default values if not set by gc
 values = gc.copy()

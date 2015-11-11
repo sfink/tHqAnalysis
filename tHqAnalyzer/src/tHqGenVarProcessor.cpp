@@ -116,6 +116,10 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
   vars.FillVar( "btopeta",btop.eta());
   vars.FillVar( "btopphi",btop.phi());
   vars.FillVar( "btopm",btop.mass());
+  vars.FillVar( "sbpt",sb.pt());
+  vars.FillVar( "sbeta",sb.eta());
+  vars.FillVar( "sbphi",sb.phi());
+  vars.FillVar( "sbm",sb.mass());
   vars.FillVar( "lqpt",lq.pt());
   vars.FillVar( "lqeta",lq.eta());
   vars.FillVar( "lqphi",lq.phi());
@@ -184,7 +188,7 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
     idxhbb[1]=-99.;
   }
   
-  std::cout << "7)" << std::endl;
+  //  std::cout << "7)" << std::endl;
 
 
 
@@ -198,7 +202,7 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
   double minDrLQ = 999;
 
 
-  std::cout << "8)" << std::endl;
+  //  std::cout << "8)" << std::endl;
   
 
   for(std::vector<math::XYZTLorentzVector>::iterator itJetVec = jetvecs.begin() ; itJetVec != jetvecs.end(); ++itJetVec){
@@ -215,7 +219,7 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
     }
   }
 
-  std::cout << "8)" << std::endl;
+  //  std::cout << "8)" << std::endl;
 
 
   
@@ -229,7 +233,7 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
   
   vars.FillVar("lqjtidx",idxlq);
 
-  std::cout << "9)" << std::endl;
+  //  std::cout << "9)" << std::endl;
 
 
 
