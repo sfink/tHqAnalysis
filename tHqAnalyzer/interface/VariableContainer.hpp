@@ -17,9 +17,9 @@ class VariableContainer{
     void InitVar( TString name, std::string type="F" );
     void InitVar( TString name, float defaultValue, std::string type="F" );
     void FillVar( TString name, float value );
-    void InitVars( TString name, float defaultValue, TString nEntryVariable, int maxentries =100 );
-    void InitVars( TString name, TString nEntryVariable, int maxentries=100 );
-    void InitIntVars( TString name, int defaulValue, int nEntries=100 );
+    void InitVars( TString name, float defaultValue, TString nEntryVariable, int maxentries =999 );
+    void InitVars( TString name, TString nEntryVariable, int maxentries=999 );
+    void InitIntVars( TString name, int defaulValue, int nEntries=999 );
     void FillVars( TString name, int index, float value ); 
     float* GetFloatVarPointer( TString name); 
     float* GetArrayVarPointer( TString name,int entry); 

@@ -45,7 +45,9 @@ struct InputCollections{
                     const std::vector<reco::GenJet>&              selectedGenJets_,
                     const SampleType                              sampleType_,
                     const std::map<std::string,float>&            weights_,
-		    const float                                   Weight_orig_
+		    const float                                   Weight_orig_,
+		    const std::vector<float>&                     syst_weights_,
+		    const std::vector<string>&                    syst_weights_id_
                   ):
                     eventInfo(eventInfo_),
 		    triggerInfo(triggerInfo_),
@@ -67,7 +69,9 @@ struct InputCollections{
                     selectedGenJets(selectedGenJets_),
                     sampleType(sampleType_),
                     weights(weights_),
-		    Weight_orig(Weight_orig_)
+		    Weight_orig(Weight_orig_),
+		    syst_weights(syst_weights_),
+		    syst_weights_id(syst_weights_id_)
                     {}
   
   const EventInfo&                              eventInfo;
@@ -91,6 +95,8 @@ struct InputCollections{
   const SampleType                              sampleType;
   const std::map<std::string,float>&            weights;
   const float                                   Weight_orig;
+  const vector<float>&                          syst_weights;
+  const vector<string>&                         syst_weights_id;
 };
 
 #endif
