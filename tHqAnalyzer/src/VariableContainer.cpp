@@ -39,6 +39,58 @@ void VariableContainer::InitVar( TString name, std::string type ) {
   InitVar(name,-1.,type);
 }
 
+void VariableContainer::InitString( TString name,TString defaultValue ) {
+  if(stringMap.count(name)>0||arrayStringMap.count(name)>0){
+    cerr << name << " already initialized!" << endl;
+  }
+  stringMap[name] = "0";
+  stringMapDefaults[name] = defaultValue;
+  stringMapFilled[name] = false;
+}
+
+
+void VariableContainer::InitVars( TString name, float defaultValue, TString nEntryVariable, int maxentries ){
+  if(intMap.count(name)>0 || floatMap.count(name)>0 || arrayMap.count(name)>0 || arrayIntMap.count(name)>0){
+    cerr << name << " already initialized!" << endl;
+  }
+
+  arrayMap[name] = new float[maxentries];
+  arrayMapDefaults[name] = defaultValue;
+  arrayMapFilled[name] = false;
+  maxEntriesArrays[name] = maxentries;
+  entryVariableOf[name] = nEntryVariable;
+}
+
+void VariableContainer::InitVars( TString name, TString nEntryVariable, int maxentries ){
+  InitVars(name,-1.,nEntryVariable,maxentries);
+}
+
+void VariableContainer::InitStrings( TString name, TString defaultValue, TString nEntryVariable, int maxentries ){
+  if(stringMap.count(name)>0 || arrayStringMap.count(name)>0){
+    cerr << name << " already initialized!" << endl;
+  }
+
+  arrayStringMap[name] = new TString[maxentries];
+  arrayStringMapDefaults[name] = defaultValue;
+  arrayStringMapFilled[name] = false;
+  maxEntriesArraysString[name] = maxentries;
+  entryVariableOf[name] = nEntryVariable;
+}
+
+
+void VariableContainer::InitIntVars( TString name, int defaultValue, int nEntries ){
+  if(intMap.count(name)>0 || floatMap.count(name)>0 || arrayMap.count(name)>0 || arrayIntMap.count(name)>0){
+    cerr << name << " already initialized!" << endl;
+  }
+
+  arrayIntMap[name] = new int[nEntries];
+  arrayIntMapDefaults[name] = defaultValue;
+  arrayIntMapFilled[name] = false;
+  maxEntriesArraysInt[name] = nEntries;
+  entryVariableOf[name] = name;
+  
+}
+
 
 void VariableContainer::FillVar( TString name, float value ) {
   if(intMap.count(name)==0&&floatMap.count(name)==0){
@@ -62,36 +114,6 @@ void VariableContainer::FillVar( TString name, float value ) {
 }
 
 
-void VariableContainer::InitVars( TString name, float defaultValue, TString nEntryVariable, int maxentries ){
-  if(intMap.count(name)>0 || floatMap.count(name)>0 || arrayMap.count(name)>0 || arrayIntMap.count(name)>0){
-    cerr << name << " already initialized!" << endl;
-  }
-
-  arrayMap[name] = new float[maxentries];
-  arrayMapDefaults[name] = defaultValue;
-  arrayMapFilled[name] = false;
-  maxEntriesArrays[name] = maxentries;
-  entryVariableOf[name] = nEntryVariable;
-}
-
-
-void VariableContainer::InitVars( TString name, TString nEntryVariable, int maxentries ){
-  InitVars(name,-1.,nEntryVariable,maxentries);
-}
-
-
-void VariableContainer::InitIntVars( TString name, int defaultValue, int nEntries ){
-  if(intMap.count(name)>0 || floatMap.count(name)>0 || arrayMap.count(name)>0 || arrayIntMap.count(name)>0){
-    cerr << name << " already initialized!" << endl;
-  }
-
-  arrayIntMap[name] = new int[nEntries];
-  arrayIntMapDefaults[name] = defaultValue;
-  arrayIntMapFilled[name] = false;
-  maxEntriesArraysInt[name] = nEntries;
-  entryVariableOf[name] = name;
-  
-}
 
 void VariableContainer::FillVars( TString name, int index, float value ) {
   if(arrayMap.count(name)==0&&arrayIntMap.count(name)==0){
@@ -107,7 +129,19 @@ void VariableContainer::FillVars( TString name, int index, float value ) {
     if(maxEntriesArraysInt[name]<index){
       cerr << "array " << name << " is shorter than " << index << endl;
     }
-     else arrayIntMap[name][index]=value;
+    else arrayIntMap[name][index]=value;
+  }
+}
+
+void VariableContainer::FillStrings( TString name, int index, TString value ) {
+  if(arrayStringMap.count(name)==0){
+    cerr << name << " does not exist!" << endl;
+  }
+  else if(arrayStringMap.count(name)==1){
+    if(maxEntriesArraysString[name]<index){
+      cerr << "array " << name << " is shorter than " << index << endl;
+    }
+    else arrayStringMap[name][index]=value;
   }
 }
 
@@ -134,6 +168,17 @@ void VariableContainer::SetDefaultValues(){
     ++itI;
     ++itIdefault;
     ++itIfilled;
+  }
+
+  auto itS= stringMap.begin();
+  auto itSdefault = stringMapDefaults.begin();
+  auto itSfilled = stringMapFilled.begin();
+  while (itS != stringMap.end()) {
+    itS->second = itSdefault->second;
+    itSfilled->second=false;
+    ++itS;
+    ++itSdefault;
+    ++itSfilled;
   }
   
   auto itA = arrayMap.begin();
@@ -165,6 +210,21 @@ void VariableContainer::SetDefaultValues(){
     ++itIAmaxEntriesArrays;
     ++itIAfilled;
   }
+
+  auto itSA = arrayStringMap.begin();
+  auto itSAdefault = arrayStringMapDefaults.begin();
+  auto itSAmaxEntriesArrays = maxEntriesArraysString.begin();
+  auto itSAfilled = arrayStringMapFilled.begin();
+  while (itSA != arrayStringMap.end()) {    
+    for(int i=0;i<itSAmaxEntriesArrays->second;++i)
+      itSA->second[i] = itSAdefault->second;
+    
+    itSAfilled->second=false;
+    ++itSA;
+    ++itSAdefault;
+    ++itSAmaxEntriesArrays;
+    ++itSAfilled;
+  }
   
 }
 
@@ -180,6 +240,11 @@ void VariableContainer::ConnectTree(TTree* tree){
     tree->Branch(itI->first, &(itI->second), itI->first+"/I" );
     itI++;
   }
+  auto itS= stringMap.begin();
+  while (itS != stringMap.end()) {
+    tree->Branch(itS->first, &(itS->second), itS->first+"/C" );
+    itS++;
+  }
   auto itA= arrayMap.begin();
   while (itA != arrayMap.end()) {
     tree->Branch(itA->first,itA->second , itA->first+"["+entryVariableOf[itA->first]+"]/F" );
@@ -189,6 +254,11 @@ void VariableContainer::ConnectTree(TTree* tree){
   while (itIA != arrayIntMap.end()) {
     tree->Branch(itIA->first,itIA->second , itIA->first+"["+to_string(maxEntriesArraysInt[itIA->first])+"]/I" );
     itIA++;
+  }
+  auto itSA= arrayStringMap.begin();
+  while (itSA != arrayStringMap.end()) {
+    tree->Branch(itSA->first,itSA->second , itSA->first+"["+maxEntriesArraysString[itSA->first]+"]/C" );
+    itSA++;
   }
 }
 
@@ -221,6 +291,14 @@ void VariableContainer::Dump(){
     ++itI;
     ++itIdefault;
   }
+  auto itS= stringMap.begin();
+  auto itSdefault = stringMapDefaults.begin();
+  cout << "strings: " << endl;
+  while (itS != stringMap.end()) {
+    cout << itS->first << " : " << itS->second << " : " << itSdefault->second << endl;
+    ++itS;
+    ++itSdefault;
+  }
 }
 
 
@@ -249,6 +327,22 @@ int* VariableContainer::GetIntVarPointer(TString name){
   return &(intMap[name]);
 }
 
+TString* VariableContainer::GetStringVarPointer(TString name){
+  if(stringMap.count(name)==0){
+    cerr << name << " does not exist!" << endl;
+    return 0;
+  }
+  return &(stringMap[name]);
+}
+
+TString* VariableContainer::GetArrayStringVarPointer(TString name, int entry){
+  if(arrayStringMap.count(name)==0){
+    cerr << name << " does not exist!" << endl;
+    return 0;
+  }
+  return &(arrayStringMap[name][entry]);
+}
+
 
 float VariableContainer::GetFloatVar(TString name){
   float* x=GetFloatVarPointer(name);
@@ -275,3 +369,13 @@ int VariableContainer::GetIntVar(TString name){
   else 
     return -999;
 }
+
+/*
+TString VariableContainer::GetStringVar(TString name){
+  TString* x=GetStringVarPointer(name);
+  if(x!="0")
+    return *x;
+  else 
+    return "-999";
+}
+*/

@@ -15,7 +15,7 @@ void WeightProcessor::Init(const InputCollections& input,VariableContainer& vars
   vars.InitVar( "Weight_orig",1.,"F" );
   vars.InitVar( "nweights", "I");
   vars.InitVars( "weights_syst","nweights" );
-  vars.InitVars( "weights_syst_id","nweights" );
+  vars.InitStrings( "weights_syst_id","999","nweights" );
 
   initialized=true;
 }
@@ -34,6 +34,12 @@ void WeightProcessor::Process(const InputCollections& input,VariableContainer& v
     int iWeight = itWeight - input.syst_weights.begin();
     cout << "Mimimimi " << input.syst_weights[iWeight] << endl;
     vars.FillVars( "weights_syst",iWeight,input.syst_weights[iWeight] );
+  }
+
+
+  for(std::vector<string>::const_iterator itWeight = input.syst_weights_id.begin() ; itWeight != input.syst_weights_id.end(); ++itWeight){
+    int iWeight = itWeight - input.syst_weights_id.begin();
+    vars.FillStrings("weights_syst_id",iWeight,input.syst_weights_id[iWeight]);
   }
 
   cout << "%%%%%%%%%%%%%%%%%%%%%%%%% /n Filling tha weights" << endl;
