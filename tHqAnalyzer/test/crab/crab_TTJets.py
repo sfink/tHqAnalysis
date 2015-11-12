@@ -2,7 +2,7 @@ from WMCore.Configuration import Configuration
 config = Configuration()
 
 config.section_("General")
-config.General.requestName = 'TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_wtruthcontainer_weights_wmass'
+config.General.requestName = 'TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_wtruthcontainer_weights_wmass_again'
 config.General.workArea = 'crab_projects'
 
 config.section_("JobType")
@@ -19,10 +19,10 @@ config.Data.unitsPerJob = 1
 config.Data.publication = False
 #config.Data.totalUnits = 5
 #config.Data.publishDbsUrl = 'phys03'
-config.Data.publishDataName = 'THQ_MiniAOD'
+config.Data.outputDatasetTag = 'THQ_MiniAOD'
 
 config.General.transferOutputs = True
 
 config.section_("Site")
 config.Site.storageSite = 'T2_DE_DESY'
-config.Site.blacklist = 'T2_US_Florida'
+config.Site.blacklist = ['T2_US_Florida']

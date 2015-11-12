@@ -19,7 +19,7 @@ config.Data.unitsPerJob = 1
 config.Data.publication = False
 #config.Data.totalUnits = 5
 #config.Data.publishDbsUrl = 'phys03'
-config.Data.publishDataName = 'tHqAnalysis_MiniAOD'
+config.Data.outputDatasetTag = 'tHqAnalysis_MiniAOD'
 
 config.General.transferOutputs = True
 
