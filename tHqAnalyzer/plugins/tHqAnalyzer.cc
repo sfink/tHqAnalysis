@@ -1267,7 +1267,6 @@ void tHqAnalyzer::GetSystWeights(const LHEEventProduct&  LHEEvent, vector<string
   cout << "Weight_orig2:" << Weight_orig << endl;
 
   for (size_t i=0; i<LHEEvent.weights().size();i++){ 
-
     weight_syst_id.push_back(LHEEvent.weights()[i].id.c_str());
     weight_syst.push_back(LHEEvent.weights()[i].wgt);
   }
@@ -1276,7 +1275,7 @@ void tHqAnalyzer::GetSystWeights(const LHEEventProduct&  LHEEvent, vector<string
   // }
 
   //  return syst_weights;
-
+  
   return;
 
 }

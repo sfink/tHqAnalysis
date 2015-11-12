@@ -63,7 +63,7 @@ class VariableContainer{
     std::map<TString,TString*> arrayStringMap;
     std::map<TString,TString> arrayStringMapDefaults;
     std::map<TString,bool> arrayStringMapFilled;
-    std::map<TString,TString> maxEntriesArraysString;
+    std::map<TString,int> maxEntriesArraysString;
 };
 
 #endif

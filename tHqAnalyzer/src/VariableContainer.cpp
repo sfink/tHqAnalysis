@@ -75,6 +75,8 @@ void VariableContainer::InitStrings( TString name, TString defaultValue, TString
   arrayStringMapFilled[name] = false;
   maxEntriesArraysString[name] = maxentries;
   entryVariableOf[name] = nEntryVariable;
+  
+
 }
 
 
@@ -141,7 +143,10 @@ void VariableContainer::FillStrings( TString name, int index, TString value ) {
     if(maxEntriesArraysString[name]<index){
       cerr << "array " << name << " is shorter than " << index << endl;
     }
-    else arrayStringMap[name][index]=value;
+    else {
+      //      cout << "Assigning " << value << " to arrayStringMap["<<name<< "][" << index << "]" << endl;
+      arrayStringMap[name][index]=value;
+    }
   }
 }
 
@@ -180,7 +185,7 @@ void VariableContainer::SetDefaultValues(){
     ++itSdefault;
     ++itSfilled;
   }
-  
+
   auto itA = arrayMap.begin();
   auto itAdefault = arrayMapDefaults.begin();
   auto itAmaxEntriesArrays = maxEntriesArrays.begin();
@@ -257,7 +262,7 @@ void VariableContainer::ConnectTree(TTree* tree){
   }
   auto itSA= arrayStringMap.begin();
   while (itSA != arrayStringMap.end()) {
-    tree->Branch(itSA->first,itSA->second , itSA->first+"["+maxEntriesArraysString[itSA->first]+"]/C" );
+    tree->Branch(itSA->first,itSA->second , itSA->first+"["+to_string(maxEntriesArraysString[itSA->first])+"]/C" );
     itSA++;
   }
 }
