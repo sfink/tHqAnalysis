@@ -341,7 +341,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig){
     if(*itPro == "RecoVarProcessor") treewriter.AddTreeProcessor(new RecoVarProcessor());
     if(*itPro == "MVAVarProcessor") treewriter.AddTreeProcessor(new MVAVarProcessor());
     if(*itPro == "MCMatchVarProcessor") treewriter.AddTreeProcessor(new MCMatchVarProcessor());
-    if(*itPro == "tHqGenVarProcessor") treewriter.AddTreeProcessor(new tHqGenVarProcessor());
+    //    if(*itPro == "tHqGenVarProcessor") treewriter.AddTreeProcessor(new tHqGenVarProcessor());
 
     else cout << "No matching processor found for: " << *itPro << endl;    
     } 
@@ -666,14 +666,18 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     else if(ttid==41||ttid==42) sampleType = SampleType::ttcc;
     else if(ttid==43||ttid==44||ttid==45) sampleType = SampleType::ttcc;    
   }
-  else if(((foundT&&!foundTbar)||(!foundT&&foundTbar))&&foundHiggs) sampleType = SampleType::thq;
+  else if(((foundT&&!foundTbar)||(!foundT&&foundTbar))&&foundHiggs){
+    sampleType = SampleType::thq;
+    cout << sampleType << endl;
+    if(!isData) gentHqEvt.Fill(*h_genParticles);
+  }
   if(!isData&&foundT&&foundTbar) {
     // fill genTopEvt with tt(H) information
+    cout << sampleType << endl;
     genTopEvt.Fill(*h_genParticles,ttid_full);
   }
   
-  if(!isData && foundHiggs)
-    gentHqEvt.Fill(*h_genParticles);
+
   
   // DO REWEIGHTING
 
@@ -686,7 +690,7 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   vector<float> syst_weights;
   float Weight_orig=1;
 
-  GetSystWeights(*h_lheeventinfo,syst_weights_id,syst_weights,Weight_orig);
+  if(sampleType == SampleType::thq) GetSystWeights(*h_lheeventinfo,syst_weights_id,syst_weights,Weight_orig);
 
   /*
   std::cout << "Weight_orig: " << Weight_orig << std::endl;

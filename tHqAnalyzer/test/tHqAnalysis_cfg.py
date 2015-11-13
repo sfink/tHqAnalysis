@@ -36,8 +36,8 @@ default = {}
 default['nickname'] = 'Lalala'
 #default['filenames'] = 'root://cmsxrootd.fnal.gov///store/user/shwillia/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/BoostedTTH_MiniAOD/150227_111650/0000/BoostedTTH_MiniAOD_15.root'
 #default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/Phys14DR/TToLeptons_t-channel-CSA14_Tune4C_13TeV-aMCatNLO-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/1E2D2522-A46A-E411-9C55-002590D0AFDC.root'
-#default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/RunIISpring15DR74/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v1/00000/00466730-F801-E511-9594-549F35AF450A.root'
-default['filenames'] = 'file:/nfs/dust/cms/user/bmaier/CMSSW_7_4_6_patch6/src/tHqAnalysis/06249A8D-FE54-E511-825E-008CFA1111EC.root'
+default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/RunIISpring15DR74/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v1/00000/00466730-F801-E511-9594-549F35AF450A.root'
+#default['filenames'] = 'file:/nfs/dust/cms/user/bmaier/CMSSW_7_4_6_patch6/src/tHqAnalysis/06249A8D-FE54-E511-825E-008CFA1111EC.root'
 default['outfilename'] = None
 default['skip'] = '0'
 default['max'] = '100'
@@ -96,7 +96,7 @@ process.ak4PFchsL1L2L3 = cms.ESProducer("JetCorrectionESChain",
 )
 
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
-#process.load("tHqAnalysis.tHqProducer.genHadronMatching_cfi")
+process.load("tHqAnalysis.tHqProducer.genHadronMatching_cfi")
 
 process.load("tHqAnalysis.tHqAnalyzer.tHqAnalyzer_cfi")
 process.tHqAnalyzer.useFatJets=False
