@@ -659,6 +659,7 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   else if(foundT&&foundTbar&&foundHiggs) sampleType = SampleType::tth;
   else if(foundT&&foundTbar){ 
     sampleType =SampleType::ttl;
+    cout << "The ttid is: " << ttid << endl;
     //if(ttid==51||ttid==52) sampleType = SampleType::ttb;
     if(ttid==51) sampleType = SampleType::ttb;
     else if(ttid==52) sampleType = SampleType::tt2b;
@@ -669,10 +670,12 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   else if(((foundT&&!foundTbar)||(!foundT&&foundTbar))&&foundHiggs){
     sampleType = SampleType::thq;
     cout << sampleType << endl;
+    cout << "!!!!!!!! THIS IS A THQ EVENT W000T! !!!!" << endl;
     if(!isData) gentHqEvt.Fill(*h_genParticles);
   }
   if(!isData&&foundT&&foundTbar) {
     // fill genTopEvt with tt(H) information
+        cout << "!!!!!!!! THIS IS A TT(H) EVENT W000T! !!!!" << endl;
     cout << sampleType << endl;
     genTopEvt.Fill(*h_genParticles,ttid_full);
   }
@@ -692,18 +695,7 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   if(sampleType == SampleType::thq) GetSystWeights(*h_lheeventinfo,syst_weights_id,syst_weights,Weight_orig);
 
-  /*
-  std::cout << "Weight_orig: " << Weight_orig << std::endl;
-
-  for (size_t i=0;i<syst_weights.size();i++){
-    weights_syst[i]=syst_weights[i];
-    weights_syst_id[i]=syst_weights_id[i];
-  }
-
-  std::cout << weights_syst[0] << std::endl;
-  std::cout << weights_syst_id[0] << std::endl;
-
-  */
+ 
 
   // Define INPUT
   InputCollections input( eventInfo,
@@ -929,7 +921,8 @@ std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJ
     //   uncorrectedPt = iJet.pt();
     //   std::cout<<iJet.currentJECLevel()<<" "<<iJet.currentJECSet()<<std::endl;
 
-    //    std::cout<< "Original JetPt: " << originalPt<<"   -   Uncorrected JetPt: "<<uncorrectedPt<<std::endl;
+    std::cout<< "Original JetEta: " << iJet.eta() << std::endl;
+    
     bufferJets.push_back(iJet);
   }
   
@@ -948,7 +941,9 @@ std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJ
     }
     cleanMuonJets = tHqUtils::RemoveOverlaps(selectedMuons, cleanEleJets);
     for( std::vector<pat::Jet>::const_iterator it = cleanMuonJets.begin(), ed = cleanMuonJets.end(); it != ed; ++it ){
-      //std::cout<< "After muon removal: " << it->pt()<<std::endl;                                                                                                             
+      //std::cout<< "After muon removal: " << it->pt()<<std::endl;                                                                                    
+      pat::Jet iJet = *it;
+      std::cout<< "Original JetEta2: " << iJet.eta() << std::endl;
     }
   }
   else{
@@ -969,6 +964,7 @@ std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJ
 	  minDeltaR = dR;
 	  matchindex=counter;
         }
+	std::cout<< "Original JetEta3: " << iJet.eta() << std::endl;
 	counter++;
       }
 
@@ -987,6 +983,7 @@ std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJ
 	if(iJet.pt()>0.0 && iJet.energy()>0.0){
 	  cleanEleJets.push_back(iJet);
 	}
+	std::cout<< "Original JetEta4: " << iJet.eta() << std::endl;
 	//	std::cout<< "After Electron removal pt: " << iJet.pt()<<std::endl;
 	counter++;
 
@@ -1008,8 +1005,10 @@ std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJ
     bufferJets.clear();
     for( std::vector<pat::Jet>::const_iterator it = cleanEleJets.begin(), ed = cleanEleJets.end(); it != ed; ++it ){
       bufferJets.push_back(*it);
+      pat::Jet iJet = *it;
+      std::cout<< "Original JetEta5: " << iJet.eta() << std::endl;
     }
-
+    
     for(std::vector<pat::Muon>::const_iterator iMuon = selectedMuons.begin(), ed = selectedMuons.end(); iMuon != ed; ++iMuon ){
       pat::Muon Muon = *iMuon;
       double maxDeltaR=0.4;
@@ -1027,6 +1026,7 @@ std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJ
 	  minDeltaR = dR;
 	  matchindex=counter;
         }
+	std::cout<< "Original JetEta6: " << iJet.eta() << std::endl;
 	counter++;
       }
       // now clean the closest jet from the muon and put it back with the rest
@@ -1076,6 +1076,7 @@ std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJ
     //    std::cout<<iJet.currentJECLevel()<<" "<<iJet.currentJECSet()<<" "<<std::endl;
     
     correctedJets.push_back(iJet);
+    std::cout<< "Original JetEta7: " << iJet.eta() << std::endl;
     //   double uncorrectedPt = iJet.pt();    
     //   math::XYZTLorentzVector correctedP4 = iJet.correctedP4("L1FastJetL2RelativeL3Absolute","","PHYS14_25_V2");                                  
     //   iJet.setP4(correctedP4);  
@@ -1104,11 +1105,22 @@ std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJ
   selectedJets.clear();
   for( std::vector<pat::Jet>::const_iterator it = correctedJets.begin(), ed = correctedJets.end(); it != ed; ++it ){
     pat::Jet iJet = *it;
-
+    std::cout<< "Original JetEta8 before: " << iJet.eta() << std::endl;
     bool isselected=false;
-    isselected=(iJet.pt()>minPt && abs(iJet.eta())<maxEta && iJet.neutralHadronEnergyFraction()<0.99 && iJet.chargedHadronEnergyFraction()>0.0 && iJet.chargedMultiplicity()>0.0 && iJet.chargedEmEnergyFraction()<0.99 && iJet.neutralEmEnergyFraction()<0.99 && iJet.numberOfDaughters()>1 );
+    if(iJet.pt()>=minPt && abs(iJet.eta())<maxEta){
+	if(abs(iJet.eta())<=3.0) isselected = (iJet.neutralHadronEnergyFraction()<0.99 && iJet.neutralEmEnergyFraction()<0.99 && (iJet.chargedMultiplicity()+iJet.neutralMultiplicity())>1) && ((abs(iJet.eta())<=2.4 && iJet.chargedHadronEnergyFraction()>0 && iJet.chargedMultiplicity()>0 && iJet.chargedEmEnergyFraction()<0.99) || abs(iJet.eta())>2.4) && abs(iJet.eta())<=3.0;
+	//tightJetID = (iJet.neutralHadronEnergyFraction()<0.90 && iJet.neutralEmEnergyFraction()<0.90 && (iJet.chargedMultiplicity()+iJet.neutralMultiplicity())>1) && ((abs(iJet.eta())<=2.4 && iJet.chargedHadronEnergyFraction()>0 && iJet.chargedMultiplicity()>0 && iJet.chargedEmEnergyFraction()<0.99) || abs(iJet.eta())>2.4) && abs(iJet.eta())<=3.0;
+	else isselected = (iJet.neutralEmEnergyFraction()<0.90 && iJet.neutralMultiplicity()>10 && abs(iJet.eta())>3.0 );
+    }
+    
+
+    //    isselected=(iJet.pt()>minPt && abs(iJet.eta())<3.0 && iJet.neutralHadronEnergyFraction()<0.99 && iJet.chargedHadronEnergyFraction()>0.0 && iJet.chargedMultiplicity()>0.0 && iJet.chargedEmEnergyFraction()<0.99 && iJet.neutralEmEnergyFraction()<0.99 && iJet.numberOfDaughters()>1 );
+    
+    // isselected=(iJet.pt()>minPt && abs(iJet.eta())<maxEta && iJet.neutralHadronEnergyFraction()<0.99 && iJet.chargedHadronEnergyFraction()>0.0 && iJet.chargedMultiplicity()>0.0 && iJet.chargedEmEnergyFraction()<0.99 && iJet.neutralEmEnergyFraction()<0.99 && iJet.numberOfDaughters()>1 );
+
     if(isselected){
       selectedJets.push_back(iJet);
+      std::cout << "After Selection : JetEta : " << iJet.eta() << std::endl;
     }
   }
 
@@ -1124,7 +1136,7 @@ std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJ
       taggedJets.push_back(iJet);
     }
   }
-
+  
   return selectedJets;
 
 }
