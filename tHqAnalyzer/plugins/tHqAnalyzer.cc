@@ -198,7 +198,8 @@ private:
 
       /** gen info data access token **/
       edm::EDGetTokenT< LHEEventProduct > EDMLHEEventToken;
-      
+      edm::EDGetTokenT< LHEEventProduct >   EDMLHEEventToken_ttbar;      
+
       /** gen particles data access token **/
       edm::EDGetTokenT< std::vector<reco::GenParticle> > EDMGenParticlesToken;
       
@@ -274,7 +275,8 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig){
   //EDMHEPTopJetsToken      = consumes< boosted::HEPTopJetCollection >(edm::InputTag("HEPTopJetsPFMatcher","heptopjets","p"));
   // EDMSubFilterJetsToken   = consumes< boosted::SubFilterJetCollection >(edm::InputTag("CA12JetsCA3FilterjetsPFMatcher","subfilterjets","p"));
   EDMGenInfoToken         = consumes< GenEventInfoProduct >(edm::InputTag("generator","","SIM"));
-  EDMLHEEventToken         = consumes< LHEEventProduct >(edm::InputTag("source","","LHEFile"));
+  EDMLHEEventToken        = consumes< LHEEventProduct >(edm::InputTag("source","","LHEFile"));
+  EDMLHEEventToken_ttbar  = consumes< LHEEventProduct >(edm::InputTag("externalLHEProducer","","LHE"));
   EDMGenParticlesToken    = consumes< std::vector<reco::GenParticle> >(edm::InputTag("prunedGenParticles","","PAT"));
   EDMGenJetsToken         = consumes< std::vector<reco::GenJet> >(edm::InputTag("slimmedGenJets","","PAT"));
   EDMCustomGenJetsToken   = consumes< std::vector<reco::GenJet> >(edm::InputTag("ak4GenJetsCustom","",""));
@@ -296,9 +298,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig){
   genCHadIndexToken              = consumes<std::vector<int> >(edm::InputTag("matchGenCHadron","genCHadIndex"));
   genCHadPlusMothersToken        = consumes<std::vector<reco::GenParticle> >(edm::InputTag("matchGenCHadron","genCHadPlusMothers",""));
 
-  std::cout << "Before consumption." << endl;
   genTtbarIdToken                = consumes<int>              (edm::InputTag("categorizeGenTtbar","genTtbarId",""));
-  std::cout << "After consumption." << endl;
   // INITIALIZE MINIAOD HELPER
   helper.SetUp(era, sampleID, iAnalysisType, isData);
   helper.SetJetCorrectorUncertainty(); 
@@ -308,16 +308,6 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig){
   cutflow.AddStep("all");
   
   std::vector<std::string> selectionNames = iConfig.getParameter< std::vector<std::string> >("selectionNames");
-  /*  for(vector<string>::const_iterator itSel = selectionNames.begin();itSel != selectionNames.end();itSel++) {
-    
-    if(*itSel == "LeptonSelection") selections.push_back(new LeptonSelection());
-    else if(*itSel == "JetTagSelection") selections.push_back(new JetTagSelection());
-    else if(*itSel == "SynchSelection") selections.push_back(new SynchSelection());
-    else cout << "No matching selection found for: " << *itSel << endl;
-    
-    selections.back()->Init(iConfig,cutflow);
-    } */
-  
   
   relevantTriggers = iConfig.getParameter< std::vector<std::string> >("relevantTriggers");
 
@@ -325,26 +315,18 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig){
   treewriter.Init(outfileName);
   std::vector<std::string> processorNames = iConfig.getParameter< std::vector<std::string> >("processorNames");
   for(vector<string>::const_iterator itPro = processorNames.begin();itPro != processorNames.end();++itPro) {
-    
-    
-    /*else if(*itPro == "MCMatchVarProcessor") treewriter.AddTreeProcessor(new MCMatchVarProcessor());
-    else if(*itPro == "MVAVarProcessor") treewriter.AddTreeProcessor(new MVAVarProcessor());
-    else if(*itPro == "tHqJetVarProcessor") treewriter.AddTreeProcessor(new tHqJetVarProcessor());
-    else if(*itPro == "tHqTopHiggsVarProcessor") treewriter.AddTreeProcessor(new ttHVarProcessor(tHqRecoType::tHqTopHiggs,"TopLikelihood","HiggsCSV","tHqTopHiggs_"));
-    else if(*itPro == "tHqTopVarProcessor") treewriter.AddTreeProcessor(new ttHVarProcessor(tHqRecoType::tHqTop,"TopLikelihood","HiggsCSV","tHqTop_"));
-    else if(*itPro == "tHqHiggsVarProcessor") treewriter.AddTreeProcessor(new ttHVarProcessor(tHqRecoType::tHqHiggs,"TopLikelihood","HiggsCSV","tHqHiggs_"));
-    // the BDT processor rely on the variables filled py the other producers and should be added at the end
-    else if(*itPro == "BDTVarProcessor") treewriter.AddTreeProcessor(new BDTVarProcessor());
-    */
+    cout << "This is Processor " << *itPro << endl;
+    treewriter.FillProcessorName(*itPro);
     if(*itPro == "WeightProcessor") treewriter.AddTreeProcessor(new WeightProcessor());    
-    if(*itPro == "BaseVarProcessor") treewriter.AddTreeProcessor(new BaseVarProcessor());
-    if(*itPro == "RecoVarProcessor") treewriter.AddTreeProcessor(new RecoVarProcessor());
-    if(*itPro == "MVAVarProcessor") treewriter.AddTreeProcessor(new MVAVarProcessor());
-    if(*itPro == "MCMatchVarProcessor") treewriter.AddTreeProcessor(new MCMatchVarProcessor());
-    if(*itPro == "tHqGenVarProcessor") treewriter.AddTreeProcessor(new tHqGenVarProcessor());
-
+    else if(*itPro == "BaseVarProcessor") treewriter.AddTreeProcessor(new BaseVarProcessor());
+    else if(*itPro == "RecoVarProcessor") treewriter.AddTreeProcessor(new RecoVarProcessor());
+    else if(*itPro == "MVAVarProcessor") treewriter.AddTreeProcessor(new MVAVarProcessor());
+    else if(*itPro == "MCMatchVarProcessor") treewriter.AddTreeProcessor(new MCMatchVarProcessor());
+    else if(*itPro == "tHqGenVarProcessor") treewriter.AddTreeProcessor(new tHqGenVarProcessor());
     else cout << "No matching processor found for: " << *itPro << endl;    
     } 
+  cout << "The total size of ProcessorNames is " << processorNames.size() << endl;
+  treewriter.FillProcessorMap();
 }
 
 
@@ -362,9 +344,9 @@ tHqAnalyzer::~tHqAnalyzer()
 //
 
 // ------------ method called for each event  ------------
-void
-tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+  cout << "########### NEW EVENT ##################" << endl;
   if(eventcount<10||eventcount%1000==0){
     cout << "Analyzing event " << eventcount << endl;
     watch.Print();
@@ -525,11 +507,6 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<GenEventInfoProduct> h_geneventinfo;
   if(!isData) iEvent.getByToken( EDMGenInfoToken, h_geneventinfo );
 
-  /**** GET LHEINFO ****/
-  edm::Handle<LHEEventProduct> h_lheeventinfo;
-  if(!isData) iEvent.getByToken( EDMLHEEventToken, h_lheeventinfo );
-
-  
   /**** GET GENPARTICLES ****/
   
   edm::Handle< std::vector<reco::GenParticle> > h_genParticles;
@@ -654,6 +631,8 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 			     *genCHadBHadronId,
 			     15,4.7); 
   }
+
+  /*** FIGURE OUT SAMPLETYPE ***/
   SampleType sampleType= SampleType::nonttbkg;
   if(isData) sampleType = SampleType::data;
   else if(foundT&&foundTbar&&foundHiggs) sampleType = SampleType::tth;
@@ -667,14 +646,27 @@ tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     else if(ttid==43||ttid==44||ttid==45) sampleType = SampleType::ttcc;    
   }
   else if(((foundT&&!foundTbar)||(!foundT&&foundTbar))&&foundHiggs) sampleType = SampleType::thq;
+
+  /**** GET LHEINFO ****/
+  edm::Handle<LHEEventProduct> h_lheeventinfo;
+  if(!isData&&(sampleType==SampleType::thq)) iEvent.getByToken( EDMLHEEventToken, h_lheeventinfo );
+  else iEvent.getByToken( EDMLHEEventToken_ttbar, h_lheeventinfo);
+
+  
+  /*** KICK OUT WRONG PROCESSORS ***/
+  if(sampleType!=SampleType::thq) treewriter.RemoveTreeProcessor("tHqGenVarProcessor"); 
+  if(sampleType==SampleType::thq || sampleType == SampleType::nonttbkg) treewriter.RemoveTreeProcessor("MCMatchVarProcessor");
   if(!isData&&foundT&&foundTbar) {
     // fill genTopEvt with tt(H) information
     genTopEvt.Fill(*h_genParticles,ttid_full);
+    cout << "APPARENTLY, THIS IS A SAMPLE WITH TWO TOP QUARKS" << endl;
   }
   
-  if(!isData && foundHiggs)
+  if(sampleType ==  SampleType::thq){
+    cout << "APPARENTLY, THIS IS A THQ SAMPLE" << endl;
     gentHqEvt.Fill(*h_genParticles);
-  
+  }
+
   // DO REWEIGHTING
 
 
@@ -1102,7 +1094,12 @@ std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJ
     pat::Jet iJet = *it;
 
     bool isselected=false;
-    isselected=(iJet.pt()>minPt && abs(iJet.eta())<maxEta && iJet.neutralHadronEnergyFraction()<0.99 && iJet.chargedHadronEnergyFraction()>0.0 && iJet.chargedMultiplicity()>0.0 && iJet.chargedEmEnergyFraction()<0.99 && iJet.neutralEmEnergyFraction()<0.99 && iJet.numberOfDaughters()>1 );
+    if(iJet.pt()>=minPt && abs(iJet.eta())<maxEta){
+      if(abs(iJet.eta())<=3.0) isselected = (iJet.neutralHadronEnergyFraction()<0.99 && iJet.neutralEmEnergyFraction()<0.99 && (iJet.chargedMultiplicity()+iJet.neutralMultiplicity())>1) && ((abs(iJet.eta())<=2.4 && iJet.chargedHadronEnergyFraction()>0 && iJet.chargedMultiplicity()>0 && iJet.chargedEmEnergyFraction()<0.99) || abs(iJet.eta())>2.4) && abs(iJet.eta())<=3.0;
+      //tightJetID = (iJet.neutralHadronEnergyFraction()<0.90 && iJet.neutralEmEnergyFraction()<0.90 && (iJet.chargedMultiplicity()+iJet.neutralMultiplicity())>1) && ((abs(iJet.eta())<=2.4 && iJet.chargedHadronEnergyFraction()>0 && iJet.chargedMultiplicity()>0 && iJet.chargedEmEnergyFraction()<0.99) ||  abs(iJet.eta())>2.4) && abs(iJet.eta())<=3.0;
+      else isselected = (iJet.neutralEmEnergyFraction()<0.90 && iJet.neutralMultiplicity()>10 && abs(iJet.eta())>3.0 );
+    }
+    // isselected=(iJet.pt()>minPt && abs(iJet.eta())<maxEta && iJet.neutralHadronEnergyFraction()<0.99 && iJet.chargedHadronEnergyFraction()>0.0 && iJet.chargedMultiplicity()>0.0 && iJet.chargedEmEnergyFraction()<0.99 && iJet.neutralEmEnergyFraction()<0.99 && iJet.numberOfDaughters()>1 );
     if(isselected){
       selectedJets.push_back(iJet);
     }

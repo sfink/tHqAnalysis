@@ -95,7 +95,7 @@ void MCMatchVarProcessor::Init(const InputCollections& input,VariableContainer& 
 void MCMatchVarProcessor::Process(const InputCollections& input,VariableContainer& vars){
   
   if(!initialized) cerr << "tree processor not initialized" << endl;
-  
+  cout << "Starting the MCMatchProcessor for ttbar samples..." << endl;  
   
   int iBB = 0;
   int iCC = 0;

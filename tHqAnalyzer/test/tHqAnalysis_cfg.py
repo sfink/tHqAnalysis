@@ -96,7 +96,7 @@ process.ak4PFchsL1L2L3 = cms.ESProducer("JetCorrectionESChain",
 )
 
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
-#process.load("tHqAnalysis.tHqProducer.genHadronMatching_cfi")
+process.load("tHqAnalysis.tHqProducer.genHadronMatching_cfi")
 
 process.load("tHqAnalysis.tHqAnalyzer.tHqAnalyzer_cfi")
 process.tHqAnalyzer.useFatJets=False

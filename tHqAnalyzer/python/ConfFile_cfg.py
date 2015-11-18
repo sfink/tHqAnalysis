@@ -13,7 +13,7 @@ process.source = cms.Source("PoolSource",
     )
 )
 
-process.demo = cms.EDAnalyzer('BoostedAnalyzer'
+process.demo = cms.EDAnalyzer('tHqAnalyzer'
 )
 
 

@@ -67,7 +67,7 @@ void tHqGenVarProcessor::Init(const InputCollections& input,VariableContainer& v
 void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer& vars){
   
   if(!initialized) cerr << "tree processor not initialized" << endl;
-
+  cout << "Starting the tHqProcessor ..." << endl;
   
   reco::GenParticle H;
   reco::GenParticle W;
@@ -88,7 +88,7 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
     Wdau=input.gentHqEvt.GetWDecayProducts();
   }
 
-  
+  /*  
   std::cout << "Higgs pt" << H.pt() << endl;
   std::cout << "#Hdaus: " << Hdau.size() << endl;
   std::cout << "Hdau eta: " << Hdau[0].eta() << endl;
@@ -96,7 +96,7 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
   std::cout << "Hdau pt: " << Hdau[0].pt() << endl;
   std::cout << "Hdau pt: " << Hdau[1].pt() << endl;
   std::cout << "#Wdaus: " << Wdau.size() << endl;
-
+  */
   
   vector<math::XYZTLorentzVector> jetvecs = tHqUtils::GetJetVecs(input.selectedJets);
 
@@ -161,16 +161,11 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
   double minDrB1 = 999;
   double minDrB2 = 999;
   
-    std::cout << "5)" << std::endl;
-
-
   for(std::vector<math::XYZTLorentzVector>::iterator itJetVec = jetvecs.begin() ; itJetVec != jetvecs.end(); ++itJetVec){
     assert(itJetVec->pt()>0);
     assert(Hdau[0].pt()>0);
     assert(Hdau[1].pt()>0);
     
-    std::cout << "6)" << std::endl;
-
     if(tHqUtils::DeltaR(*itJetVec,Hdau[0].p4())<minDrB1){
       idxhbb[0] = itJetVec-jetvecs.begin();
       minDrB1 = tHqUtils::DeltaR(*itJetVec,Hdau[0].p4());
@@ -188,10 +183,6 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
     idxhbb[1]=-99.;
   }
   
-  //  std::cout << "7)" << std::endl;
-
-
-
   for (int i =0; i<2; i++)
     vars.FillVars("Hjtidx",i,idxhbb[i]);
 
@@ -200,10 +191,6 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
     
   double minDrSB = 999;
   double minDrLQ = 999;
-
-
-  //  std::cout << "8)" << std::endl;
-  
 
   for(std::vector<math::XYZTLorentzVector>::iterator itJetVec = jetvecs.begin() ; itJetVec != jetvecs.end(); ++itJetVec){
     assert(itJetVec->pt()>0);
@@ -219,10 +206,6 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
     }
   }
 
-  //  std::cout << "8)" << std::endl;
-
-
-  
   if(minDrSB>.4)
     idxsb=-99;
   
@@ -232,9 +215,5 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
     idxlq=-99;
   
   vars.FillVar("lqjtidx",idxlq);
-
-  //  std::cout << "9)" << std::endl;
-
-
 
 }

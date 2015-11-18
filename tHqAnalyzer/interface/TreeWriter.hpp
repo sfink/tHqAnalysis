@@ -5,6 +5,7 @@
 
 #include "TFile.h"
 #include "TTree.h"
+#include "TStopwatch.h"
 
 #include "tHqAnalysis/tHqAnalyzer/interface/VariableContainer.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/InputCollections.hpp"
@@ -33,8 +34,9 @@ class TreeWriter{
     bool Process(const InputCollections& input);
     void AddTreeProcessor(TreeProcessor* processor);
     void AddSampleInformation();
-
-
+    void FillProcessorMap();
+    void RemoveTreeProcessor(string name);
+    void FillProcessorName(string name);
 
   private:
   
@@ -46,5 +48,8 @@ class TreeWriter{
     TFile* outFile;
     VariableContainer vars;
     std::vector<TreeProcessor*> processors;
+    std::vector<TStopwatch> stopwatches;
+    std::vector<std::string> processorNames;
+    std::map<std::string,TreeProcessor*>  ProcessorMap;
 };
 #endif
