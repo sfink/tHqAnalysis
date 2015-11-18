@@ -1,12 +1,12 @@
-#include "tHqAnalysis/tHqAnalyzer/interface/MCMatchVarProcessor.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/TopGenVarProcessor.hpp"
 
 using namespace std;
 
-MCMatchVarProcessor::MCMatchVarProcessor (){}
-MCMatchVarProcessor::~MCMatchVarProcessor (){}
+TopGenVarProcessor::TopGenVarProcessor (){}
+TopGenVarProcessor::~TopGenVarProcessor (){}
 
 
-void MCMatchVarProcessor::Init(const InputCollections& input,VariableContainer& vars){
+void TopGenVarProcessor::Init(const InputCollections& input,VariableContainer& vars){
 
  
   vars.InitVar( "genevt_ttcc",-1,"I" );
@@ -92,10 +92,10 @@ void MCMatchVarProcessor::Init(const InputCollections& input,VariableContainer& 
   initialized = true;
 }
 
-void MCMatchVarProcessor::Process(const InputCollections& input,VariableContainer& vars){
+void TopGenVarProcessor::Process(const InputCollections& input,VariableContainer& vars){
   
   if(!initialized) cerr << "tree processor not initialized" << endl;
-  cout << "Starting the MCMatchProcessor for ttbar samples..." << endl;  
+  cout << "Starting the TopGenVarProcessor for ttbar samples..." << endl;  
   
   int iBB = 0;
   int iCC = 0;

@@ -7,12 +7,12 @@
 #include "tHqAnalysis/tHqAnalyzer/interface/tHqUtils.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/GenTopEvent.hpp"
 
-class MCMatchVarProcessor: public TreeProcessor{
+class TopGenVarProcessor: public TreeProcessor{
   
 public:
   
-  MCMatchVarProcessor();
-  ~MCMatchVarProcessor();
+  TopGenVarProcessor();
+  ~TopGenVarProcessor();
     
   void Init(const InputCollections& input,VariableContainer& var);
   void Process(const InputCollections& input,VariableContainer& var);

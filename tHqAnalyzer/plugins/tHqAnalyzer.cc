@@ -54,7 +54,7 @@
 #include "tHqAnalysis/tHqAnalyzer/interface/Selection.hpp"
 
 #include "tHqAnalysis/tHqAnalyzer/interface/WeightProcessor.hpp"
-#include "tHqAnalysis/tHqAnalyzer/interface/MCMatchVarProcessor.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/TopGenVarProcessor.hpp"
 
 #include "tHqAnalysis/tHqAnalyzer/interface/MVAVarProcessor.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/BaseVarProcessor.hpp"
@@ -198,7 +198,7 @@ private:
 
       /** gen info data access token **/
       edm::EDGetTokenT< LHEEventProduct > EDMLHEEventToken;
-      edm::EDGetTokenT< LHEEventProduct >   EDMLHEEventToken_ttbar;      
+      edm::EDGetTokenT< LHEEventProduct >   EDMLHEEventToken_alt;      
 
       /** gen particles data access token **/
       edm::EDGetTokenT< std::vector<reco::GenParticle> > EDMGenParticlesToken;
@@ -276,7 +276,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig){
   // EDMSubFilterJetsToken   = consumes< boosted::SubFilterJetCollection >(edm::InputTag("CA12JetsCA3FilterjetsPFMatcher","subfilterjets","p"));
   EDMGenInfoToken         = consumes< GenEventInfoProduct >(edm::InputTag("generator","","SIM"));
   EDMLHEEventToken        = consumes< LHEEventProduct >(edm::InputTag("source","","LHEFile"));
-  EDMLHEEventToken_ttbar  = consumes< LHEEventProduct >(edm::InputTag("externalLHEProducer","","LHE"));
+  EDMLHEEventToken_alt  = consumes< LHEEventProduct >(edm::InputTag("externalLHEProducer","","LHE"));
   EDMGenParticlesToken    = consumes< std::vector<reco::GenParticle> >(edm::InputTag("prunedGenParticles","","PAT"));
   EDMGenJetsToken         = consumes< std::vector<reco::GenJet> >(edm::InputTag("slimmedGenJets","","PAT"));
   EDMCustomGenJetsToken   = consumes< std::vector<reco::GenJet> >(edm::InputTag("ak4GenJetsCustom","",""));
@@ -321,7 +321,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig){
     else if(*itPro == "BaseVarProcessor") treewriter.AddTreeProcessor(new BaseVarProcessor());
     else if(*itPro == "RecoVarProcessor") treewriter.AddTreeProcessor(new RecoVarProcessor());
     else if(*itPro == "MVAVarProcessor") treewriter.AddTreeProcessor(new MVAVarProcessor());
-    else if(*itPro == "MCMatchVarProcessor") treewriter.AddTreeProcessor(new MCMatchVarProcessor());
+    else if(*itPro == "TopGenVarProcessor") treewriter.AddTreeProcessor(new TopGenVarProcessor());
     else if(*itPro == "tHqGenVarProcessor") treewriter.AddTreeProcessor(new tHqGenVarProcessor());
     else cout << "No matching processor found for: " << *itPro << endl;    
     } 
@@ -650,12 +650,12 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   /**** GET LHEINFO ****/
   edm::Handle<LHEEventProduct> h_lheeventinfo;
   if(!isData&&(sampleType==SampleType::thq)) iEvent.getByToken( EDMLHEEventToken, h_lheeventinfo );
-  else iEvent.getByToken( EDMLHEEventToken_ttbar, h_lheeventinfo);
+  else iEvent.getByToken( EDMLHEEventToken_alt, h_lheeventinfo);
 
   
   /*** KICK OUT WRONG PROCESSORS ***/
   if(sampleType!=SampleType::thq) treewriter.RemoveTreeProcessor("tHqGenVarProcessor"); 
-  if(sampleType==SampleType::thq || sampleType == SampleType::nonttbkg) treewriter.RemoveTreeProcessor("MCMatchVarProcessor");
+  if(sampleType==SampleType::thq || sampleType == SampleType::nonttbkg) treewriter.RemoveTreeProcessor("TopGenVarProcessor");
   if(!isData&&foundT&&foundTbar) {
     // fill genTopEvt with tt(H) information
     genTopEvt.Fill(*h_genParticles,ttid_full);
