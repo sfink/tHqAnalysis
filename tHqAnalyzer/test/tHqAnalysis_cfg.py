@@ -18,8 +18,9 @@ gc['max'] = '__MAX_EVENTS__'
 gc['sampletype'] = '__SAMPLE_TYPE__'
 gc['xs'] = '__XS__'
 gc['mcevents'] = '__MCEVENTS__'
+gc['globaltag'] = '__GLOBALTAG__'
 
-# envoirnment variables
+# environment variables
 env = {}
 env['nickname'] = os.getenv('NICK_NAME')
 env['filenames'] = os.getenv('FILE_NAMES')
@@ -30,13 +31,16 @@ env['max'] = os.getenv('MAX_EVENTS')
 env['sampletype'] = os.getenv('SAMPLE_TYPE')
 env['xs'] = os.getenv('XS')
 env['mcevents'] = os.getenv('MCEVENTS')
+env['globaltag'] = os.getenv('GLOBALTAG')
 
 # default variables
 default = {}
 default['nickname'] = 'Lalala'
 #default['filenames'] = 'root://cmsxrootd.fnal.gov///store/user/shwillia/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/BoostedTTH_MiniAOD/150227_111650/0000/BoostedTTH_MiniAOD_15.root'
 #default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/Phys14DR/TToLeptons_t-channel-CSA14_Tune4C_13TeV-aMCatNLO-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/1E2D2522-A46A-E411-9C55-002590D0AFDC.root'
-default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/RunIISpring15DR74/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v1/00000/00466730-F801-E511-9594-549F35AF450A.root'
+#default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/RunIISpring15DR74/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v1/00000/00466730-F801-E511-9594-549F35AF450A.root'
+#default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/RunIISpring15DR74/ZZ_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v3/10000/0C479546-7209-E511-BA6A-3417EBE8862E.root'
+default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/RunIISpring15MiniAODv2/ttHTobb_M125_13TeV_powheg_pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/30000/0461E874-C56D-E511-9CE9-00266CF9AED8.root'
 #default['filenames'] = 'file:/nfs/dust/cms/user/bmaier/CMSSW_7_4_6_patch6/src/tHqAnalysis/06249A8D-FE54-E511-825E-008CFA1111EC.root'
 default['outfilename'] = None
 default['skip'] = '0'
@@ -45,6 +49,9 @@ default['max'] = '100'
 default['sampletype'] = '9125'
 default['xs'] = '248'
 default['mcevents'] = '3500000'
+default['globaltag'] = 'PHYS14_25_V2::All'
+
+
 
 # fill in default values if not set by gc
 values = gc.copy()
@@ -55,6 +62,8 @@ for key, value in values.iteritems():
         else:
             values[key] = env[key]
 
+print "The Global Tag is %s \n " % values['globaltag']
+
 # convert strings
 values['filenames'] = values['filenames'].strip(',')
 values['filenames'] = map(lambda s: s.strip('" '), values['filenames'].split(","))
@@ -64,7 +73,7 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = 'PHYS14_25_V2::All'
+process.GlobalTag.globaltag = values['globaltag']
 
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.options.allowUnscheduled = cms.untracked.bool(True)

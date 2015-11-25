@@ -1,1 +1,1 @@
-for i in $(find crab_projects/ -maxdepth 1 -mindepth 1 -atime -1 -type d); do crab status -d $i; done
+for i in $(find crab_projects/ -maxdepth 1 -mindepth 1 -atime -1 -type d); do echo -e  "################ STATUS FOR FOLDER " $i " ################\n \n" ; crab status -d $i --verboseErrors $1;echo -e "\n \n" ; done
