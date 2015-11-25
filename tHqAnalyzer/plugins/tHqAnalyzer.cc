@@ -197,8 +197,8 @@ private:
       edm::EDGetTokenT< GenEventInfoProduct > EDMGenInfoToken;
 
       /** gen info data access token **/
-      edm::EDGetTokenT< LHEEventProduct > EDMLHEEventToken;
-      edm::EDGetTokenT< LHEEventProduct >   EDMLHEEventToken_alt;      
+  //      edm::EDGetTokenT< LHEEventProduct > EDMLHEEventToken;
+  //    edm::EDGetTokenT< LHEEventProduct >   EDMLHEEventToken_alt;      
 
       /** gen particles data access token **/
       edm::EDGetTokenT< std::vector<reco::GenParticle> > EDMGenParticlesToken;
@@ -275,8 +275,8 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig){
   //EDMHEPTopJetsToken      = consumes< boosted::HEPTopJetCollection >(edm::InputTag("HEPTopJetsPFMatcher","heptopjets","p"));
   // EDMSubFilterJetsToken   = consumes< boosted::SubFilterJetCollection >(edm::InputTag("CA12JetsCA3FilterjetsPFMatcher","subfilterjets","p"));
   EDMGenInfoToken         = consumes< GenEventInfoProduct >(edm::InputTag("generator","","SIM"));
-  EDMLHEEventToken        = consumes< LHEEventProduct >(edm::InputTag("source","","LHEFile"));
-  EDMLHEEventToken_alt  = consumes< LHEEventProduct >(edm::InputTag("externalLHEProducer","","LHE"));
+  //  EDMLHEEventToken        = consumes< LHEEventProduct >(edm::InputTag("source","","LHEFile"));
+  //  EDMLHEEventToken_alt  = consumes< LHEEventProduct >(edm::InputTag("externalLHEProducer","","LHE"));
   EDMGenParticlesToken    = consumes< std::vector<reco::GenParticle> >(edm::InputTag("prunedGenParticles","","PAT"));
   EDMGenJetsToken         = consumes< std::vector<reco::GenJet> >(edm::InputTag("slimmedGenJets","","PAT"));
   EDMCustomGenJetsToken   = consumes< std::vector<reco::GenJet> >(edm::InputTag("ak4GenJetsCustom","",""));
@@ -648,9 +648,9 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   else if(((foundT&&!foundTbar)||(!foundT&&foundTbar))&&foundHiggs) sampleType = SampleType::thq;
 
   /**** GET LHEINFO ****/
-  edm::Handle<LHEEventProduct> h_lheeventinfo;
-  if(!isData&&(sampleType==SampleType::thq)) iEvent.getByToken( EDMLHEEventToken, h_lheeventinfo );
-  else iEvent.getByToken( EDMLHEEventToken_alt, h_lheeventinfo);
+  //  edm::Handle<LHEEventProduct> h_lheeventinfo;
+  //  if(!isData&&(sampleType==SampleType::thq)) iEvent.getByToken( EDMLHEEventToken, h_lheeventinfo );
+  //  else iEvent.getByToken( EDMLHEEventToken_alt, h_lheeventinfo);
 
   
   /*** KICK OUT WRONG PROCESSORS ***/
@@ -677,9 +677,9 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   vector<string> syst_weights_id;
   vector<float> syst_weights;
   float Weight_orig=1;
-
+  /*
   GetSystWeights(*h_lheeventinfo,syst_weights_id,syst_weights,Weight_orig);
-
+  */
   /*
   std::cout << "Weight_orig: " << Weight_orig << std::endl;
 
