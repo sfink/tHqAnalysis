@@ -72,7 +72,7 @@ values['filenames'] = map(lambda s: s.strip('" '), values['filenames'].split(","
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 process.GlobalTag.globaltag = values['globaltag']
 
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
