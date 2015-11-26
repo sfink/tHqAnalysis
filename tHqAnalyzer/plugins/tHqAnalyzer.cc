@@ -277,11 +277,11 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig){
   EDMGenInfoToken         = consumes< GenEventInfoProduct >(edm::InputTag("generator","","SIM"));
   //  EDMLHEEventToken        = consumes< LHEEventProduct >(edm::InputTag("source","","LHEFile"));
   //  EDMLHEEventToken_alt  = consumes< LHEEventProduct >(edm::InputTag("externalLHEProducer","","LHE"));
-  EDMGenParticlesToken    = consumes< std::vector<reco::GenParticle> >(edm::InputTag("prunedGenParticles","","PAT"));
-  EDMGenJetsToken         = consumes< std::vector<reco::GenJet> >(edm::InputTag("slimmedGenJets","","PAT"));
-  EDMCustomGenJetsToken   = consumes< std::vector<reco::GenJet> >(edm::InputTag("ak4GenJetsCustom","",""));
+  if(!isData){
+    EDMGenParticlesToken    = consumes< std::vector<reco::GenParticle> >(edm::InputTag("prunedGenParticles","","PAT"));
+    EDMGenJetsToken         = consumes< std::vector<reco::GenJet> >(edm::InputTag("slimmedGenJets","","PAT"));
+    EDMCustomGenJetsToken   = consumes< std::vector<reco::GenJet> >(edm::InputTag("ak4GenJetsCustom","",""));
 
-  
     // tt+X CATEGORIZATION data
     genBHadJetIndexToken           = consumes<std::vector<int> >(edm::InputTag("matchGenBHadron","genBHadJetIndex",""));
     genBHadFlavourToken            = consumes<std::vector<int> >(edm::InputTag("matchGenBHadron","genBHadFlavour",""));
@@ -668,10 +668,16 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   vector<string> syst_weights_id;
   vector<float> syst_weights;
   float Weight_orig=1;
+  map<string,float> weights;
+  map<string,float> weights_uncorrjets;
 
-  /*
-  GetSystWeights(*h_lheeventinfo,syst_weights_id,syst_weights,Weight_orig);
-  */
+  if(!isData){
+    weights = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets,selectedElectrons,selectedMuons,*h_genParticles,sysType::NA);
+    weights_uncorrjets = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_uncorrected,selectedElectrons,selectedMuons,*h_genParticles,sysType::NA);
+  
+ 
+    //GetSystWeights(*h_lheeventinfo,syst_weights_id,syst_weights,Weight_orig);
+  }
   /*
   std::cout << "Weight_orig: " << Weight_orig << std::endl;
 
