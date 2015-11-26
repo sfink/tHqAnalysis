@@ -317,7 +317,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig){
   treewriter.Init(outfileName);
   std::vector<std::string> processorNames = iConfig.getParameter< std::vector<std::string> >("processorNames");
   for(vector<string>::const_iterator itPro = processorNames.begin();itPro != processorNames.end();++itPro) {
-    cout << "This is Processor " << *itPro << endl;
+    //    cout << "This is Processor " << *itPro << endl;
     treewriter.FillProcessorName(*itPro);
     if(*itPro == "WeightProcessor") treewriter.AddTreeProcessor(new WeightProcessor());    
     else if(*itPro == "BaseVarProcessor") treewriter.AddTreeProcessor(new BaseVarProcessor());
@@ -327,7 +327,6 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig){
     else if(*itPro == "tHqGenVarProcessor") treewriter.AddTreeProcessor(new tHqGenVarProcessor());
     else cout << "No matching processor found for: " << *itPro << endl;    
     } 
-  cout << "The total size of ProcessorNames is " << processorNames.size() << endl;
   treewriter.FillProcessorMap();
 }
 
@@ -348,7 +347,7 @@ tHqAnalyzer::~tHqAnalyzer()
 // ------------ method called for each event  ------------
 void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-  cout << "########### NEW EVENT ##################" << endl;
+  //cout << "########### NEW EVENT ##################" << endl;
   if(eventcount<10||eventcount%1000==0){
     cout << "Analyzing event " << eventcount << endl;
     watch.Print();
@@ -356,7 +355,6 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   }
   
   eventcount++;
-  
   /**** GET PILEUPSUMMARYINFO ****/
   edm::Handle< std::vector<PileupSummaryInfo> >  h_puinfosummary;
   iEvent.getByToken( EDMPUInfoToken, h_puinfosummary);
@@ -445,7 +443,6 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   iEvent.getByToken( EDMPuppiJetsToken,h_pfpuppijets );
   std::vector<pat::Jet> const &pfpuppijets = *h_pfpuppijets;
 
-  
   const JetCorrector* corrector = JetCorrector::getJetCorrector( "ak4PFchsL1L2L3", iSetup );   
   helper.SetJetCorrector(corrector);
   
@@ -513,7 +510,6 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   
   edm::Handle< std::vector<reco::GenParticle> > h_genParticles;
   if(!isData){
-    cout << "Ja was gehjt." << endl;
     iEvent.getByToken( EDMGenParticlesToken,h_genParticles );
     std::vector<reco::GenParticle> const &genParticles = *h_genParticles;
   }
@@ -529,6 +525,7 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	selectedGenJets.push_back(genjets[i]);
     }
   }
+
   
   // custom genjets for tt+X categorization
   edm::Handle< std::vector<reco::GenJet> > h_customgenjets;
@@ -549,7 +546,7 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     }
     else{
       triggerMap[*name]=triggerResults.accept(TriggerID);
-      std::cout << "Jo: Trigger ID: " << TriggerID << "  Name: " << *name << endl;
+      //      std::cout << "Jo: Trigger ID: " << TriggerID << "  Name: " << *name << endl;
     }
   }
 
@@ -634,7 +631,6 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			     *genCHadBHadronId,
 			     15,4.7); 
   }
-
   /*** FIGURE OUT SAMPLETYPE ***/
   SampleType sampleType= SampleType::nonttbkg;
   if(isData) sampleType = SampleType::data;
@@ -649,7 +645,6 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     else if(ttid==43||ttid==44||ttid==45) sampleType = SampleType::ttcc;    
   }
   else if(((foundT&&!foundTbar)||(!foundT&&foundTbar))&&foundHiggs) sampleType = SampleType::thq;
-
   /**** GET LHEINFO ****/
   edm::Handle<LHEEventProduct> h_lheeventinfo;
   if(!isData&&(sampleType==SampleType::thq)) iEvent.getByToken( EDMLHEEventToken, h_lheeventinfo );
@@ -662,14 +657,13 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   if(!isData&&foundT&&foundTbar) {
     // fill genTopEvt with tt(H) information
     genTopEvt.Fill(*h_genParticles,ttid_full);
-    cout << "APPARENTLY, THIS IS A SAMPLE WITH TWO TOP QUARKS" << endl;
+    //cout << "APPARENTLY, THIS IS A SAMPLE WITH TWO TOP QUARKS" << endl;
   }
   
   if(sampleType ==  SampleType::thq){
-    cout << "APPARENTLY, THIS IS A THQ SAMPLE" << endl;
+    //cout << "APPARENTLY, THIS IS A THQ SAMPLE" << endl;
     gentHqEvt.Fill(*h_genParticles);
   }
-
   // DO REWEIGHTING
 
   vector<string> syst_weights_id;
@@ -681,7 +675,6 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     weights = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets,selectedElectrons,selectedMuons,*h_genParticles,sysType::NA);
     weights_uncorrjets = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_uncorrected,selectedElectrons,selectedMuons,*h_genParticles,sysType::NA);
   
- 
     GetSystWeights(*h_lheeventinfo,syst_weights_id,syst_weights,Weight_orig);
   }
   /*
@@ -696,7 +689,6 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   std::cout << weights_syst_id[0] << std::endl;
 
   */
-
   // Define INPUT
   InputCollections input( eventInfo,
 			  //selectedTrigger,
@@ -725,7 +717,6 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			  syst_weights_id
 			  );
        
-  
 
   // DO SELECTION
   cutflow.EventSurvivedStep("all");
@@ -733,13 +724,11 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   for(size_t i=0; i<selections.size() && selected; i++){
     if(!selections.at(i)->IsSelected(input,cutflow)) selected=false;
   }
-
   if(!selected) return;    
 
   selectedElectrons = ElectronSelection(selectedElectrons,input.selectedPVs);
   selectedMuons = MuonSelection(selectedMuons,input.selectedPVs);
   selectedJets = JetSelection(selectedJets,selectedElectrons, selectedMuons, input);
-  
   // WRITE TREE
   treewriter.Process(input);  
 }
@@ -747,145 +736,143 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
 std::vector<pat::Muon> tHqAnalyzer::MuonSelection( std::vector<pat::Muon> selectedMuons,  const reco::VertexCollection& selectedPVs){
   std::vector<pat::Muon> newselectedMuons;
-  for( std::vector<pat::Muon>::const_iterator it = selectedMuons.begin(), ed = selectedMuons.end(); it != ed; ++it ){
-    pat::Muon iMuon = *it;
-    bool passesKinematics=false;
-    bool isPFandGlobal=false;
-    bool passesISO=false;
-    bool passesGlobalTrackID=false;
-    bool passesBestTrackID=false;
-    bool passesinnerTrackID=false;
-    bool passesTrackID=false;
-    bool passesID=false;
-    
-    const float minPt=5;
-    const float maxEta=2.4;
-    
-    
-    
-    if(iMuon.globalTrack().isAvailable()){
-      double chi2ndof = iMuon.globalTrack()->normalizedChi2();
-      int nValidHits = iMuon.globalTrack()->hitPattern().numberOfValidMuonHits();
-      passesGlobalTrackID=(chi2ndof<10.0 && nValidHits>0);
-    } 
-    
-    if(iMuon.muonBestTrack().isAvailable()){
-      double d0 = fabs(iMuon.muonBestTrack()->dxy(selectedPVs.at(0).position()));
-      double dZ = fabs(iMuon.muonBestTrack()->dz(selectedPVs.at(0).position()));
-      passesBestTrackID=(d0<0.2 && dZ<0.5);
+  if(selectedPVs.size()>0){
+    for( std::vector<pat::Muon>::const_iterator it = selectedMuons.begin(), ed = selectedMuons.end(); it != ed; ++it ){
+      pat::Muon iMuon = *it;
+      bool passesKinematics=false;
+      bool isPFandGlobal=false;
+      bool passesISO=false;
+      bool passesGlobalTrackID=false;
+      bool passesBestTrackID=false;
+      bool passesinnerTrackID=false;
+      bool passesTrackID=false;
+      bool passesID=false;
+      
+      const float minPt=5;
+      const float maxEta=2.4;
+      
+      
+      if(iMuon.globalTrack().isAvailable()){
+	double chi2ndof = iMuon.globalTrack()->normalizedChi2();
+	int nValidHits = iMuon.globalTrack()->hitPattern().numberOfValidMuonHits();
+	passesGlobalTrackID=(chi2ndof<10.0 && nValidHits>0);
+      } 
+      
+      if(iMuon.muonBestTrack().isAvailable()){
+	double d0 = fabs(iMuon.muonBestTrack()->dxy(selectedPVs.at(0).position()));
+	double dZ = fabs(iMuon.muonBestTrack()->dz(selectedPVs.at(0).position()));
+	passesBestTrackID=(d0<0.2 && dZ<0.5);
+      }
+      int nMatchedStations = iMuon.numberOfMatchedStations();
+      
+      if(iMuon.track().isAvailable()){
+	int nTrackerLayers = iMuon.track()->hitPattern().trackerLayersWithMeasurement();
+	passesTrackID=(nTrackerLayers>5);
+      }
+      
+      if(iMuon.innerTrack().isAvailable()){
+	int nValidPiyles = iMuon.innerTrack()->hitPattern().numberOfValidPixelHits();
+	passesinnerTrackID=(nValidPiyles>0);
+      }
+      double relIso = (iMuon.pfIsolationR04().sumChargedHadronPt + std::max( iMuon.pfIsolationR04().sumNeutralHadronEt + iMuon.pfIsolationR04().sumPhotonEt - 0.5 * iMuon.pfIsolationR04().sumPUPt,0.0)) / iMuon.pt();
+      isPFandGlobal = (iMuon.isPFMuon() && iMuon.isGlobalMuon());
+      passesKinematics = (iMuon.pt()>minPt && fabs(iMuon.eta())<maxEta);
+      passesISO = (relIso<0.12);
+      passesID = (passesinnerTrackID && passesGlobalTrackID && passesBestTrackID && passesTrackID && nMatchedStations>1);
+      if(passesKinematics && passesISO && passesID && isPFandGlobal){
+	newselectedMuons.push_back(*it);
+      }
+      else std::cout << " Bad Muon found. " << std::endl;
     }
-    
-    int nMatchedStations = iMuon.numberOfMatchedStations();
-        
-    if(iMuon.track().isAvailable()){
-    int nTrackerLayers = iMuon.track()->hitPattern().trackerLayersWithMeasurement();
-    passesTrackID=(nTrackerLayers>5);
-    }
-
-    
-    if(iMuon.innerTrack().isAvailable()){
-    int nValidPiyles = iMuon.innerTrack()->hitPattern().numberOfValidPixelHits();
-    passesinnerTrackID=(nValidPiyles>0);
-    }
-    double relIso = (iMuon.pfIsolationR04().sumChargedHadronPt + std::max( iMuon.pfIsolationR04().sumNeutralHadronEt + iMuon.pfIsolationR04().sumPhotonEt - 0.5 * iMuon.pfIsolationR04().sumPUPt,0.0)) / iMuon.pt();
-    
-    isPFandGlobal = (iMuon.isPFMuon() && iMuon.isGlobalMuon());
-    passesKinematics = (iMuon.pt()>minPt && fabs(iMuon.eta())<maxEta);
-    passesISO = (relIso<0.12);
-    passesID = (passesinnerTrackID && passesGlobalTrackID && passesBestTrackID && passesTrackID && nMatchedStations>1);
-    
-    if(passesKinematics && passesISO && passesID && isPFandGlobal){
-    newselectedMuons.push_back(*it);
-    }
-    else std::cout << " Bad Muon found. " << std::endl;
   }
+  else std::cout << "No good PVs found." << endl;
   return newselectedMuons;
 }
 
 
-  std::vector<pat::Electron> tHqAnalyzer::ElectronSelection( std::vector<pat::Electron> selectedElectrons,  const reco::VertexCollection& selectedPVs){
+std::vector<pat::Electron> tHqAnalyzer::ElectronSelection( std::vector<pat::Electron> selectedElectrons,  const reco::VertexCollection& selectedPVs){
   //-------------------------------------------------------------------------                                                                              
   //do electrons                              
   
   std::vector<pat::Electron> newselectedElectrons;
-  
-  for( std::vector<pat::Electron>::const_iterator it = selectedElectrons.begin(), ed = selectedElectrons.end(); it != ed; ++it ){
-    pat::Electron iElectron = *it;
-    bool passesKinematics=false;
-    bool inCrack=true;
-    bool passesConversion=false;
-    bool passesISO=false;
-    bool passessID=false;
+  if(selectedPVs.size()>0){
+    for( std::vector<pat::Electron>::const_iterator it = selectedElectrons.begin(), ed = selectedElectrons.end(); it != ed; ++it ){
+      pat::Electron iElectron = *it;
+      bool passesKinematics=false;
+      bool inCrack=true;
+      bool passesConversion=false;
+      bool passesISO=false;
+      bool passessID=false;
+      
+      const float minPt=5;
+      const float maxEta=2.4;
+      
+      
+      //check if barrel or endcap supercluster                                                                                                             
+      double SCeta = (iElectron.superCluster().isAvailable()) ? iElectron.superCluster()->position().eta() : 99;
+      double absSCeta = fabs(SCeta);
+      bool isEB = ( absSCeta <= 1.479 );
+      bool isEE = ( absSCeta > 1.479 && absSCeta < 2.5 );
+      
+      //isolation                                                                                                                                          
+      double pfIsoCharged = iElectron.pfIsolationVariables().sumChargedHadronPt;
+      double pfIsoNeutralHadron = iElectron.pfIsolationVariables().sumNeutralHadronEt;
+      double pfIsoNeutralPhoton = iElectron.pfIsolationVariables().sumPhotonEt;
+      double pfIsoSumPUPt = iElectron.pfIsolationVariables().sumPUPt;
+      
+      double relIso = (pfIsoCharged + max( pfIsoNeutralHadron + pfIsoNeutralPhoton - 0.5*pfIsoSumPUPt, 0.0 ))/iElectron.pt();
+      
+      
+      //other stuff                                                                                                                                        
+      double full5x5_sigmaIetaIeta = iElectron.full5x5_sigmaIetaIeta();
+      double dEtaIn = fabs( iElectron.deltaEtaSuperClusterTrackAtVtx() );
+      double dPhiIn = fabs( iElectron.deltaPhiSuperClusterTrackAtVtx() );
+      double hOverE = iElectron.hcalOverEcal();
+      
+      double ooEmooP = 999;
+      if( iElectron.ecalEnergy() == 0 ) ooEmooP = 1e30;
+      else if( !std::isfinite(iElectron.ecalEnergy()) ) ooEmooP = 1e30;
+      else ooEmooP = fabs(1.0/iElectron.ecalEnergy() - iElectron.eSuperClusterOverP()/iElectron.ecalEnergy() );
+      
+      double d0 = 999;
+      double dZ = 999;
+      double expectedMissingInnerHits = 999;
+      if( iElectron.gsfTrack().isAvailable() ){
+	d0 = fabs(iElectron.gsfTrack()->dxy(selectedPVs.at(0).position()));
+	dZ = fabs(iElectron.gsfTrack()->dz(selectedPVs.at(0).position()));
+	expectedMissingInnerHits = iElectron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
+      }
+      
+      //do the checks                                                                                                                                        
+      passesConversion = ( iElectron.passConversionVeto() );
+      passesKinematics = (iElectron.pt()>minPt && fabs(iElectron.eta())<maxEta);
+      if(iElectron.superCluster().isAvailable()){
+	inCrack = (fabs(iElectron.superCluster()->position().eta())>1.4442 && fabs(iElectron.superCluster()->position().eta())<1.5660);
+      }
+      
+      //dZ and d0 cuts are different than in the posted recipe                                                                                               
+      if(isEB){
+	passessID = (full5x5_sigmaIetaIeta<0.010399 && dEtaIn<0.007641 && dPhiIn<0.032643 &&hOverE<0.060662 && d0<0.011811 && dZ<0.070775 && expectedMissingInnerHits<=1 && ooEmooP<0.153897);
+	passesISO = (relIso<0.097213);
+      }
+      else if(isEE){
+	passessID = (full5x5_sigmaIetaIeta<0.029524 && dEtaIn<0.009285 && dPhiIn<0.042447 &&hOverE<0.104263 && d0<0.051682 && dZ<0.180720 && expectedMissingInnerHits<=1 && ooEmooP<0.137468);
+	passesISO = (relIso<0.116708);
+      }
+      else{
+	passessID=false;
+	passesISO=false;
+      }
 
-    const float minPt=5;
-    const float maxEta=2.4;
-
-
-    //check if barrel or endcap supercluster                                                                                                             
-    double SCeta = (iElectron.superCluster().isAvailable()) ? iElectron.superCluster()->position().eta() : 99;
-    double absSCeta = fabs(SCeta);
-    bool isEB = ( absSCeta <= 1.479 );
-    bool isEE = ( absSCeta > 1.479 && absSCeta < 2.5 );
-
-    //isolation                                                                                                                                          
-    double pfIsoCharged = iElectron.pfIsolationVariables().sumChargedHadronPt;
-    double pfIsoNeutralHadron = iElectron.pfIsolationVariables().sumNeutralHadronEt;
-    double pfIsoNeutralPhoton = iElectron.pfIsolationVariables().sumPhotonEt;
-    double pfIsoSumPUPt = iElectron.pfIsolationVariables().sumPUPt;
-
-    double relIso = (pfIsoCharged + max( pfIsoNeutralHadron + pfIsoNeutralPhoton - 0.5*pfIsoSumPUPt, 0.0 ))/iElectron.pt();
-
-
-    //other stuff                                                                                                                                        
-    double full5x5_sigmaIetaIeta = iElectron.full5x5_sigmaIetaIeta();
-    double dEtaIn = fabs( iElectron.deltaEtaSuperClusterTrackAtVtx() );
-    double dPhiIn = fabs( iElectron.deltaPhiSuperClusterTrackAtVtx() );
-    double hOverE = iElectron.hcalOverEcal();
-
-    double ooEmooP = 999;
-    if( iElectron.ecalEnergy() == 0 ) ooEmooP = 1e30;
-    else if( !std::isfinite(iElectron.ecalEnergy()) ) ooEmooP = 1e30;
-    else ooEmooP = fabs(1.0/iElectron.ecalEnergy() - iElectron.eSuperClusterOverP()/iElectron.ecalEnergy() );
-
-    double d0 = 999;
-    double dZ = 999;
-    double expectedMissingInnerHits = 999;
-    if( iElectron.gsfTrack().isAvailable() ){
-      d0 = fabs(iElectron.gsfTrack()->dxy(selectedPVs.at(0).position()));
-      dZ = fabs(iElectron.gsfTrack()->dz(selectedPVs.at(0).position()));
-      expectedMissingInnerHits = iElectron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
+      //    std::cout<<relIso<<" "<<isEB<<std::endl;
+      //    std::cout<<dZ<<" "<<d0<<std::endl;
+      //    std::cout<<passesKinematics<<" "<<passesConversion<<" "<<passesISO<<" "<<passessID<<" "<<inCrack<<std::endl;
+      
+      if(passesKinematics && passesConversion && passesISO && passessID && !inCrack){
+	newselectedElectrons.push_back(*it);
+      }
     }
-
-    //do the checks                                                                                                                                        
-    passesConversion = ( iElectron.passConversionVeto() );
-    passesKinematics = (iElectron.pt()>minPt && fabs(iElectron.eta())<maxEta);
-    if(iElectron.superCluster().isAvailable()){
-      inCrack = (fabs(iElectron.superCluster()->position().eta())>1.4442 && fabs(iElectron.superCluster()->position().eta())<1.5660);
-    }
-
-    //dZ and d0 cuts are different than in the posted recipe                                                                                               
-    if(isEB){
-      passessID = (full5x5_sigmaIetaIeta<0.010399 && dEtaIn<0.007641 && dPhiIn<0.032643 &&hOverE<0.060662 && d0<0.011811 && dZ<0.070775 && expectedMissingInnerHits<=1 && ooEmooP<0.153897);
-      passesISO = (relIso<0.097213);
-    }
-    else if(isEE){
-      passessID = (full5x5_sigmaIetaIeta<0.029524 && dEtaIn<0.009285 && dPhiIn<0.042447 &&hOverE<0.104263 && d0<0.051682 && dZ<0.180720 && expectedMissingInnerHits<=1 && ooEmooP<0.137468);
-      passesISO = (relIso<0.116708);
-    }
-    else{
-      passessID=false;
-      passesISO=false;
-    }
-
-    //    std::cout<<relIso<<" "<<isEB<<std::endl;
-    //    std::cout<<dZ<<" "<<d0<<std::endl;
-    //    std::cout<<passesKinematics<<" "<<passesConversion<<" "<<passesISO<<" "<<passessID<<" "<<inCrack<<std::endl;
-
-    if(passesKinematics && passesConversion && passesISO && passessID && !inCrack){
-      newselectedElectrons.push_back(*it);
-    }
-    else std::cout << " Bad Electron found. " << std::endl;
-  }
+  } else std::cout << "No good PV found. " << std::endl;
   return newselectedElectrons;
 }
 
@@ -1264,8 +1251,8 @@ void tHqAnalyzer::GetSystWeights(const LHEEventProduct&  LHEEvent, vector<string
 
   //cout << "lalala " << LHEEvent.weights().size() <<endl;
   //cout << "lululu " << LHEEvent.weights()[491].id.c_str() <<endl;
-  cout << "original weight:" << LHEEvent.originalXWGTUP() << endl;
-  cout << "Weight_orig2:" << Weight_orig << endl;
+  //  cout << "original weight:" << LHEEvent.originalXWGTUP() << endl;
+  //  cout << "Weight_orig2:" << Weight_orig << endl;
 
   for (size_t i=0; i<LHEEvent.weights().size();i++){ 
     weight_syst_id.push_back(LHEEvent.weights()[i].id.c_str());

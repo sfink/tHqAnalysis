@@ -57,17 +57,17 @@ void TreeWriter::FillProcessorName(string name){
 }
 
 void TreeWriter::FillProcessorMap(){
-  cout << "FILLING THE PROCESSOR MAP"<< processors.size() << " &" << processorNames.size() << endl;
+  //  cout << "FILLING THE PROCESSOR MAP"<< processors.size() << " &" << processorNames.size() << endl;
   assert(processors.size() == processorNames.size());
   for (size_t i = 0; i < processorNames.size(); ++i)
     ProcessorMap[processorNames[i]] = processors[i];
 }
 
 void TreeWriter::RemoveTreeProcessor(string name){
-  cout << "TRYING TO REMOVE " << name << endl;
+  //  cout << "TRYING TO REMOVE " << name << endl;
   auto it = ProcessorMap.find(name);
   if (it != ProcessorMap.end()){
-    cout << "IM GOING IN!" << endl;
+    //cout << "IM GOING IN!" << endl;
     ProcessorMap.erase (it);
     std::vector<TreeProcessor*> processors_temp;
     std::vector<std::string> processorNames_temp;
