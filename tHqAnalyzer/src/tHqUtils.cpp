@@ -666,7 +666,6 @@ void tHqUtils::GetAplanaritySphericity(math::XYZTLorentzVector leptonVec, math::
   tensor(2,0) = mxz;
   tensor(1,2) = myz;
   tensor(2,1) = myz;
-  cout << "After Filling Tensor elements" << endl;
   TVector eigenval(3);
   try{
     tensor.EigenVectors(eigenval);
@@ -677,9 +676,6 @@ void tHqUtils::GetAplanaritySphericity(math::XYZTLorentzVector leptonVec, math::
     sphericity = -99;
     aplanarity = -99;
   }
-  cout << "After Getting EigenVectors" << endl;
-  
-  
   return;
 }
 
