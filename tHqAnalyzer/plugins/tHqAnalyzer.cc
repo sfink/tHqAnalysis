@@ -268,21 +268,21 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):pvWeight((tHqUtils::G
   EDMSelectedTriggerToken = consumes< pat::TriggerObjectStandAloneCollection > (edm::InputTag("selectedPatTrigger","",""));
   EDMTriggerResultToken   = consumes< edm::TriggerResults > (edm::InputTag("TriggerResults","","HLT"));
   EDMBeamSpotToken        = consumes< reco::BeamSpot > (edm::InputTag("offlineBeamSpot","",""));
-  EDMVertexToken          = consumes< reco::VertexCollection > (edm::InputTag("offlineSlimmedPrimaryVertices","","PAT"));
-  EDMMuonsToken           = consumes< std::vector<pat::Muon> >(edm::InputTag("slimmedMuons","","PAT"));
-  EDMElectronsToken       = consumes< std::vector<pat::Electron> >(edm::InputTag("slimmedElectrons","","PAT"));
-  EDMJetsToken            = consumes< std::vector<pat::Jet> >(edm::InputTag("slimmedJets","","PAT"));
-  EDMPuppiJetsToken       = consumes< std::vector<pat::Jet> >(edm::InputTag("slimmedJetsPuppi","","PAT"));
-  EDMMETsToken            = consumes< std::vector<pat::MET> >(edm::InputTag("slimmedMETs","","PAT"));
+  EDMVertexToken          = consumes< reco::VertexCollection > (edm::InputTag("offlineSlimmedPrimaryVertices"));
+  EDMMuonsToken           = consumes< std::vector<pat::Muon> >(edm::InputTag("slimmedMuons"));
+  EDMElectronsToken       = consumes< std::vector<pat::Electron> >(edm::InputTag("slimmedElectrons"));
+  EDMJetsToken            = consumes< std::vector<pat::Jet> >(edm::InputTag("slimmedJets"));
+  EDMPuppiJetsToken       = consumes< std::vector<pat::Jet> >(edm::InputTag("slimmedJetsPuppi"));
+  EDMMETsToken            = consumes< std::vector<pat::MET> >(edm::InputTag("slimmedMETs"));
   //EDMHEPTopJetsToken      = consumes< boosted::HEPTopJetCollection >(edm::InputTag("HEPTopJetsPFMatcher","heptopjets","p"));
   // EDMSubFilterJetsToken   = consumes< boosted::SubFilterJetCollection >(edm::InputTag("CA12JetsCA3FilterjetsPFMatcher","subfilterjets","p"));
-  EDMGenInfoToken         = consumes< GenEventInfoProduct >(edm::InputTag("generator","","SIM"));
-  //  EDMLHEEventToken        = consumes< LHEEventProduct >(edm::InputTag("source","","LHEFile"));
-  //  EDMLHEEventToken_alt  = consumes< LHEEventProduct >(edm::InputTag("externalLHEProducer","","LHE"));
+  EDMGenInfoToken         = consumes< GenEventInfoProduct >(edm::InputTag("generator"));
+  //  EDMLHEEventToken        = consumes< LHEEventProduct >(edm::InputTag("source"));
+  //  EDMLHEEventToken_alt  = consumes< LHEEventProduct >(edm::InputTag("externalLHEProducer"));
   if(!isData){
-    EDMGenParticlesToken    = consumes< std::vector<reco::GenParticle> >(edm::InputTag("prunedGenParticles","","PAT"));
-    EDMGenJetsToken         = consumes< std::vector<reco::GenJet> >(edm::InputTag("slimmedGenJets","","PAT"));
-    EDMCustomGenJetsToken   = consumes< std::vector<reco::GenJet> >(edm::InputTag("ak4GenJetsCustom","",""));
+    EDMGenParticlesToken    = consumes< std::vector<reco::GenParticle> >(edm::InputTag("prunedGenParticles"));
+    EDMGenJetsToken         = consumes< std::vector<reco::GenJet> >(edm::InputTag("slimmedGenJets"));
+    EDMCustomGenJetsToken   = consumes< std::vector<reco::GenJet> >(edm::InputTag("ak4GenJetsCustom"));
 
     // tt+X CATEGORIZATION data
     genBHadJetIndexToken           = consumes<std::vector<int> >(edm::InputTag("matchGenBHadron","genBHadJetIndex",""));
