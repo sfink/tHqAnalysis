@@ -40,9 +40,9 @@ default['nickname'] = 'Lalala'
 #default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/Phys14DR/TToLeptons_t-channel-CSA14_Tune4C_13TeV-aMCatNLO-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/1E2D2522-A46A-E411-9C55-002590D0AFDC.root'
 #default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/RunIISpring15DR74/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v1/00000/00466730-F801-E511-9594-549F35AF450A.root'
 #default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/RunIISpring15DR74/ZZ_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v3/10000/0C479546-7209-E511-BA6A-3417EBE8862E.root'
-#default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/RunIISpring15MiniAODv2/ttHTobb_M125_13TeV_powheg_pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/30000/0461E874-C56D-E511-9CE9-00266CF9AED8.root'
+default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/RunIISpring15MiniAODv2/ttHTobb_M125_13TeV_powheg_pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/30000/0461E874-C56D-E511-9CE9-00266CF9AED8.root'
 #default['filenames'] = 'file:/nfs/dust/cms/user/bmaier/CMSSW_7_4_6_patch6/src/tHqAnalysis/06249A8D-FE54-E511-825E-008CFA1111EC.root'
-default['filenames'] = 'root://cmsxrootd.fnal.gov///store/data/Run2015D/SingleMuon/MINIAOD/05Oct2015-v1/10000/025A01CA-8B6F-E511-B7A5-0025905A6084.root'
+#default['filenames'] = 'root://cmsxrootd.fnal.gov///store/data/Run2015D/SingleMuon/MINIAOD/05Oct2015-v1/10000/025A01CA-8B6F-E511-B7A5-0025905A6084.root'
 default['outfilename'] = None
 default['skip'] = '0'
 default['max'] = '100'
@@ -50,7 +50,7 @@ default['max'] = '100'
 default['sampletype'] = '9125'
 default['xs'] = '248'
 default['mcevents'] = '3500000'
-default['globaltag'] = 'PHYS14_25_V2::All'
+default['globaltag'] = '74X_mcRun2_asymptotic_v2'
 
 
 

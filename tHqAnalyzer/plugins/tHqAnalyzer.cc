@@ -42,6 +42,7 @@
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 
 #include "MiniAOD/MiniAODHelper/interface/MiniAODHelper.h"
+#include "MiniAOD/MiniAODHelper/interface/CSVHelper.h"
 
 #include "tHqAnalysis/tHqAnalyzer/interface/tHqUtils.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/InputCollections.hpp"
@@ -98,8 +99,10 @@ private:
       /** the beanhelper is used for selections and reweighting */
       MiniAODHelper helper;
       
+      CSVHelper csvReweighter;
+
       /** Reweighter to match the PV distribution in data*/
-  //      HistoReweighter pvWeight;
+      HistoReweighter pvWeight;
 
 
       /** writes flat trees for MVA analysis */
@@ -238,8 +241,7 @@ private:
 //
 // constructors and destructor
 //
-tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig){
-  //  pvWeight = ((tHqUtils::GetAnalyzerPath()+"/data/pvweights/PUhistos.root").c_str(),"data","mc")
+tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):pvWeight((tHqUtils::GetAnalyzerPath()+"/data/pvweights/PUhistos.root").c_str(),"data","mc"){
   std::string era = iConfig.getParameter<std::string>("era");
   string analysisType = iConfig.getParameter<std::string>("analysisType");
   analysisType::analysisType iAnalysisType = analysisType::LJ;
@@ -673,7 +675,7 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   map<string,float> weights_uncorrjets;
   if(!isData){
     weights = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets,selectedElectrons,selectedMuons,*h_genParticles,sysType::NA);
-    weights_uncorrjets = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_uncorrected,selectedElectrons,selectedMuons,*h_genParticles,sysType::NA);
+    //    weights_uncorrjets = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_uncorrected,selectedElectrons,selectedMuons,*h_genParticles,sysType::NA);
   
     GetSystWeights(*h_lheeventinfo,syst_weights_id,syst_weights,Weight_orig);
   }
@@ -1212,24 +1214,37 @@ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventIn
 
   weight = genEventInfo.weight();
 
-  //  double csvWgtHF, csvWgtLF, csvWgtCF;
+  double csvWgtHF, csvWgtLF, csvWgtCF;
 
   float xsweight = xs*luminosity/totalMCevents;
   float csvweight = 1.;
   float puweight = 1.;
   float topptweight = 1.;
   
+
+  //get vectors of jet properties
+  std::vector<double> jetPts;
+  std::vector<double> jetEtas;
+  std::vector<double> jetCSVs;
+  std::vector<int> jetFlavors;
+  for(std::vector<pat::Jet>::const_iterator itJet = selectedJets.begin(); itJet != selectedJets.end(); ++itJet){
+    jetPts.push_back(itJet->pt());
+    jetEtas.push_back(itJet->eta());
+    jetCSVs.push_back(helper.GetJetCSV(*itJet,"pfCombinedInclusiveSecondaryVertexV2BJetTags"));
+    jetFlavors.push_back(itJet->hadronFlavour());
+  }  
   // ADD CSV WEIGHTS HERE OR SEPARATLY?
+  csvweight= csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,0, csvWgtHF, csvWgtLF, csvWgtCF);
 
-
-  //weight *= xsweight*csvweight*puweight*topptweight;
+  weight *= xsweight*csvweight*puweight*topptweight;
   weights["Weight"] = weight;
   weights["Weight_XS"] = xsweight;
   weights["Weight_CSV"] = csvweight;
   weights["Weight_PU"] = puweight;
   weights["Weight_TopPt"] = topptweight;
-  //  weights["Weight_PV"] = pvWeight.GetWeight(selectedPVs.size());
-
+  weights["Weight_PV"] = pvWeight.GetWeight(selectedPVs.size());
+  cout << "PV weight :" << weights["Weight_PV"] << endl;
+  cout << "CSV weight :" << weights["Weight_CSV"] << endl;
   
   
   
