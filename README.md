@@ -22,7 +22,7 @@ Follow These Steps:
     git cms-merge-topic gkasieczka:htt-v2-74X
     
     git clone git@github.com:sfink/tHqAnalysis.git
-    git clone git@github.com:cms-ttH/MiniAOD.git
+    git clone git@github.com:sfink/MiniAOD.git
     
     scram b -j 12
 
