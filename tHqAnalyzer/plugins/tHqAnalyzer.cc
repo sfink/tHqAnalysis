@@ -241,7 +241,7 @@ private:
 //
 // constructors and destructor
 //
-tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):pvWeight((tHqUtils::GetAnalyzerPath()+"/data/pvweights/PUhistos.root").c_str(),"data","mc"){
+tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):pvWeight((tHqUtils::GetAnalyzerPath()+"/data/pvweights/MyDataPileupHistogram.root").c_str(),"pileup",(tHqUtils::GetAnalyzerPath()+"/data/pvweights/PUhistos.root").c_str(),"mc"){
   std::string era = iConfig.getParameter<std::string>("era");
   string analysisType = iConfig.getParameter<std::string>("analysisType");
   analysisType::analysisType iAnalysisType = analysisType::LJ;
@@ -1199,7 +1199,6 @@ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventIn
     weights["Weight_XS"] = 1.0;
     weights["Weight_CSV"] = 1.0;
     weights["Weight_PU"] = 1.0;
-    weights["Weight_PV"] = 1.0;
     weights["Weight_TopPt"] = 1.0;
     return weights;
   }
@@ -1239,10 +1238,9 @@ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventIn
   weights["Weight"] = weight;
   weights["Weight_XS"] = xsweight;
   weights["Weight_CSV"] = csvweight;
-  weights["Weight_PU"] = puweight;
   weights["Weight_TopPt"] = topptweight;
-  weights["Weight_PV"] = pvWeight.GetWeight(selectedPVs.size());
-  cout << "PV weight :" << weights["Weight_PV"] << endl;
+  weights["Weight_PU"] = pvWeight.GetWeight(selectedPVs.size());
+  cout << "PU weight :" << weights["Weight_PU"] << endl;
   cout << "CSV weight :" << weights["Weight_CSV"] << endl;
   
   
