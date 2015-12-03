@@ -252,7 +252,6 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):pvWeight((tHqUtils::G
   xs = iConfig.getParameter<double>("xs");
   totalMCevents = iConfig.getParameter<int>("nMCEvents");
   isData = iConfig.getParameter<bool>("isData");
-
   useGenHadronMatch = iConfig.getParameter<bool>("useGenHadronMatch");
 
   //  useFatJets = iConfig.getParameter<bool>("useFatJets");
