@@ -19,7 +19,6 @@ gc['sampletype'] = '__SAMPLE_TYPE__'
 gc['xs'] = '__XS__'
 gc['mcevents'] = '__MCEVENTS__'
 gc['globaltag'] = '__GLOBALTAG__'
-gc['isData'] = '__ISDATA__'
 
 # environment variables
 env = {}
@@ -33,18 +32,17 @@ env['sampletype'] = os.getenv('SAMPLE_TYPE')
 env['xs'] = os.getenv('XS')
 env['mcevents'] = os.getenv('MCEVENTS')
 env['globaltag'] = os.getenv('GLOBALTAG')
-env['isData'] = os.getenv('ISDATA')
 
 # default variables
 default = {}
 default['nickname'] = 'Lalala'
 #default['filenames'] = 'root://cmsxrootd.fnal.gov///store/user/shwillia/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/BoostedTTH_MiniAOD/150227_111650/0000/BoostedTTH_MiniAOD_15.root'
 #default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/Phys14DR/TToLeptons_t-channel-CSA14_Tune4C_13TeV-aMCatNLO-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/1E2D2522-A46A-E411-9C55-002590D0AFDC.root'
-default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/RunIISpring15DR74/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v1/00000/00466730-F801-E511-9594-549F35AF450A.root'
+#default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/RunIISpring15DR74/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v1/00000/00466730-F801-E511-9594-549F35AF450A.root'
 #default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/RunIISpring15DR74/ZZ_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v3/10000/0C479546-7209-E511-BA6A-3417EBE8862E.root'
 #default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/RunIISpring15DR74/QCD_Pt-15to20_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v1/50000/5084EE68-9507-E511-A8ED-0025905C3D40.root'
 #default['filenames'] = 'file:/nfs/dust/cms/user/bmaier/CMSSW_7_4_6_patch6/src/tHqAnalysis/06249A8D-FE54-E511-825E-008CFA1111EC.root'
-#default['filenames'] = 'root://cmsxrootd.fnal.gov///store/data/Run2015D/SingleMuon/MINIAOD/05Oct2015-v1/10000/025A01CA-8B6F-E511-B7A5-0025905A6084.root'
+default['filenames'] = 'root://cmsxrootd.fnal.gov///store/data/Run2015D/SingleMuon/MINIAOD/05Oct2015-v1/10000/025A01CA-8B6F-E511-B7A5-0025905A6084.root'
 default['outfilename'] = None
 default['skip'] = '0'
 default['max'] = '100'
@@ -52,8 +50,7 @@ default['max'] = '100'
 default['sampletype'] = '9125'
 default['xs'] = '248'
 default['mcevents'] = '3500000'
-default['globaltag'] = '74X_mcRun2_asymptotic_v2'
-default['isData'] = 0
+default['globaltag'] = '74X_mcRun2_asymptotic_v4'
 
 
 # fill in default values if not set by gc
@@ -66,7 +63,6 @@ for key, value in values.iteritems():
             values[key] = env[key]
 
 print "The Global Tag is %s \n " % values['globaltag']
-#print "The isData flag is : " + values['isData']
 # convert strings
 values['filenames'] = values['filenames'].strip(',')
 values['filenames'] = map(lambda s: s.strip('" '), values['filenames'].split(","))
@@ -120,10 +116,6 @@ if values['xs'] is not None:
     process.tHqAnalyzer.xs=cms.double(float(values['xs']))
 if values['mcevents'] is not None:
     process.tHqAnalyzer.nMCEvents=cms.int32(int(values['mcevents']))      
-#if values['isData'] is not None:
-#    if values['isData']=='True':
-#        process.tHqAnalyzer.isData=cms.bool(True)
-#    print "IsData is %s " % process.tHqAnalyzer.isData
     
 #process.content = cms.EDAnalyzer("EventContentAnalyzer")
 #process.p = cms.Path(process.content*process.BoostedAnalyzer)
