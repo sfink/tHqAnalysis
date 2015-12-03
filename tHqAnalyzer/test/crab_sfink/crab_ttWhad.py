@@ -1,8 +1,8 @@
 from WMCore.Configuration import Configuration
 import os
 os.environ['GLOBALTAG'] = '74X_mcRun2_asymptotic_v4'
-os.environ['ISDATA'] = 0
-os.environ['USELHE'] = 1
+os.environ['ISDATA'] = "0"
+os.environ['USELHE'] = "1"
 
 config = Configuration()
 

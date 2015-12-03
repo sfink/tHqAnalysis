@@ -3,8 +3,8 @@ import os
 config = Configuration()
 
 os.environ['GLOBALTAG'] = '74X_mcRun2_asymptotic_v4'
-os.environ['ISDATA'] = 0
-os.environ['USELHE'] = 1
+os.environ['ISDATA'] = "0"
+os.environ['USELHE'] = "1"
 
 config.section_("General")
 config.General.requestName = 'ttHTobb_M125_13TeV_powheg_pythia8_glob'
