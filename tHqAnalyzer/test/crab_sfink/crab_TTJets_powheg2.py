@@ -3,6 +3,8 @@ import os
 os.environ['GLOBALTAG'] = '74X_mcRun2_asymptotic_v4'
 os.environ['ISDATA'] = "0"
 os.environ['USELHE'] = "1"
+os.environ['USEGENHADRONMATCH'] = "1"
+
 config = Configuration()
 
 config.section_("General")
@@ -15,7 +17,7 @@ config.JobType.psetName = '/afs/desy.de/user/f/fink/xxl/af-cms/13TeV/CMSSW_7_4_1
 config.JobType.outputFiles = ['tHqAnalyzed_Tree.root']
 
 config.section_("Data")
-config.Data.inputDataset = '/TT_TuneCUETP8M1_13TeV-powheg-pythia8/RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v4_ext3-v1/MINIAODSIM'
+config.Data.inputDataset = '/TT_TuneCUETP8M1_13TeV-powheg-pythia8/RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2_ext3-v1/MINIAODSIM'
 
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'

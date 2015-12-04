@@ -244,7 +244,7 @@ private:
 //
 // constructors and destructor
 //
-tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):pvWeight((tHqUtils::GetAnalyzerPath()+"/data/pvweights/MyDataPileupHistogram.root").c_str(),"pileup",(tHqUtils::GetAnalyzerPath()+"/data/pvweights/PUhistos.root").c_str(),"mc"){
+tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):pvWeight((tHqUtils::GetAnalyzerPath()+"/data/pvweights/data.root").c_str(),"data",(tHqUtils::GetAnalyzerPath()+"/data/pvweights/mc.root").c_str(),"mc"){
   std::string era = iConfig.getParameter<std::string>("era");
   string analysisType = iConfig.getParameter<std::string>("analysisType");
   analysisType::analysisType iAnalysisType = analysisType::LJ;

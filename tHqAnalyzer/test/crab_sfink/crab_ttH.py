@@ -16,7 +16,7 @@ config.JobType.psetName = '/afs/desy.de/user/f/fink/xxl/af-cms/13TeV/CMSSW_7_4_1
 config.JobType.outputFiles = ['tHqAnalyzed_Tree.root']
 
 config.section_("Data")
-config.Data.inputDataset = '/ttHTobb_M125_13TeV_powheg_pythia8/RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v4-v1/MINIAODSIM'
+config.Data.inputDataset = '/ttHTobb_M125_13TeV_powheg_pythia8/RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/MINIAODSIM'
 
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'

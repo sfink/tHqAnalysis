@@ -4,19 +4,26 @@ import os
 
  
 if os.getenv('USELHE')=='1':
-    print "lhe is 1"
+    print "useLHE is 1 -> Filling LHE weights"
     var_useLHE=True
 else: 
     var_useLHE=False
     print "USE LHE: %s (for LHE usage : \"export USELHE=1\")" % var_useLHE
 
 if os.getenv('ISDATA')=='1':
-    print "isData is 1"
+    print "isData is 1 -> Not using GenInfo"
     var_isData=True
 else: 
     var_isData=False
     print "isData: %s (for isData usage : \"export ISDATA=1\")" % var_isData
 
+
+if os.getenv('USEGENHARDONMATCH')=='1':
+    print "genHadronMatch is 1 -> Doing tt+x splitting + matching"
+    var_genHadronMatch=True
+else: 
+    var_genHadronMatch=False
+    print "genHadronMatch: %s (for useGenHadronMatch usage : \"export USEGENHADRONMATCH=1\")" % var_genHadronMatch
 
 tHqAnalyzer = cms.EDAnalyzer(
     'tHqAnalyzer',
@@ -35,7 +42,7 @@ tHqAnalyzer = cms.EDAnalyzer(
     outfileName = cms.string("tHqAnalyzed"),
     selectionNames = cms.vstring("LeptonSelection"),
     useLHE = cms.bool(var_useLHE),
-    useGenHadronMatch = cms.bool(False),
+    useGenHadronMatch = cms.bool(var_genHadronMatch),
 #    processorNames = cms.vstring("MVAVarProcessor","BaseVarProcessor")
     processorNames = cms.vstring("WeightProcessor","BaseVarProcessor","RecoVarProcessor","tHqGenVarProcessor","TopGenVarProcessor")
 #    processorNames = cms.vstring("WeightProcessor","TopGenVarProcessor","MVAVarProcessor","tHqJetVarProcessor","tHqTopHiggsVarProcessor","tHqTopVarProcessor","tHqHiggsVarProcessor")

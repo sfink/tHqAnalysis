@@ -26,6 +26,7 @@ HistoReweighter::HistoReweighter(const char* nom_filename, const char* nom_histo
 void HistoReweighter::CreateWeightHisto(TH1* nom_histo, TH1* denom_histo, bool normalize){
   nomHisto=(TH1*)nom_histo->Clone("nomHisto");
   denomHisto=(TH1*)denom_histo->Clone("denomHisto");
+  cout << "Bins of NomHisto: " << nomHisto->GetNbinsX() << "   Bins of DenomHisto: " << denomHisto->GetNbinsX() << endl;
   assert(denomHisto->GetNbinsX()==nomHisto->GetNbinsX());
   nbins=denomHisto->GetNbinsX();
   for(int i=1; i<=denomHisto->GetNbinsX(); i++){
