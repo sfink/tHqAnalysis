@@ -18,7 +18,7 @@ else:
     print "isData: %s (for isData usage : \"export ISDATA=1\")" % var_isData
 
 
-if os.getenv('USEGENHARDONMATCH')=='1':
+if os.getenv('USEGENHADRONMATCH')=='1':
     print "genHadronMatch is 1 -> Doing tt+x splitting + matching"
     var_genHadronMatch=True
 else: 
