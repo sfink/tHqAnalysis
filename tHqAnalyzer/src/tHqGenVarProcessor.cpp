@@ -162,9 +162,9 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
   double minDrB2 = 999;
   
   for(std::vector<math::XYZTLorentzVector>::iterator itJetVec = jetvecs.begin() ; itJetVec != jetvecs.end(); ++itJetVec){
-    assert(itJetVec->pt()>0);
-    assert(Hdau[0].pt()>0);
-    assert(Hdau[1].pt()>0);
+    if (itJetVec->pt()<0) continue;
+    if (Hdau[0].pt()<0) continue;
+    if (Hdau[1].pt()<0) continue;
     
     if(tHqUtils::DeltaR(*itJetVec,Hdau[0].p4())<minDrB1){
       idxhbb[0] = itJetVec-jetvecs.begin();
@@ -193,9 +193,9 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
   double minDrLQ = 999;
 
   for(std::vector<math::XYZTLorentzVector>::iterator itJetVec = jetvecs.begin() ; itJetVec != jetvecs.end(); ++itJetVec){
-    assert(itJetVec->pt()>0);
-    assert(sb.pt()>0);
-    assert(lq.pt()>0);
+    if (itJetVec->pt()>0) continue;
+    if (sb.pt()>0) continue;
+    if (lq.pt()>0) continue;
     if(tHqUtils::DeltaR(*itJetVec,sb.p4())<minDrSB){
       idxsb = itJetVec-jetvecs.begin();
       minDrSB = tHqUtils::DeltaR(*itJetVec,sb.p4());
