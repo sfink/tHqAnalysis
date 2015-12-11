@@ -426,8 +426,17 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   iEvent.getByToken( EDMElectronsToken,h_electrons );
   std::vector<pat::Electron> const &electrons = *h_electrons;
   std::vector<pat::Electron> rawElectrons = electrons;
-  std::vector<pat::Electron> selectedElectrons = helper.GetSelectedElectrons( electrons, 15., electronID::electronTight );
-  std::vector<pat::Electron> selectedElectronsLoose = helper.GetSelectedElectrons( electrons, 10., electronID::electronLoose );
+  std::vector<pat::Electron> selectedElectrons = helper.GetSelectedElectrons( electrons, 15., electronID::electronSpring15M );
+  std::vector<pat::Electron> selectedElectronsLoose = helper.GetSelectedElectrons( electrons, 10., electronID::electronSpring15M );
+
+
+  /**** GET MET ****/
+  edm::Handle< std::vector<pat::MET> > h_pfmet;
+  iEvent.getByToken( EDMMETsToken,h_pfmet );
+  std::vector<pat::MET> const &pfMETs = *h_pfmet;
+  // type I met corrections?
+  assert(pfMETs.size()>0);
+
 
   // Leptons
   /*
@@ -457,19 +466,33 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   std::vector<pat::Jet> idJets = helper.GetSelectedJets(pfjets, 0., 9999., jetID::jetLoose, '-' );
   // Get raw jets
   std::vector<pat::Jet> rawJets = helper.GetUncorrectedJets(idJets);
-  // Clean muons from jets
-  std::vector<pat::Jet> jetsNoMu = helper.RemoveOverlaps(selectedMuonsLoose, rawJets);
-  // Clean electrons from jets
-  std::vector<pat::Jet> jetsNoEle = helper.RemoveOverlaps(selectedElectronsLoose, jetsNoMu);
-  // Apply jet corrections
-  std::vector<pat::Jet> correctedJets = helper.GetCorrectedJets(jetsNoEle, iEvent, iSetup, sysType::NA);
+
+  // Clean muons and electrons from jets
+  std::vector<pat::Jet> cleanJets = helper.GetDeltaRCleanedJets(rawJets,selectedMuonsLoose,selectedElectronsLoose,0.4);
+  // Apply nominal jet corrections
+  std::vector<pat::Jet> correctedJets = helper.GetCorrectedJets(cleanJets, iEvent, iSetup, sysType::NA);
   // Get jet Collection which pass selection
-  std::vector<pat::Jet> selectedJets = helper.GetSelectedJets(correctedJets, 20., 4.7, jetID::jetLoose, '-' );
+  std::vector<pat::Jet> selectedJets = helper.GetSelectedJets(correctedJets, 20., 4.7, jetID::none, '-' );
+  // Sort jets
+  selectedJets = helper.GetSortedByPt(selectedJets);
+
   // Get jet Collection which pass loose selection
-  std::vector<pat::Jet> selectedJetsLoose = helper.GetSelectedJets(correctedJets, 15., 4.7, jetID::jetLoose, '-' );
+  std::vector<pat::Jet> selectedJetsLoose = helper.GetSelectedJets(correctedJets, 15. , 4.7, jetID::none, '-' );
+  // Sort jets
+  selectedJetsLoose = helper.GetSortedByPt(selectedJetsLoose);
 
-  std::vector<pat::Jet> selectedJets_uncorrected = helper.GetSelectedJets(jetsNoEle, 15., 4.7, jetID::jetLoose, '-');
+  // Get uncorrected Jets 
+  std::vector<pat::Jet> selectedJets_uncorrected = helper.GetSelectedJets(cleanJets, 20. , 4.7, jetID::none, '-' );
+  // Sort jets
+  selectedJets_uncorrected = helper.GetSortedByPt(selectedJets_uncorrected);
 
+
+  //Get selected jets for MET filters
+  std::vector<pat::Jet> idJetsForMET = helper.GetSelectedJets(pfjets, 0., 5.4, jetID::jetMETcorrection, '-' );
+  std::vector<pat::Jet> rawJetsForMET = helper.GetUncorrectedJets(idJetsForMET);
+  std::vector<pat::Jet> correctedJetsForMET_nominal = helper.GetCorrectedJets(rawJetsForMET, iEvent, iSetup, sysType::NA);
+  //correct MET 
+  std::vector<pat::MET> correctedMETs_nominal = helper.CorrectMET(idJetsForMET,correctedJetsForMET_nominal,pfMETs);
 
 
   // Get raw puppi jets
@@ -484,12 +507,6 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   // Get puppi jet Collection which pass selection
   std::vector<pat::Jet> selectedPuppiJets = helper.GetSelectedJets(correctedPuppiJets, 20., 4.7, jetID::jetLoose, '-' );
 
-  /**** GET MET ****/
-  edm::Handle< std::vector<pat::MET> > h_pfmet;
-  iEvent.getByToken( EDMMETsToken,h_pfmet );
-  std::vector<pat::MET> const &pfMETs = *h_pfmet;
-  // type I met corrections?
-  assert(pfMETs.size()>0);
 
   /**** GET TOPJETS ****/
   /* edm::Handle<boosted::HEPTopJetCollection> h_heptopjet;
