@@ -3,6 +3,7 @@ import os
 os.environ['GLOBALTAG'] = '74X_dataRun2_v5'
 os.environ['ISDATA'] = "1"
 os.environ['USELHE'] = "1"
+os.environ['RECORRECTMET'] = "1"
 
 config = Configuration()
 

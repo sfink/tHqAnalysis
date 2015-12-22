@@ -4,6 +4,7 @@ os.environ['GLOBALTAG'] = '74X_mcRun2_asymptotic_v4'
 os.environ['ISDATA'] = "0"
 os.environ['USELHE'] = "1"
 os.environ['USEGENHADRONMATCH'] = "1"
+os.environ['RECORRECTMET'] = "1"
 
 config = Configuration()
 
