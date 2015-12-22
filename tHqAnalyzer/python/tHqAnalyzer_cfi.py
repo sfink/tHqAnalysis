@@ -25,6 +25,14 @@ else:
     var_genHadronMatch=False
     print "genHadronMatch: %s (for useGenHadronMatch usage : \"export USEGENHADRONMATCH=1\")" % var_genHadronMatch
 
+if os.getenv('RECORRECTMET')=='1':
+    print "recorrectMET is 1 -> Recorrecting MiniAOD MET"
+    var_recorrectMET=True
+else: 
+    var_recorrectMET=False
+    print "Recorrect MET: %s (To activate use : \"export RECORRECTMET=1\")" % var_recorrectMET
+
+
 tHqAnalyzer = cms.EDAnalyzer(
     'tHqAnalyzer',
     LeptonSelectionNoTrigger,
@@ -43,6 +51,7 @@ tHqAnalyzer = cms.EDAnalyzer(
     selectionNames = cms.vstring("LeptonSelection"),
     useLHE = cms.bool(var_useLHE),
     useGenHadronMatch = cms.bool(var_genHadronMatch),
+    recorrectMET = cms.bool(var_recorrectMET),
 #    processorNames = cms.vstring("MVAVarProcessor","BaseVarProcessor")
     processorNames = cms.vstring("WeightProcessor","BaseVarProcessor","RecoVarProcessor","tHqGenVarProcessor","TopGenVarProcessor")
 #    processorNames = cms.vstring("WeightProcessor","TopGenVarProcessor","MVAVarProcessor","tHqJetVarProcessor","tHqTopHiggsVarProcessor","tHqTopVarProcessor","tHqHiggsVarProcessor")

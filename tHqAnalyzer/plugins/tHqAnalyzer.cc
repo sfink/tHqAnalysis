@@ -150,6 +150,9 @@ private:
       /** use GenBmatching info? this is only possible if the miniAOD contains them */
       bool useGenHadronMatch;
     
+     /** recorrect the jets and MET that were in MiniAOD? */
+      bool recorrectMET;
+
       /** jet systematic that is applied (the outher systematics are done at a different place with reweighting)*/
       sysType::sysType jsystype;
       
@@ -263,6 +266,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):pvWeight((tHqUtils::G
   isData = iConfig.getParameter<bool>("isData");
   useLHE = iConfig.getParameter<bool>("useLHE");
   useGenHadronMatch = iConfig.getParameter<bool>("useGenHadronMatch");
+  recorrectMET = iConfig.getParameter<bool>("recorrectMET");
 
   //  useFatJets = iConfig.getParameter<bool>("useFatJets");
 
@@ -497,20 +501,18 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   std::vector<pat::Jet> rawJetsForMET = helper.GetUncorrectedJets(idJetsForMET);
   std::vector<pat::Jet> correctedJetsForMET_nominal = helper.GetCorrectedJets(rawJetsForMET, iEvent, iSetup, sysType::NA);
   //correct MET 
-  std::vector<pat::MET> correctedMETs_nominal = helper.CorrectMET(idJetsForMET,correctedJetsForMET_nominal,pfMETs);
-
+  if(recorrectMET) std::vector<pat::MET> correctedMETs_nominal = helper.CorrectMET(idJetsForMET,correctedJetsForMET_nominal,pfMETs);
+  else std::vector<pat::MET> correctedMETs_nominal = pfMETs;
 
   // Get raw puppi jets
   std::vector<pat::Jet> rawPuppiJets = helper.GetUncorrectedJets(pfpuppijets);
-  // Clean muons from jets
-  std::vector<pat::Jet> puppiJetsNoMu = helper.RemoveOverlaps(selectedMuonsLoose, rawPuppiJets);
-  // Clean electrons from jets
-  std::vector<pat::Jet> puppiJetsNoEle = helper.RemoveOverlaps(selectedElectronsLoose, puppiJetsNoMu);
+  // DeltaR clean puppi jets
+  std::vector<pat::Jet> cleanedPuppiJets = helper.GetDeltaRCleanedJets(rawPuppiJets,selectedMuonsLoose, selectedElectronsLoose, 0.4);
   // Apply jet corrections 
-  std::vector<pat::Jet> correctedPuppiJets = helper.GetCorrectedJets(puppiJetsNoEle, iEvent, iSetup, sysType::NA);
+  std::vector<pat::Jet> correctedPuppiJets = helper.GetCorrectedJets(cleanedPuppiJets, iEvent, iSetup, sysType::NA);
 
   // Get puppi jet Collection which pass selection
-  std::vector<pat::Jet> selectedPuppiJets = helper.GetSelectedJets(correctedPuppiJets, 20., 4.7, jetID::jetLoose, '-' );
+  std::vector<pat::Jet> selectedPuppiJets = helper.GetSelectedJets(correctedPuppiJets, 20., 4.7, jetID::none, '-' );
 
 
   /**** GET TOPJETS ****/
@@ -737,7 +739,7 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			  rawPuppiJets,
 			  selectedPuppiJets,
                           selectedJetsLoose,
-                          pfMETs[0],
+                          correctedMETs_nominal[0],
 			  genTopEvt,
 			  gentHqEvt,
                           selectedGenJets,
