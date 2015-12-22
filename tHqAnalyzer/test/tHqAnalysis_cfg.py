@@ -33,12 +33,14 @@ env['xs'] = os.getenv('XS')
 env['mcevents'] = os.getenv('MCEVENTS')
 env['globaltag'] = os.getenv('GLOBALTAG')
 
+isData = os.getenv('ISDATA')
+
 # default variables
 default = {}
 default['nickname'] = 'Lalala'
 #default['filenames'] = 'root://cmsxrootd.fnal.gov///store/user/shwillia/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/BoostedTTH_MiniAOD/150227_111650/0000/BoostedTTH_MiniAOD_15.root'
 #default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/Phys14DR/TToLeptons_t-channel-CSA14_Tune4C_13TeV-aMCatNLO-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/1E2D2522-A46A-E411-9C55-002590D0AFDC.root'
-default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/RunIISpring15DR74/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v1/00000/00466730-F801-E511-9594-549F35AF450A.root'
+default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/RunIISpring15MiniAODv2/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v3/60000/00181849-176A-E511-8B11-848F69FD4C94.root'
 #default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/RunIISpring15DR74/ZZ_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v3/10000/0C479546-7209-E511-BA6A-3417EBE8862E.root'
 #default['filenames'] = 'root://cmsxrootd.fnal.gov///store/mc/RunIISpring15DR74/QCD_Pt-15to20_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v1/50000/5084EE68-9507-E511-A8ED-0025905C3D40.root'
 #default['filenames'] = 'file:/nfs/dust/cms/user/bmaier/CMSSW_7_4_6_patch6/src/tHqAnalysis/06249A8D-FE54-E511-825E-008CFA1111EC.root'
@@ -96,12 +98,17 @@ process.ak4PFCHSL1Fastjet = cms.ESProducer(
   )
 process.ak4PFchsL2Relative = ak4CaloL2Relative.clone( algorithm = 'AK4PFchs' )
 process.ak4PFchsL3Absolute = ak4CaloL3Absolute.clone( algorithm = 'AK4PFchs' )
+process.ak4PFchsResidual = ak4CaloResidual.clone( algorithm = 'AK4PFchs' )
+
 process.ak4PFchsL1L2L3 = cms.ESProducer("JetCorrectionESChain",
   correctors = cms.vstring(
     'ak4PFCHSL1Fastjet',
     'ak4PFchsL2Relative',
     'ak4PFchsL3Absolute')
 )
+if isData:
+  process.ak4PFchsL1L2L3.correctors.append('ak4PFchsResidual') # add residual JEC for data
+
 
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 process.load("tHqAnalysis.tHqProducer.genHadronMatching_cfi")
@@ -117,7 +124,12 @@ if values['xs'] is not None:
 if values['mcevents'] is not None:
     process.tHqAnalyzer.nMCEvents=cms.int32(int(values['mcevents']))      
     
-#process.content = cms.EDAnalyzer("EventContentAnalyzer")
-#process.p = cms.Path(process.content*process.BoostedAnalyzer)
 
-process.p = cms.Path(process.tHqAnalyzer)
+### electron MVA ####
+# Load the producer for MVA IDs
+process.load("RecoEgamma.ElectronIdentification.ElectronMVAValueMapProducer_cfi")
+## check the event content 
+process.content = cms.EDAnalyzer("EventContentAnalyzer")
+
+
+process.p = cms.Path(process.electronMVAValueMapProducer * process.tHqAnalyzer)

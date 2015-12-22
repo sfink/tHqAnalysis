@@ -181,7 +181,7 @@ private:
       edm::EDGetTokenT< std::vector<pat::Muon> > EDMMuonsToken;
       
       /** electrons data access token **/
-      edm::EDGetTokenT< std::vector<pat::Electron> > EDMElectronsToken;
+      edm::EDGetTokenT< edm::View<pat::Electron> > EDMElectronsToken;
       
       /** jets data access token **/
       edm::EDGetTokenT< std::vector<pat::Jet> > EDMJetsToken;
@@ -215,6 +215,12 @@ private:
       // custom genjets for tt+X categorization
       edm::EDGetTokenT< std::vector<reco::GenJet> > EDMCustomGenJetsToken;
         
+
+      // MVA values and categories
+      edm::EDGetTokenT<edm::ValueMap<float> > EDMeleMVAvaluesToken;
+      edm::EDGetTokenT<edm::ValueMap<int> >   EDMeleMVAcategoriesToken;
+
+
       /** tt+X categorization tokens **/
       edm::EDGetTokenT<std::vector<int> > genBHadJetIndexToken;
       edm::EDGetTokenT<std::vector<int> > genBHadFlavourToken;
@@ -273,15 +279,19 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):pvWeight((tHqUtils::G
   EDMBeamSpotToken        = consumes< reco::BeamSpot > (edm::InputTag("offlineBeamSpot","",""));
   EDMVertexToken          = consumes< reco::VertexCollection > (edm::InputTag("offlineSlimmedPrimaryVertices"));
   EDMMuonsToken           = consumes< std::vector<pat::Muon> >(edm::InputTag("slimmedMuons"));
-  EDMElectronsToken       = consumes< std::vector<pat::Electron> >(edm::InputTag("slimmedElectrons"));
+  EDMElectronsToken       = consumes< edm::View<pat::Electron> >(edm::InputTag("slimmedElectrons"));
   EDMJetsToken            = consumes< std::vector<pat::Jet> >(edm::InputTag("slimmedJets"));
   EDMPuppiJetsToken       = consumes< std::vector<pat::Jet> >(edm::InputTag("slimmedJetsPuppi"));
   EDMMETsToken            = consumes< std::vector<pat::MET> >(edm::InputTag("slimmedMETs"));
-  //EDMHEPTopJetsToken      = consumes< boosted::HEPTopJetCollection >(edm::InputTag("HEPTopJetsPFMatcher","heptopjets","p"));
-  // EDMSubFilterJetsToken   = consumes< boosted::SubFilterJetCollection >(edm::InputTag("CA12JetsCA3FilterjetsPFMatcher","subfilterjets","p"));
   EDMGenInfoToken         = consumes< GenEventInfoProduct >(edm::InputTag("generator"));
+
+  // electron MVA info
+  // TODO: these (and many of the names above) shouldn't be hard coded but set in python cfg
+  EDMeleMVAvaluesToken           = consumes<edm::ValueMap<float> >(edm::InputTag("electronMVAValueMapProducer","ElectronMVAEstimatorRun2Spring15NonTrig25nsV1Values",""));
+  EDMeleMVAcategoriesToken       = consumes<edm::ValueMap<int> >(edm::InputTag("electronMVAValueMapProducer","ElectronMVAEstimatorRun2Spring15NonTrig25nsV1Categories",""));
+
   if(useLHE){
-    EDMLHEEventToken        = consumes< LHEEventProduct >(edm::InputTag("source"));
+    EDMLHEEventToken      = consumes< LHEEventProduct >(edm::InputTag("source"));
     EDMLHEEventToken_alt  = consumes< LHEEventProduct >(edm::InputTag("externalLHEProducer"));
   }
   if(!isData){
@@ -421,33 +431,28 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   std::vector<pat::Muon> selectedMuons = helper.GetSelectedMuons( muons, 15., muonID::muonTight );
   std::vector<pat::Muon> selectedMuonsLoose = helper.GetSelectedMuons( muons, 10., muonID::muonLoose );
 
-  // ELECTRONS`
-  edm::Handle< std::vector<pat::Electron> > h_electrons;
+  // ELECTRONS
+
+  edm::Handle< edm::View<pat::Electron> > h_electrons;
   iEvent.getByToken( EDMElectronsToken,h_electrons );
-  std::vector<pat::Electron> const &electrons = *h_electrons;
+
+  // add electron mva info to electrons
+  edm::Handle<edm::ValueMap<float> > h_mvaValues; 
+  edm::Handle<edm::ValueMap<int> > h_mvaCategories;
+  iEvent.getByToken(EDMeleMVAvaluesToken,h_mvaValues);
+  iEvent.getByToken(EDMeleMVAcategoriesToken,h_mvaCategories);  
+  std::vector<pat::Electron> electrons = helper.GetElectronsWithMVAid(h_electrons,h_mvaValues,h_mvaCategories);
+
+  helper.AddElectronRelIso(electrons,coneSize::R03, corrType::rhoEA,effAreaType::spring15,"relIso");
   std::vector<pat::Electron> rawElectrons = electrons;
-  std::vector<pat::Electron> selectedElectrons = helper.GetSelectedElectrons( electrons, 15., electronID::electronSpring15M );
-  std::vector<pat::Electron> selectedElectronsLoose = helper.GetSelectedElectrons( electrons, 10., electronID::electronSpring15M );
+  std::vector<pat::Electron> selectedElectrons = helper.GetSelectedElectrons( electrons, 15., electronID::electronEndOf15MVA80iso0p15 );
+  std::vector<pat::Electron> selectedElectronsLoose = helper.GetSelectedElectrons( electrons, 10., electronID::electronEndOf15MVA80iso0p15 );
 
 
   /**** GET MET ****/
   edm::Handle< std::vector<pat::MET> > h_pfmet;
   iEvent.getByToken( EDMMETsToken,h_pfmet );
   std::vector<pat::MET> const &pfMETs = *h_pfmet;
-  // type I met corrections?
-  assert(pfMETs.size()>0);
-
-
-  // Leptons
-  /*
-  std::vector<pat::Pat>BNleptonCollection selectedLeptons_loose;
-  for(size_t i=0; i<selectedElectronsLoose.size();i++){
-    selectedLeptons_loose.push_back(&(selectedElectronsLoose[i]));
-  }
-  for(size_t i=0; i<selectedMuonsLoose.size();i++){
-    selectedLeptons_loose.push_back(&(selectedMuonsLoose[i]));
-  }    
-  */
 
   /**** GET JETS ****/
   edm::Handle< std::vector<pat::Jet> > h_pfjets;
