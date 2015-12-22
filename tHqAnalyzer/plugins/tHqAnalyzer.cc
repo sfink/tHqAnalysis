@@ -514,24 +514,6 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   // Get puppi jet Collection which pass selection
   std::vector<pat::Jet> selectedPuppiJets = helper.GetSelectedJets(correctedPuppiJets, 20., 4.7, jetID::none, '-' );
 
-
-  /**** GET TOPJETS ****/
-  /* edm::Handle<boosted::HEPTopJetCollection> h_heptopjet;
-  boosted::HEPTopJetCollection heptopjets;
-  if(useFatJets){
-    iEvent.getByToken( EDMHEPTopJetsToken,h_heptopjet);
-    boosted::HEPTopJetCollection const &heptopjets_unsorted = *h_heptopjet;
-    heptopjets = tHqUtils::GetSortedByPt(heptopjets_unsorted);
-    }*/
-  
-  /**** GET SUBFILTERJETS ****/
-  /*  edm::Handle<boosted::SubFilterJetCollection> h_subfilterjet;                   
-  boosted::SubFilterJetCollection subfilterjets;
-  if(useFatJets){
-    iEvent.getByToken( EDMSubFilterJetsToken,h_subfilterjet );
-    boosted::SubFilterJetCollection const &subfilterjets_unsorted = *h_subfilterjet;
-    subfilterjets = tHqUtils::GetSortedByPt(subfilterjets_unsorted);
-    }*/
   
   /**** GET GENEVENTINFO ****/
   edm::Handle<GenEventInfoProduct> h_geneventinfo;
@@ -572,19 +554,12 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   for(auto name=relevantTriggers.begin(); name!=relevantTriggers.end();name++){
     unsigned int TriggerID =  hlt_config.triggerIndex(*name);
     if( TriggerID >= triggerResults.size() ) { 
-      //      std::cerr <<"triggerID > trigger results.size: "<<TriggerID<<" > "<<triggerResults.size()<<std::endl; 
       triggerMap[*name]=false;
     }
     else{
       triggerMap[*name]=triggerResults.accept(TriggerID);
-      //      std::cout << "Jo: Trigger ID: " << TriggerID << "  Name: " << *name << endl;
     }
   }
-
-  //for(auto name=triggerResults.begin(); name!=triggerResults.end();name++){
-    //    unsigned int TriggerID =  hlt_config.triggerIndex(*name);
-  //   std::cout << "Jo: Name: " << *name << endl;
-  // }
 
   TriggerInfo triggerInfo(triggerMap);
 
@@ -676,6 +651,7 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     else if(ttid==43||ttid==44||ttid==45) sampleType = SampleType::ttcc;    
   }
   else if(((foundT&&!foundTbar)||(!foundT&&foundTbar))&&foundHiggs) sampleType = SampleType::thq;
+
   /**** GET LHEINFO ****/
   edm::Handle<LHEEventProduct> h_lheeventinfo;
   if(useLHE){
@@ -1275,7 +1251,13 @@ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventIn
   cout << "PU weight :" << weights["Weight_PU"] << endl;
   cout << "CSV weight :" << weights["Weight_CSV"] << endl;
   
-  
+  // set optional additional PU weights
+  for(std::vector<PUWeights::Weight>::const_iterator it = puWeights_.additionalWeightsBegin();
+      it != puWeights_.additionalWeightsEnd(); ++it) {
+    weights[it->name()] = it->value();
+    cout << "Additional PU weight :" << it->value() << endl;
+
+  }
   
   return weights;
 }
