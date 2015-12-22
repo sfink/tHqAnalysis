@@ -254,7 +254,7 @@ private:
 //
 // constructors and destructor
 //
-tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):pvWeight((tHqUtils::GetAnalyzerPath()+"/data/pvweights/data.root").c_str(),"data",(tHqUtils::GetAnalyzerPath()+"/data/pvweights/mc.root").c_str(),"mc"){
+tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelper("MiniAOD/MiniAODHelper/data/csv_rwt_fit_hf_2015_11_20.root","MiniAOD/MiniAODHelper/data/csv_rwt_fit_lf_2015_11_20.root",5)),pvWeight((tHqUtils::GetAnalyzerPath()+"/data/pvweights/data.root").c_str(),"data",(tHqUtils::GetAnalyzerPath()+"/data/pvweights/mc.root").c_str(),"mc"){
   std::string era = iConfig.getParameter<std::string>("era");
   string analysisType = iConfig.getParameter<std::string>("analysisType");
   analysisType::analysisType iAnalysisType = analysisType::LJ;
@@ -1174,7 +1174,6 @@ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventIn
   csvweight= csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,0, csvWgtHF, csvWgtLF, csvWgtCF);
 
   // compute PU weights, and set nominal weight
-  cout << "###" << eventInfo.numTruePV << "#####" << endl;
   puWeights_.compute(eventInfo);
   puweight = puWeights_.nominalWeight();
 
