@@ -2,7 +2,7 @@
 
 EventInfo::EventInfo(const edm::Event& iEvent, const edm::Handle<reco::BeamSpot>& beamSpot, const edm::Handle<HcalNoiseSummary>& hcalNoiseSummary, const edm::Handle< std::vector<PileupSummaryInfo> >& puSummaryInfo, bool firstVertexIsGood_, float rho_):firstVertexIsGood(firstVertexIsGood_),rho(rho_)
 {
-  
+
   evt         = iEvent.id().event();
   run         = iEvent.id().run();
   lumiBlock   = iEvent.luminosityBlock();
@@ -10,8 +10,7 @@ EventInfo::EventInfo(const edm::Event& iEvent, const edm::Handle<reco::BeamSpot>
   BSx = beamSpot->x0();
   BSy = beamSpot->y0();
   BSz = beamSpot->z0();
-  
- 
+
   if( hcalNoiseSummary.isValid() ){
     hcalnoiseLoose = hcalNoiseSummary->passLooseNoiseFilter();
     hcalnoiseTight = hcalNoiseSummary->passTightNoiseFilter();
@@ -24,7 +23,6 @@ EventInfo::EventInfo(const edm::Event& iEvent, const edm::Handle<reco::BeamSpot>
 
       sumNVtx  += float(PVI->getPU_NumInteractions());
       sumTrueNVtx += float(PVI->getTrueNumInteractions());
-
       if( BX==0 ){
 	numGenPV = PVI->getPU_NumInteractions();
 	numTruePV = PVI->getTrueNumInteractions();

@@ -51,6 +51,7 @@
 #include "tHqAnalysis/tHqAnalyzer/interface/TreeWriter.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/TriggerInfo.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/HistoReweighter.hpp"
+#include "tHqAnalysis/tHqAnalyzer/interface/PUWeights.hpp"
 
 #include "tHqAnalysis/tHqAnalyzer/interface/Selection.hpp"
 
@@ -85,7 +86,7 @@ private:
   virtual void endJob() override;
   virtual void beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup) override;
   
-  boosted::Event FillEvent(const edm::Event& iEvent, const edm::Handle<GenEventInfoProduct>& genEvtInfo, const edm::Handle<reco::BeamSpot>& beamSpot, const edm::Handle<HcalNoiseSummary>& hcalNoiseSummary, const edm::Handle< std::vector<PileupSummaryInfo> >& puSummaryInfo);
+
   map<string,float> GetWeights(const GenEventInfoProduct& genEventInfo, const EventInfo& eventInfo, const reco::VertexCollection& selectedPVs, const std::vector<pat::Jet>& selectedJets, const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon>& selectedMuons, const std::vector<reco::GenParticle>& genParticles, sysType::sysType systype=sysType::NA);//, edm::Run const& iRun);
   void GetSystWeights(const LHEEventProduct& LHEEvent, vector<string> &weight_syst_id, vector<float> &weight_syst, float &Weight_orig);
   std::vector<pat::Electron> ElectronSelection( std::vector<pat::Electron> selectedElectrons,  const reco::VertexCollection& selectedPVs);
@@ -103,7 +104,7 @@ private:
 
       /** Reweighter to match the PV distribution in data*/
       HistoReweighter pvWeight;
-
+      PUWeights puWeights_;
 
       /** writes flat trees for MVA analysis */
       TreeWriter treewriter;
@@ -275,7 +276,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):pvWeight((tHqUtils::G
   std::cout << "Outfile Name: " << outfileName << std::endl;
   
   // REGISTER DATA ACCESS
-  EDMPUInfoToken          = consumes< std::vector<PileupSummaryInfo> >(edm::InputTag("addPileupInfo","",""));
+  EDMPUInfoToken          = consumes< std::vector<PileupSummaryInfo> >(edm::InputTag("slimmedAddPileupInfo","",""));
   EDMRhoToken             = consumes <double> (edm::InputTag(std::string("fixedGridRhoFastjetAll")));
   EDMHcalNoiseToken       = consumes< HcalNoiseSummary >(edm::InputTag("hcalnoise","",""));
   EDMSelectedTriggerToken = consumes< pat::TriggerObjectStandAloneCollection > (edm::InputTag("selectedPatTrigger","",""));
@@ -325,6 +326,9 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):pvWeight((tHqUtils::G
   // INITIALIZE MINIAOD HELPER
   helper.SetUp(era, sampleID, iAnalysisType, isData);
   helper.SetJetCorrectorUncertainty(); 
+
+  // INITIALIZE PU WEIGHTS
+  puWeights_.init(iConfig);
 
   // INITIALIZE SELECTION & CUTFLOW
   cutflow.Init((outfileName+"_Cutflow.txt").c_str());
@@ -549,7 +553,7 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   
   // Fill Event Info Object
   EventInfo eventInfo(iEvent,h_beamspot,h_hcalnoisesummary,h_puinfosummary,firstVertexIsGood,*h_rho);
-  
+
   // Fill Trigger Info
   map<string,bool> triggerMap;
   for(auto name=relevantTriggers.begin(); name!=relevantTriggers.end();name++){
@@ -1125,80 +1129,6 @@ std::vector<pat::Jet> tHqAnalyzer::JetSelection( std::vector<pat::Jet> selectedJ
 
 
 
-boosted::Event tHqAnalyzer::FillEvent(const edm::Event& iEvent, const edm::Handle<GenEventInfoProduct>& genEvtInfo, const edm::Handle<reco::BeamSpot>& beamSpot, const edm::Handle<HcalNoiseSummary>& hcalNoiseSummary, const edm::Handle< std::vector<PileupSummaryInfo> >& puSummaryInfo){
- 
-  boosted::Event event = boosted::Event();
-  
-  event.evt         = iEvent.id().event();
-  event.run         = iEvent.id().run();
-  event.sample      = sampleID;
-  event.lumiBlock   = iEvent.luminosityBlock();
-  
-  
-  if(genEvtInfo.isValid()){
-    std::vector<double> genWeights = genEvtInfo->weights();
-    for(size_t i=0;i<genWeights.size();i++){
-      event.weight *= genWeights[i];
-    }
-
-    event.qScale = genEvtInfo->qScale();
-    event.alphaQCD = genEvtInfo->alphaQCD();
-    event.alphaQED = genEvtInfo->alphaQED();
-    event.pthat = ( genEvtInfo->hasBinningValues() ? (genEvtInfo->binningValues())[0] : 0.0);
-    event.scalePDF = genEvtInfo->pdf()->scalePDF;
-    event.x1 = genEvtInfo->pdf()->x.first;
-    event.x2 = genEvtInfo->pdf()->x.second;
-    event.xPDF1 = genEvtInfo->pdf()->xPDF.first;
-    event.xPDF2 = genEvtInfo->pdf()->xPDF.second;
-    event.id1 = genEvtInfo->pdf()->id.first;
-    event.id2 = genEvtInfo->pdf()->id.second;
-  }
-  
-  if(beamSpot.isValid()){
-    event.BSx = beamSpot->x0();
-    event.BSy = beamSpot->y0();
-    event.BSz = beamSpot->z0();
-  }
-  
- 
-  if( hcalNoiseSummary.isValid() ){
-    event.hcalnoiseLoose = hcalNoiseSummary->passLooseNoiseFilter();
-    event.hcalnoiseTight = hcalNoiseSummary->passTightNoiseFilter();
-  }
-  
-  if( puSummaryInfo.isValid() ){
-    for(std::vector<PileupSummaryInfo>::const_iterator PVI = puSummaryInfo->begin(); PVI != puSummaryInfo->end(); ++PVI) {
-
-      int BX = PVI->getBunchCrossing();
-
-      event.sumNVtx  += float(PVI->getPU_NumInteractions());
-      event.sumTrueNVtx += float(PVI->getTrueNumInteractions());
-
-      if( BX==0 ){
-	      event.numGenPV = PVI->getPU_NumInteractions();
-	      event.numTruePV = PVI->getTrueNumInteractions();
-      }
-
-      if(BX == -1) { 
-	      event.nm1 = PVI->getPU_NumInteractions();
-	      event.nm1_true = PVI->getTrueNumInteractions();
-      }
-      else if(BX == 0) { 
-	      event.n0 = PVI->getPU_NumInteractions();
-	      event.n0_true = PVI->getTrueNumInteractions();
-      }
-      else if(BX == 1) { 
-	      event.np1 = PVI->getPU_NumInteractions();
-	      event.np1_true = PVI->getTrueNumInteractions();
-      }
-    }
-  }
-
-
-  
-  return event;
-}
-
 map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventInfo,const EventInfo& eventInfo, const reco::VertexCollection& selectedPVs, const std::vector<pat::Jet>& selectedJets, const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon>& selectedMuons, const std::vector<reco::GenParticle>& genParticles, sysType::sysType systype){//, edm::Run const& iRun){
   
   map<string,float> weights;
@@ -1243,15 +1173,31 @@ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventIn
   // ADD CSV WEIGHTS HERE OR SEPARATLY?
   csvweight= csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,0, csvWgtHF, csvWgtLF, csvWgtCF);
 
+  // compute PU weights, and set nominal weight
+  cout << "###" << eventInfo.numTruePV << "#####" << endl;
+  puWeights_.compute(eventInfo);
+  puweight = puWeights_.nominalWeight();
+
   weight *= xsweight*csvweight*puweight*topptweight;
   weights["Weight"] = weight;
   weights["Weight_XS"] = xsweight;
   weights["Weight_CSV"] = csvweight;
   weights["Weight_TopPt"] = topptweight;
-  weights["Weight_PU"] = pvWeight.GetWeight(selectedPVs.size());
+  weights["Weight_PU"] = puweight;
+
+  weights["Weight_PV"] = pvWeight.GetWeight(selectedPVs.size());
   cout << "PU weight :" << weights["Weight_PU"] << endl;
+  cout << "PV weight :" << weights["Weight_PV"] << endl;
   cout << "CSV weight :" << weights["Weight_CSV"] << endl;
   
+  // set optional additional PU weights
+  for(std::vector<PUWeights::Weight>::const_iterator it = puWeights_.additionalWeightsBegin();
+      it != puWeights_.additionalWeightsEnd(); ++it) {
+    weights[it->name()] = it->value();
+    cout << "Additional PU weight :" <<  it->value() << endl;
+  }
+
+
   return weights;
 }
 

@@ -1,5 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 from tHqAnalysis.tHqAnalyzer.Selection_cff import *
+from tHqAnalysis.tHqAnalyzer.Weights_cff import *
+
 import os
 
  
@@ -44,15 +46,22 @@ tHqAnalyzer = cms.EDAnalyzer(
     sampleID = cms.int32(9125),
     xs = cms.double(248),
     nMCEvents = cms.int32(25000000),
+
+    # PU weights, defined in Weights_cff
+    nominalPUWeight = cms.PSet(NominalPUWeight),
+    additionalPUWeights = cms.VPSet(AdditionalPUWeights),
+
     isData = cms.bool(var_isData),
     useFatJets = cms.bool(False),
-    disableObjectSelections = cms.bool(False), # disables selection of some objects for synch exe
-    outfileName = cms.string("tHqAnalyzed"),
-    selectionNames = cms.vstring("LeptonSelection"),
     useLHE = cms.bool(var_useLHE),
     useGenHadronMatch = cms.bool(var_genHadronMatch),
     recorrectMET = cms.bool(var_recorrectMET),
-#    processorNames = cms.vstring("MVAVarProcessor","BaseVarProcessor")
+
+    disableObjectSelections = cms.bool(False), # disables selection of some objects for synch exe
+    outfileName = cms.string("tHqAnalyzed"),
+    selectionNames = cms.vstring("LeptonSelection"),
+
+
     processorNames = cms.vstring("WeightProcessor","BaseVarProcessor","RecoVarProcessor","tHqGenVarProcessor","TopGenVarProcessor")
 #    processorNames = cms.vstring("WeightProcessor","TopGenVarProcessor","MVAVarProcessor","tHqJetVarProcessor","tHqTopHiggsVarProcessor","tHqTopVarProcessor","tHqHiggsVarProcessor")
 )
