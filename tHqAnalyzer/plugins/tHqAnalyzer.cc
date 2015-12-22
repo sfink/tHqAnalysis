@@ -501,8 +501,9 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   std::vector<pat::Jet> rawJetsForMET = helper.GetUncorrectedJets(idJetsForMET);
   std::vector<pat::Jet> correctedJetsForMET_nominal = helper.GetCorrectedJets(rawJetsForMET, iEvent, iSetup, sysType::NA);
   //correct MET 
-  if(recorrectMET) std::vector<pat::MET> correctedMETs_nominal = helper.CorrectMET(idJetsForMET,correctedJetsForMET_nominal,pfMETs);
-  else std::vector<pat::MET> correctedMETs_nominal = pfMETs;
+  std::vector<pat::MET> correctedMETs_nominal;
+  if(recorrectMET) correctedMETs_nominal = helper.CorrectMET(idJetsForMET,correctedJetsForMET_nominal,pfMETs);
+  else correctedMETs_nominal = pfMETs;
 
   // Get raw puppi jets
   std::vector<pat::Jet> rawPuppiJets = helper.GetUncorrectedJets(pfpuppijets);
@@ -1250,14 +1251,6 @@ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventIn
   weights["Weight_PU"] = pvWeight.GetWeight(selectedPVs.size());
   cout << "PU weight :" << weights["Weight_PU"] << endl;
   cout << "CSV weight :" << weights["Weight_CSV"] << endl;
-  
-  // set optional additional PU weights
-  for(std::vector<PUWeights::Weight>::const_iterator it = puWeights_.additionalWeightsBegin();
-      it != puWeights_.additionalWeightsEnd(); ++it) {
-    weights[it->name()] = it->value();
-    cout << "Additional PU weight :" << it->value() << endl;
-
-  }
   
   return weights;
 }
