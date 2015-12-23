@@ -1,13 +1,15 @@
 from WMCore.Configuration import Configuration
 import os
-os.environ['GLOBALTAG'] = '74X_mcRun2_asymptotic_v4'
-os.environ['ISDATA'] = "0"
-os.environ['USELHE'] = "0"
-
 config = Configuration()
 
+os.environ['GLOBALTAG'] = '74X_mcRun2_asymptotic_v4'
+os.environ['ISDATA'] = "0"
+os.environ['USELHE'] = "1"
+os.environ['USEGENHADRONMATCH'] = "0"
+os.environ['RECORRECTMET'] = "1"
+
 config.section_("General")
-config.General.requestName = 'QCD_Pt_30to80_bcToE_TuneCUETP8M1_13TeV_pythia8'
+config.General.requestName = 'THW_Hincl_13TeV-madgraph-pythia8_TuneCUETP8M1'
 config.General.workArea = 'crab_projects'
 
 config.section_("JobType")
@@ -16,8 +18,8 @@ config.JobType.psetName = '/afs/desy.de/user/f/fink/xxl/af-cms/13TeV/CMSSW_7_4_1
 config.JobType.outputFiles = ['tHqAnalyzed_Tree.root']
 
 config.section_("Data")
-config.Data.inputDataset = '/QCD_Pt_30to80_bcToE_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM'
-                            
+config.Data.inputDataset = '/THW_Hincl_13TeV-madgraph-pythia8_TuneCUETP8M1/RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v2/MINIAODSIM'
+
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 5

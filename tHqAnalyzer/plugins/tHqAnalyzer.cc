@@ -656,17 +656,18 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     else if(ttid==43||ttid==44||ttid==45) sampleType = SampleType::ttcc;    
   }
   else if(((foundT&&!foundTbar)||(!foundT&&foundTbar))&&foundHiggs) sampleType = SampleType::thq;
+  else if(((foundT&&!foundTbar)||(!foundT&&foundTbar))&&!foundHiggs) sampleType = SampleType::st;
 
   /**** GET LHEINFO ****/
   edm::Handle<LHEEventProduct> h_lheeventinfo;
   if(useLHE){
-    if(!isData&&(sampleType==SampleType::thq)) iEvent.getByToken( EDMLHEEventToken, h_lheeventinfo );
+    if(!isData&&(sampleType==SampleType::thq||sampleType==SampleType::st)) iEvent.getByToken( EDMLHEEventToken, h_lheeventinfo );
     else iEvent.getByToken( EDMLHEEventToken_alt, h_lheeventinfo);
   }
   
   /*** KICK OUT WRONG PROCESSORS ***/
   if(sampleType!=SampleType::thq) treewriter.RemoveTreeProcessor("tHqGenVarProcessor"); 
-  if(sampleType==SampleType::thq || sampleType == SampleType::nonttbkg || sampleType==SampleType::data) treewriter.RemoveTreeProcessor("TopGenVarProcessor");
+    if(sampleType==SampleType::thq || sampleType == SampleType::nonttbkg || sampleType==SampleType::data || sampleType==SampleType::st) treewriter.RemoveTreeProcessor("TopGenVarProcessor");
   if(!isData&&foundT&&foundTbar) {
     // fill genTopEvt with tt(H) information
     genTopEvt.Fill(*h_genParticles,ttid_full);

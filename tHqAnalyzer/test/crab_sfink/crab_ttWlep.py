@@ -29,3 +29,4 @@ config.General.transferOutputs = True
 
 config.section_("Site")
 config.Site.storageSite = 'T2_DE_DESY'
+os.environ['RECORRECTMET'] = "1"

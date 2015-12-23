@@ -32,3 +32,4 @@ config.General.transferOutputs = True
 config.section_("Site")
 config.Site.storageSite = 'T2_DE_DESY'
 config.Site.blacklist = ['T2_US_Florida']
+os.environ['RECORRECTMET'] = "1"

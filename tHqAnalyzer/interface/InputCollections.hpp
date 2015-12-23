@@ -21,7 +21,7 @@
 #include "MiniAOD/MiniAODHelper/interface/MiniAODHelper.h"
 
 
-enum SampleType{data,tth,ttl,ttbb,ttb,tt2b,ttcc,ttc,nonttbkg,thq};
+enum SampleType{data,tth,ttl,ttbb,ttb,tt2b,ttcc,ttc,nonttbkg,thq,st};
 namespace HiggsDecay{enum HiggsDecay{NA,bb,nonbb};};
 
 struct InputCollections{

@@ -6,6 +6,7 @@ os.environ['GLOBALTAG'] = '74X_mcRun2_asymptotic_v4'
 os.environ['ISDATA'] = "0"
 os.environ['USELHE'] = "1"
 os.environ['USEGENHADRONMATCH'] = "0"
+os.environ['RECORRECTMET'] = "1"
 
 config.section_("General")
 config.General.requestName = 'THQ_Hincl_13TeV-madgraph-pythia8_TuneCUETP8M1'
@@ -31,3 +32,4 @@ config.General.transferOutputs = True
 
 config.section_("Site")
 config.Site.storageSite = 'T2_DE_DESY'
+os.environ['RECORRECTMET'] = "1"
