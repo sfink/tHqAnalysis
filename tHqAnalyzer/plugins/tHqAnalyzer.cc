@@ -453,8 +453,8 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   helper.AddElectronRelIso(electrons,coneSize::R03, corrType::rhoEA,effAreaType::spring15,"relIso");
   std::vector<pat::Electron> rawElectrons = electrons;
-  std::vector<pat::Electron> selectedElectrons = helper.GetSelectedElectrons( electrons, 15., electronID::electronEndOf15MVA80iso0p15 );
-  std::vector<pat::Electron> selectedElectronsLoose = helper.GetSelectedElectrons( electrons, 10., electronID::electronEndOf15MVA80iso0p15 );
+  std::vector<pat::Electron> selectedElectrons = helper.GetSelectedElectrons( electrons, 15., electronID::electronEndOf15NonTrigMVA80iso0p15 );
+  std::vector<pat::Electron> selectedElectronsLoose = helper.GetSelectedElectrons( electrons, 10., electronID::electronEndOf15NonTrigMVA80iso0p15 );
 
 
   /**** GET MET ****/
