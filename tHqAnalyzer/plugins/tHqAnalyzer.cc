@@ -254,7 +254,7 @@ private:
 //
 // constructors and destructor
 //
-tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelper("MiniAOD/MiniAODHelper/data/csv_rwt_fit_hf_2015_11_20.root","MiniAOD/MiniAODHelper/data/csv_rwt_fit_lf_2015_11_20.root",5)),pvWeight((tHqUtils::GetAnalyzerPath()+"/data/pvweights/data.root").c_str(),"data",(tHqUtils::GetAnalyzerPath()+"/data/pvweights/mc.root").c_str(),"mc"){
+tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelper("../../MiniAOD/MiniAODHelper/data/csv_rwt_fit_hf_2015_11_20.root","../../MiniAOD/MiniAODHelper/data/csv_rwt_fit_lf_2015_11_20.root",5)),pvWeight((tHqUtils::GetAnalyzerPath()+"/data/pvweights/data.root").c_str(),"data",(tHqUtils::GetAnalyzerPath()+"/data/pvweights/mc.root").c_str(),"mc"){
   std::string era = iConfig.getParameter<std::string>("era");
   string analysisType = iConfig.getParameter<std::string>("analysisType");
   analysisType::analysisType iAnalysisType = analysisType::LJ;
@@ -820,7 +820,7 @@ std::vector<pat::Electron> tHqAnalyzer::ElectronSelection( std::vector<pat::Elec
       bool passessID=false;
       
       const float minPt=5;
-      const float maxEta=2.4;
+      const float maxEta=2.5;
       
       
       //check if barrel or endcap supercluster                                                                                                             
