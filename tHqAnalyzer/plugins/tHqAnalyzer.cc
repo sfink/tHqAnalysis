@@ -73,11 +73,11 @@
 //
 
 class tHqAnalyzer : public edm::EDAnalyzer {
-   public:
-      explicit tHqAnalyzer(const edm::ParameterSet&);
-      ~tHqAnalyzer();
+public:
+  explicit tHqAnalyzer(const edm::ParameterSet&);
+  ~tHqAnalyzer();
 
-      static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
+  static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
 
 private:
@@ -95,152 +95,172 @@ private:
       
       
       
-      // ----------member data ---------------------------
-      
-      /** the beanhelper is used for selections and reweighting */
-      MiniAODHelper helper;
-      
-      CSVHelper csvReweighter;
-
-      /** Reweighter to match the PV distribution in data*/
-      HistoReweighter pvWeight;
-      PUWeights puWeights_;
-
-      /** writes flat trees for MVA analysis */
-      TreeWriter treewriter;
-      
-      /** stores cutflow*/
-      Cutflow cutflow;
+  // ----------member data ---------------------------
   
-      /** selections that are applied */
-      vector<Selection*> selections;
+  /** the beanhelper is used for selections and reweighting */
+  MiniAODHelper helper;
+  
+  CSVHelper csvReweighter;
+  
+  /** Reweighter to match the PV distribution in data*/
+  HistoReweighter pvWeight;
+  PUWeights puWeights_;
+  
+  /** writes flat trees for MVA analysis */
+  TreeWriter treewriter_nominal;
+  
+  
+  /** Declare TreeWriters for JES and JER systematics */
+  TreeWriter treewriter_jesup;
+  TreeWriter treewriter_jesdown;
+  TreeWriter treewriter_jerup;
+  TreeWriter treewriter_jerdown;
+  
+  /** store output file names */
+
+  
+  std::string outfileNameNominal;
+  std::string outfileNameJESup;
+  std::string outfileNameJESdown;
+  std::string outfileNameJERup;
+  std::string outfileNameJERdown;
+
+  /** stores cutflow*/
+  Cutflow cutflow;
+  
+  
+  /** selections that are applied */
+  vector<Selection*> selections;
       
-      /** sample ID */
-      int sampleID;
+  /** sample ID */
+  int sampleID;
       
-      /** stops the time needed */
-      TStopwatch watch;
+  /** stops the time needed */
+  TStopwatch watch;
       
-      /** events to be analyzed */
-      int maxEvents;
+  /** events to be analyzed */
+  int maxEvents;
       
-      /** data luminosity */
-      float luminosity;
+  /** data luminosity */
+  float luminosity;
       
-      /** sample cross section*/
-      float xs;
+  /** sample cross section*/
+  float xs;
       
-      /** total number of events in input file(s) */
-      int totalMCevents;
+  /** total number of events in input file(s) */
+  int totalMCevents;
      
-      /** Event counter */
-      int eventcount;
+  /** Event counter */
+  int eventcount;
       
-       /** is analyzed sample data? */
-      bool isData;
+  /** is analyzed sample data? */
+  bool isData;
 
-       /** is LHE info available */
-      bool useLHE;
+  /** is LHE info available */
+  bool useLHE;
 
-       /** triggers that are checked */
-       vector<std::string> relevantTriggers;
+  /** triggers that are checked */
+  vector<std::string> relevantTriggers;
 
-      /** calculate and store systematic weights? */
-      bool doSystematics;
+  /** calculate and store systematic weights? */
+  bool doSystematics;
+
+  /** calculate JER systematics **/
+  bool doJERsystematic;
   
-      /** use GenBmatching info? this is only possible if the miniAOD contains them */
-      bool useGenHadronMatch;
+  /** use GenBmatching info? this is only possible if the miniAOD contains them */
+  bool useGenHadronMatch;
     
-     /** recorrect the jets and MET that were in MiniAOD? */
-      bool recorrectMET;
+  /** recorrect the jets and MET that were in MiniAOD? */
+  bool recorrectMET;
 
-      /** jet systematic that is applied (the outher systematics are done at a different place with reweighting)*/
-      sysType::sysType jsystype;
+  /** jet systematic that is applied (the outher systematics are done at a different place with reweighting)*/
+  sysType::sysType jsystype;
       
       
-      /** pu summary data access token **/
-      edm::EDGetTokenT< std::vector<PileupSummaryInfo> > EDMPUInfoToken;
+  /** pu summary data access token **/
+  edm::EDGetTokenT< std::vector<PileupSummaryInfo> > EDMPUInfoToken;
       
-      /** pileup density data access token **/
-      edm::EDGetTokenT <double> EDMRhoToken;
-
-
-      /** hcal noise data access token **/
-      edm::EDGetTokenT< HcalNoiseSummary > EDMHcalNoiseToken;
-      
-      /** selected trigger data access token **/
-      edm::EDGetTokenT< pat::TriggerObjectStandAloneCollection > EDMSelectedTriggerToken;
-      
-      /** trigger results data access token **/
-      edm::EDGetTokenT< edm::TriggerResults > EDMTriggerResultToken;
-      HLTConfigProvider hlt_config;
-
-      /** beam spot data access token **/
-      edm::EDGetTokenT< reco::BeamSpot > EDMBeamSpotToken;
-      
-      /** vertex data access token **/
-      edm::EDGetTokenT< reco::VertexCollection > EDMVertexToken;
-      
-      /** muons data access token **/
-      edm::EDGetTokenT< std::vector<pat::Muon> > EDMMuonsToken;
-      
-      /** electrons data access token **/
-      edm::EDGetTokenT< edm::View<pat::Electron> > EDMElectronsToken;
-      
-      /** jets data access token **/
-      edm::EDGetTokenT< std::vector<pat::Jet> > EDMJetsToken;
-
-      /** puppi jets data access token **/
-      edm::EDGetTokenT< std::vector<pat::Jet> > EDMPuppiJetsToken;
+  /** pileup density data access token **/
+  edm::EDGetTokenT <double> EDMRhoToken;
 
 
-      /** mets data access token **/
-      edm::EDGetTokenT< std::vector<pat::MET> > EDMMETsToken;
+  /** hcal noise data access token **/
+  edm::EDGetTokenT< HcalNoiseSummary > EDMHcalNoiseToken;
       
-      /** hep top jets data access token **/
+  /** selected trigger data access token **/
+  edm::EDGetTokenT< pat::TriggerObjectStandAloneCollection > EDMSelectedTriggerToken;
+      
+  /** trigger results data access token **/
+  edm::EDGetTokenT< edm::TriggerResults > EDMTriggerResultToken;
+  HLTConfigProvider hlt_config;
+
+  /** beam spot data access token **/
+  edm::EDGetTokenT< reco::BeamSpot > EDMBeamSpotToken;
+      
+  /** vertex data access token **/
+  edm::EDGetTokenT< reco::VertexCollection > EDMVertexToken;
+      
+  /** muons data access token **/
+  edm::EDGetTokenT< std::vector<pat::Muon> > EDMMuonsToken;
+      
+  /** electrons data access token **/
+  edm::EDGetTokenT< edm::View<pat::Electron> > EDMElectronsToken;
+      
+  /** jets data access token **/
+  edm::EDGetTokenT< std::vector<pat::Jet> > EDMJetsToken;
+
+  /** puppi jets data access token **/
+  edm::EDGetTokenT< std::vector<pat::Jet> > EDMPuppiJetsToken;
+
+
+  /** mets data access token **/
+  edm::EDGetTokenT< std::vector<pat::MET> > EDMMETsToken;
+      
+  /** hep top jets data access token **/
   //      edm::EDGetTokenT< boosted::HEPTopJetCollection > EDMHEPTopJetsToken;
       
-      /** subjet filterjets data access token **/
+  /** subjet filterjets data access token **/
   //      edm::EDGetTokenT< boosted::SubFilterJetCollection > EDMSubFilterJetsToken;
       
-      /** gen info data access token **/
-      edm::EDGetTokenT< GenEventInfoProduct > EDMGenInfoToken;
+  /** gen info data access token **/
+  edm::EDGetTokenT< GenEventInfoProduct > EDMGenInfoToken;
 
-      /** gen info data access token **/
-      edm::EDGetTokenT< LHEEventProduct > EDMLHEEventToken;
-      edm::EDGetTokenT< LHEEventProduct >   EDMLHEEventToken_alt;      
+  /** gen info data access token **/
+  edm::EDGetTokenT< LHEEventProduct > EDMLHEEventToken;
+  edm::EDGetTokenT< LHEEventProduct >   EDMLHEEventToken_alt;      
 
-      /** gen particles data access token **/
-      edm::EDGetTokenT< std::vector<reco::GenParticle> > EDMGenParticlesToken;
+  /** gen particles data access token **/
+  edm::EDGetTokenT< std::vector<reco::GenParticle> > EDMGenParticlesToken;
       
-      /** gen jets data access token **/
-      edm::EDGetTokenT< std::vector<reco::GenJet> > EDMGenJetsToken;
+  /** gen jets data access token **/
+  edm::EDGetTokenT< std::vector<reco::GenJet> > EDMGenJetsToken;
    
-      // custom genjets for tt+X categorization
-      edm::EDGetTokenT< std::vector<reco::GenJet> > EDMCustomGenJetsToken;
+  // custom genjets for tt+X categorization
+  edm::EDGetTokenT< std::vector<reco::GenJet> > EDMCustomGenJetsToken;
         
 
-      // MVA values and categories
-      edm::EDGetTokenT<edm::ValueMap<float> > EDMeleMVAvaluesToken;
-      edm::EDGetTokenT<edm::ValueMap<int> >   EDMeleMVAcategoriesToken;
+  // MVA values and categories
+  edm::EDGetTokenT<edm::ValueMap<float> > EDMeleMVAvaluesToken;
+  edm::EDGetTokenT<edm::ValueMap<int> >   EDMeleMVAcategoriesToken;
 
 
-      /** tt+X categorization tokens **/
-      edm::EDGetTokenT<std::vector<int> > genBHadJetIndexToken;
-      edm::EDGetTokenT<std::vector<int> > genBHadFlavourToken;
-      edm::EDGetTokenT<std::vector<int> > genBHadFromTopWeakDecayToken;
-      edm::EDGetTokenT<std::vector<reco::GenParticle> > genBHadPlusMothersToken;
-      edm::EDGetTokenT<std::vector<std::vector< int > > > genBHadPlusMothersIndicesToken;
-      edm::EDGetTokenT<std::vector<int> > genBHadIndexToken;
-      edm::EDGetTokenT<std::vector<int> > genBHadLeptonHadronIndexToken;
-      edm::EDGetTokenT<std::vector<int> > genBHadLeptonViaTauToken;
-      edm::EDGetTokenT<std::vector<int> > genCHadJetIndexToken;
-      edm::EDGetTokenT<std::vector<int> > genCHadFlavourToken;
-      edm::EDGetTokenT<std::vector<int> > genCHadFromTopWeakDecayToken;
-      edm::EDGetTokenT<std::vector<int> > genCHadBHadronIdToken;
-      edm::EDGetTokenT<std::vector<int> > genCHadIndexToken;
-      edm::EDGetTokenT<std::vector<reco::GenParticle> > genCHadPlusMothersToken;
-      edm::EDGetTokenT<int> genTtbarIdToken;
+  /** tt+X categorization tokens **/
+  edm::EDGetTokenT<std::vector<int> > genBHadJetIndexToken;
+  edm::EDGetTokenT<std::vector<int> > genBHadFlavourToken;
+  edm::EDGetTokenT<std::vector<int> > genBHadFromTopWeakDecayToken;
+  edm::EDGetTokenT<std::vector<reco::GenParticle> > genBHadPlusMothersToken;
+  edm::EDGetTokenT<std::vector<std::vector< int > > > genBHadPlusMothersIndicesToken;
+  edm::EDGetTokenT<std::vector<int> > genBHadIndexToken;
+  edm::EDGetTokenT<std::vector<int> > genBHadLeptonHadronIndexToken;
+  edm::EDGetTokenT<std::vector<int> > genBHadLeptonViaTauToken;
+  edm::EDGetTokenT<std::vector<int> > genCHadJetIndexToken;
+  edm::EDGetTokenT<std::vector<int> > genCHadFlavourToken;
+  edm::EDGetTokenT<std::vector<int> > genCHadFromTopWeakDecayToken;
+  edm::EDGetTokenT<std::vector<int> > genCHadBHadronIdToken;
+  edm::EDGetTokenT<std::vector<int> > genCHadIndexToken;
+  edm::EDGetTokenT<std::vector<reco::GenParticle> > genCHadPlusMothersToken;
+  edm::EDGetTokenT<int> genTtbarIdToken;
 };
 
 //
@@ -270,10 +290,29 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelp
   recorrectMET = iConfig.getParameter<bool>("recorrectMET");
 
   //  useFatJets = iConfig.getParameter<bool>("useFatJets");
-
-  string outfileName = iConfig.getParameter<std::string>("outfileName");
   
-  std::cout << "Outfile Name: " << outfileName << std::endl;
+  outfileName_nominal = iConfig.getParameter<std::string>("outfileName");
+  outfileNameJESup=outfileName_nominal;
+  outfileNameJESdown=outfileName_nominal;
+  outfileNameJERup=outfileName_nominal;
+  outfileNameJERdown=outfileName_nominal;
+  
+  size_t stringIndex = outfileName.find("nominal");
+  if(stringIndex!=std::string::npos){
+    outfileNameJESup.replace(stringIndex,7,"JESUP");
+    outfileNameJESdown.replace(stringIndex,7,"JESDOWN");
+    outfileNameJERup.replace(stringIndex,7,"JERUP");
+    outfileNameJERdown.replace(stringIndex,7,"JERDOWN");
+  }
+  else{
+    outfileNameNominal=outfileName+"_nominal";
+    outfileNameJESup=outfileName+"_JESUP";
+    outfileNameJESdown=outfileName+"_JESDOWN";
+    outfileNameJERup=outfileName+"_JERUP";
+    outfileNameJERdown=outfileName+"_JERDOWN";
+  }
+  
+  std::cout << "Outfile Name: " << outfileName_nominal << std::endl;
   
   // REGISTER DATA ACCESS
   EDMPUInfoToken          = consumes< std::vector<PileupSummaryInfo> >(edm::InputTag("slimmedAddPileupInfo","",""));
@@ -331,7 +370,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelp
   puWeights_.init(iConfig);
 
   // INITIALIZE SELECTION & CUTFLOW
-  cutflow.Init((outfileName+"_Cutflow.txt").c_str());
+  cutflow.Init((outfileName_nominal+"_Cutflow.txt").c_str());
   cutflow.AddStep("all");
   
   std::vector<std::string> selectionNames = iConfig.getParameter< std::vector<std::string> >("selectionNames");
@@ -339,20 +378,48 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelp
   relevantTriggers = iConfig.getParameter< std::vector<std::string> >("relevantTriggers");
 
   // INITIALIZE TREEWRITER
-  treewriter.Init(outfileName);
+  treewriter_nominal.Init(outfileName_nominal);
+  // in case of systematics
+  if(doSystematics){
+    // this is are the usual tree names
+    treewriter_jesup.Init(outfileNameJESup);
+    treewriter_jesdown.Init(outfileNameJESdown);
+    if(doJERsystematic){
+      treewriter_jerup.Init(outfileNameJERup);
+      treewriter_jerdown.Init(outfileNameJERdown);
+    }
+  }
+
   std::vector<std::string> processorNames = iConfig.getParameter< std::vector<std::string> >("processorNames");
   for(vector<string>::const_iterator itPro = processorNames.begin();itPro != processorNames.end();++itPro) {
     //    cout << "This is Processor " << *itPro << endl;
-    treewriter.FillProcessorName(*itPro);
-    if(*itPro == "WeightProcessor") treewriter.AddTreeProcessor(new WeightProcessor());    
-    else if(*itPro == "BaseVarProcessor") treewriter.AddTreeProcessor(new BaseVarProcessor());
-    else if(*itPro == "RecoVarProcessor") treewriter.AddTreeProcessor(new RecoVarProcessor());
-    else if(*itPro == "MVAVarProcessor") treewriter.AddTreeProcessor(new MVAVarProcessor());
-    else if(*itPro == "TopGenVarProcessor") treewriter.AddTreeProcessor(new TopGenVarProcessor());
-    else if(*itPro == "tHqGenVarProcessor") treewriter.AddTreeProcessor(new tHqGenVarProcessor());
+    treewriter_nominal.FillProcessorName(*itPro);
+    if(*itPro == "WeightProcessor") treewriter_nominal.AddTreeProcessor(new WeightProcessor());    
+    else if(*itPro == "BaseVarProcessor") treewriter_nominal.AddTreeProcessor(new BaseVarProcessor());
+    else if(*itPro == "RecoVarProcessor") treewriter_nominal.AddTreeProcessor(new RecoVarProcessor());
+    else if(*itPro == "MVAVarProcessor") treewriter_nominal.AddTreeProcessor(new MVAVarProcessor());
+    else if(*itPro == "TopGenVarProcessor") treewriter_nominal.AddTreeProcessor(new TopGenVarProcessor());
+    else if(*itPro == "tHqGenVarProcessor") treewriter_nominal.AddTreeProcessor(new tHqGenVarProcessor());
     else cout << "No matching processor found for: " << *itPro << endl;    
     } 
-  treewriter.FillProcessorMap();
+  treewriter_nominal.FillProcessorMap();
+
+  // the systematics tree writers use the same processors that are used for the nominal trees
+  // it might improve the performance to turn some of them off
+  if(doSystematics){
+    std::vector<TreeProcessor*> tps = treewriter_nominal.GetTreeProcessors();
+    std::vector<string> tpsn = treewriter_nominal.GetTreeProcessorNames();
+    for(uint i=0; i<tps.size();i++){
+      treewriter_jesup.AddTreeProcessor(tps[i],tpsn[i]);
+      treewriter_jesdown.AddTreeProcessor(tps[i],tpsn[i]);
+      if(doJERsystematic){
+	treewriter_jerup.AddTreeProcessor(tps[i],tpsn[i]);
+	treewriter_jerdown.AddTreeProcessor(tps[i],tpsn[i]);
+      }
+    }
+  }
+
+
 }
 
 
@@ -666,8 +733,20 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   }
   
   /*** KICK OUT WRONG PROCESSORS ***/
-  if(sampleType!=SampleType::thq) treewriter.RemoveTreeProcessor("tHqGenVarProcessor"); 
-    if(sampleType==SampleType::thq || sampleType == SampleType::nonttbkg || sampleType==SampleType::data || sampleType==SampleType::st) treewriter.RemoveTreeProcessor("TopGenVarProcessor");
+  if(sampleType!=SampleType::thq) {
+    treewriter_nominal.RemoveTreeProcessor("tHqGenVarProcessor"); 
+    treewriter_jesup.RemoveTreeProcessor("tHqGenVarProcessor"); 
+    treewriter_jesdown.RemoveTreeProcessor("tHqGenVarProcessor"); 
+    treewriter_jerup.RemoveTreeProcessor("tHqGenVarProcessor"); 
+    treewriter_jerdown.RemoveTreeProcessor("tHqGenVarProcessor"); 
+  }
+  if(sampleType==SampleType::thq || sampleType == SampleType::nonttbkg || sampleType==SampleType::data || sampleType==SampleType::st){
+    treewriter_nominal.RemoveTreeProcessor("TopGenVarProcessor");
+    treewriter_jesup.RemoveTreeProcessor("TopGenVarProcessor");
+    treewriter_jesdown.RemoveTreeProcessor("TopGenVarProcessor");
+    treewriter_jerup.RemoveTreeProcessor("TopGenVarProcessor");
+    treewriter_jerdown.RemoveTreeProcessor("TopGenVarProcessor");
+  }
   if(!isData&&foundT&&foundTbar) {
     // fill genTopEvt with tt(H) information
     genTopEvt.Fill(*h_genParticles,ttid_full);
@@ -705,33 +784,40 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   */
   // Define INPUT
-  InputCollections input( eventInfo,
-			  //selectedTrigger,
-			  //triggerResults,
-                          triggerInfo,
-			  selectedPVs,
-			  rawMuons,
-			  selectedMuons,
-			  selectedMuonsLoose,
-			  rawElectrons,
-			  selectedElectrons,
-                          selectedElectronsLoose,
-			  rawJets,
-                          selectedJets,
-			  rawPuppiJets,
-			  selectedPuppiJets,
-                          selectedJetsLoose,
-                          correctedMETs_nominal[0],
-			  genTopEvt,
-			  gentHqEvt,
-                          selectedGenJets,
-                          sampleType,
-                          weights,
-			  Weight_orig,
-			  syst_weights,
-			  syst_weights_id
-			  );
+  InputCollections input_nominal( eventInfo,
+				  //selectedTrigger,
+				  //triggerResults,
+				  triggerInfo,
+				  selectedPVs,
+				  rawMuons,
+				  selectedMuons,
+				  selectedMuonsLoose,
+				  rawElectrons,
+				  selectedElectrons,
+				  selectedElectronsLoose,
+				  rawJets,
+				  selectedJets,
+				  rawPuppiJets,
+				  selectedPuppiJets,
+				  selectedJetsLoose,
+				  correctedMETs_nominal[0],
+				  genTopEvt,
+				  gentHqEvt,
+				  selectedGenJets,
+				  sampleType,
+				  weights,
+				  Weight_orig,
+				  syst_weights,
+				  syst_weights_id
+				  );
        
+  // define systematically shifted input (replace quantaties affected by jets)
+  InputCollections input_jesup( input_nominal,selectedJets_jesup,selectedJetsLoose_jesup,selectedJetsSingleTop_jesup,correctedMETs_jesup[0],weights_jesup);
+  InputCollections input_jesdown( input_nominal,selectedJets_jesdown,selectedJetsLoose_jesdown,selectedJetsSingleTop_jesdown,correctedMETs_jesdown[0],weights_jesdown);
+  InputCollections input_jerup( input_nominal,selectedJets_jerup,selectedJetsLoose_jerup,selectedJetsSingleTop_jerup,correctedMETs_jerup[0],weights_jerup);
+  InputCollections input_jerdown( input_nominal,selectedJets_jerdown,selectedJetsLoose_jerdown,selectedJetsSingleTop_jerdown,correctedMETs_jerdown[0],weights_jerdown);
+  InputCollections input_uncorrjets( input_nominal,selectedJets_uncorrected,selectedJetsLoose_uncorrected,selectedJetsSingleTop_uncorrected,pfMETs[0],weights_uncorrjets);
+
 
   // DO SELECTION
   cutflow.EventSurvivedStep("all");
@@ -745,7 +831,15 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   selectedMuons = MuonSelection(selectedMuons,input.selectedPVs);
   selectedJets = JetSelection(selectedJets,selectedElectrons, selectedMuons, input);
   // WRITE TREE
-  treewriter.Process(input);  
+  treewriter_nominal.Process(input);  
+  if (doSystematics) {
+    treewriter_jesup.Process(input_jesup);
+    treewriter_jesdown.Process(input_jesdown);
+    if (doJERsystematic){
+      treewriter_jerup.Process(input_jerup);
+      treewriter_jerdown.Process(input_jerdown);
+    }
+  }
 }
 
 
@@ -1249,7 +1343,7 @@ void
 tHqAnalyzer::endJob() 
 {
   std::cout << "Original File had " << eventcount << " Entries." << std::endl;
-  treewriter.AddSampleInformation();
+  treewriter_nominal.AddSampleInformation();
   cutflow.Print();
 }
 // ------------ method called when starting to processes a run ------------

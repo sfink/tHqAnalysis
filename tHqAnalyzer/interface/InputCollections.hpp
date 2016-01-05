@@ -34,6 +34,7 @@ struct InputCollections{
                     const std::vector<pat::Electron>&             rawElectrons_,
                     const std::vector<pat::Electron>&             selectedElectrons_,
                     const std::vector<pat::Electron>&             selectedElectronsLoose_,
+                    const std::vector<pat::Jet>&                  idJets_,
                     const std::vector<pat::Jet>&                  rawJets_,
                     const std::vector<pat::Jet>&                  selectedJets_,
                     const std::vector<pat::Jet>&                  rawPuppiJets_,
@@ -58,6 +59,7 @@ struct InputCollections{
 		    rawElectrons(rawElectrons_),
                     selectedElectrons(selectedElectrons_),
                     selectedElectronsLoose(selectedElectronsLoose_),
+		    idJets(idJets_),
 		    rawJets(rawJets_),
                     selectedJets(selectedJets_),
                     rawPuppiJets(rawPuppiJets_),
@@ -74,6 +76,41 @@ struct InputCollections{
 		    syst_weights_id(syst_weights_id_)
                     {}
   
+  /**
+   Constructor that replaces all variables related to jets and copies the remaining ones from a different input colection
+  */
+  InputCollections(   const InputCollections&                       input,
+		      const std::vector<pat::Jet>&                  selectedJets_,
+		      const std::vector<pat::Jet>&                  selectedJetsLoose_,
+		      const pat::MET&                               pfMET_,
+		      const std::map<std::string,float>&            weights_
+		      ): 
+    eventInfo(input.eventInfo),
+    triggerInfo(input.triggerInfo),
+    selectedPVs(input.selectedPVs),
+    rawMuons(input.rawMuons),
+    selectedMuons(input.selectedMuons),
+    selectedMuonsLoose(input.selectedMuonsLoose),
+    rawElectrons(input.rawElectrons),
+    selectedElectrons(input.selectedElectrons),
+    selectedElectronsLoose(input.selectedElectronsLoose),
+    idJets(input.idJets),
+    rawJets(input.rawJets),
+    selectedJets(selectedJets_),
+    rawPuppiJets(input.rawPuppiJets),
+    selectedJetsLoose(selectedJetsLoose_),
+    selectedPuppiJets(input.selectedPuppiJets),
+    pfMET(pfMET_),
+    genTopEvt(input.genTopEvt),
+    selectedGenJets(input.selectedGenJets),
+    sampleType(input.sampleType),
+    weights(weights_),
+    Weight_orig(input.Weight_orig),
+    syst_weights(input.syst_weights),
+    syst_weights_id(input.syst_weights_id_)
+  {}
+
+
   const EventInfo&                              eventInfo;
   const TriggerInfo&                            triggerInfo;
   const std::vector<reco::Vertex>&              selectedPVs;
@@ -83,6 +120,7 @@ struct InputCollections{
   const std::vector<pat::Electron>&             rawElectrons;
   const std::vector<pat::Electron>&             selectedElectrons;
   const std::vector<pat::Electron>&             selectedElectronsLoose;
+  const std::vector<pat::Jet>&                  idJets; // all input jets that pass the jet-ID cuts
   const std::vector<pat::Jet>&                  rawJets;
   const std::vector<pat::Jet>&                  selectedJets;
   const std::vector<pat::Jet>&                  rawPuppiJets;
