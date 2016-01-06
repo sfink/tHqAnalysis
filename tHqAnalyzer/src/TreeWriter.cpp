@@ -4,6 +4,7 @@ using namespace std;
 
 TreeWriter::TreeWriter(){
   initialized=false;
+  outFile=0;
   cout << "Tree initialized." << endl;
 }
 
@@ -26,48 +27,55 @@ TreeWriter::~TreeWriter(){
   }
 
 }
-/*TreeWriter::~TreeWriter(){
-  outFile->cd();
-
-  tree->Write(); 
-  outFile->Write();
-  outFile->Close();
-  cout << "Tree Written to " << outFile->GetPath() << endl;
-}
-*/
 
 void TreeWriter::Init( std::string fileName){
   
   outFile = new TFile( (fileName+"_Tree.root").c_str(), "RECREATE" );
-  //  outFile->cd();
+  outFile->cd();
       
   dir = (TDirectory*) outFile->mkdir("utm");
   dir->cd();
   tree = new TTree("t","t");
-  vars = VariableContainer();
 }
+
+std::vector<TreeProcessor*> TreeWriter::GetTreeProcessors() const{
+  return processors;
+}
+
+std::vector<std::string> TreeWriter::GetTreeProcessorNames() const{
+  return processorNames;
+}
+
+
 
 
 void TreeWriter::AddTreeProcessor(TreeProcessor* processor){
   processors.push_back(processor);
+  stopwatches.push_back(TStopwatch());
+}
+
+void TreeWriter::AddTreeProcessor(TreeProcessor* processor, string name){
+  processorNames.push_back(name);
+  processors.push_back(processor);
+  stopwatches.push_back(TStopwatch());
 }
 
 void TreeWriter::FillProcessorName(string name){
   processorNames.push_back(name);
 }
 
+
+
+
 void TreeWriter::FillProcessorMap(){
-  //  cout << "FILLING THE PROCESSOR MAP"<< processors.size() << " &" << processorNames.size() << endl;
   assert(processors.size() == processorNames.size());
   for (size_t i = 0; i < processorNames.size(); ++i)
     ProcessorMap[processorNames[i]] = processors[i];
 }
 
 void TreeWriter::RemoveTreeProcessor(string name){
-  //  cout << "TRYING TO REMOVE " << name << endl;
   auto it = ProcessorMap.find(name);
   if (it != ProcessorMap.end()){
-    //cout << "IM GOING IN!" << endl;
     ProcessorMap.erase (it);
     std::vector<TreeProcessor*> processors_temp;
     std::vector<std::string> processorNames_temp;
@@ -101,7 +109,9 @@ bool TreeWriter::Process(const InputCollections& input) {
   vars.SetDefaultValues();
   
   for(uint i=0; i<processors.size(); i++){
+    stopwatches[i].Start(false);
     processors[i]->Process(input,vars);
+    stopwatches[i].Stop();
   }
 
   FillTree();

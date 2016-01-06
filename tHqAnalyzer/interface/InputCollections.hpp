@@ -102,12 +102,13 @@ struct InputCollections{
     selectedPuppiJets(input.selectedPuppiJets),
     pfMET(pfMET_),
     genTopEvt(input.genTopEvt),
+    gentHqEvt(input.gentHqEvt),
     selectedGenJets(input.selectedGenJets),
     sampleType(input.sampleType),
     weights(weights_),
     Weight_orig(input.Weight_orig),
     syst_weights(input.syst_weights),
-    syst_weights_id(input.syst_weights_id_)
+    syst_weights_id(input.syst_weights_id)
   {}
 
 

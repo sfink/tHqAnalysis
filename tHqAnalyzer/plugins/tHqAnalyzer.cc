@@ -118,8 +118,8 @@ private:
   
   /** store output file names */
 
-  
-  std::string outfileNameNominal;
+  std::string outfileName;
+  std::string outfileName_nominal;
   std::string outfileNameJESup;
   std::string outfileNameJESdown;
   std::string outfileNameJERup;
@@ -291,7 +291,8 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelp
 
   //  useFatJets = iConfig.getParameter<bool>("useFatJets");
   
-  outfileName_nominal = iConfig.getParameter<std::string>("outfileName");
+  outfileName = iConfig.getParameter<std::string>("outfileName");
+  outfileName_nominal=outfileName;
   outfileNameJESup=outfileName_nominal;
   outfileNameJESdown=outfileName_nominal;
   outfileNameJERup=outfileName_nominal;
@@ -305,7 +306,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelp
     outfileNameJERdown.replace(stringIndex,7,"JERDOWN");
   }
   else{
-    outfileNameNominal=outfileName+"_nominal";
+    outfileName=outfileName+"_nominal";
     outfileNameJESup=outfileName+"_JESUP";
     outfileNameJESdown=outfileName+"_JESDOWN";
     outfileNameJERup=outfileName+"_JERUP";
@@ -542,6 +543,11 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   const JetCorrector* corrector = JetCorrector::getJetCorrector( "ak4PFchsL1L2L3", iSetup );   
   helper.SetJetCorrector(corrector);
   
+  const double jetptcut=20.0; 
+  const double jetetacut=4.7; 
+  const double jetptcut_loose=15.0; 
+  const double jetetacut_loose=4.7;
+
   // selected jets with jet ID cuts
   std::vector<pat::Jet> idJets = helper.GetSelectedJets(pfjets, 0., 9999., jetID::jetLoose, '-' );
   // Get raw jets
@@ -550,22 +556,16 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   // Clean muons and electrons from jets
   std::vector<pat::Jet> cleanJets = helper.GetDeltaRCleanedJets(rawJets,selectedMuonsLoose,selectedElectronsLoose,0.4);
   // Apply nominal jet corrections
-  std::vector<pat::Jet> correctedJets = helper.GetCorrectedJets(cleanJets, iEvent, iSetup, sysType::NA);
+  std::vector<pat::Jet> correctedJets_nominal = helper.GetCorrectedJets(cleanJets, iEvent, iSetup, sysType::NA);
   // Get jet Collection which pass selection
-  std::vector<pat::Jet> selectedJets = helper.GetSelectedJets(correctedJets, 20., 4.7, jetID::none, '-' );
+  std::vector<pat::Jet> selectedJets = helper.GetSelectedJets(correctedJets_nominal, jetptcut, jetetacut, jetID::none, '-' );
   // Sort jets
   selectedJets = helper.GetSortedByPt(selectedJets);
 
   // Get jet Collection which pass loose selection
-  std::vector<pat::Jet> selectedJetsLoose = helper.GetSelectedJets(correctedJets, 15. , 4.7, jetID::none, '-' );
+  std::vector<pat::Jet> selectedJetsLoose = helper.GetSelectedJets(correctedJets_nominal, jetptcut_loose ,jetetacut_loose, jetID::none, '-' );
   // Sort jets
   selectedJetsLoose = helper.GetSortedByPt(selectedJetsLoose);
-
-  // Get uncorrected Jets 
-  std::vector<pat::Jet> selectedJets_uncorrected = helper.GetSelectedJets(cleanJets, 20. , 4.7, jetID::none, '-' );
-  // Sort jets
-  selectedJets_uncorrected = helper.GetSortedByPt(selectedJets_uncorrected);
-
 
   //Get selected jets for MET filters
   std::vector<pat::Jet> idJetsForMET = helper.GetSelectedJets(pfjets, 0., 5.4, jetID::jetMETcorrection, '-' );
@@ -584,7 +584,101 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   std::vector<pat::Jet> correctedPuppiJets = helper.GetCorrectedJets(cleanedPuppiJets, iEvent, iSetup, sysType::NA);
 
   // Get puppi jet Collection which pass selection
-  std::vector<pat::Jet> selectedPuppiJets = helper.GetSelectedJets(correctedPuppiJets, 20., 4.7, jetID::none, '-' );
+  std::vector<pat::Jet> selectedPuppiJets = helper.GetSelectedJets(correctedPuppiJets, jetptcut, jetetacut, jetID::none, '-' );
+
+  /** JES Correcteions for Jets */
+  // Apply systematically shifted jet corrections -- these vector stay empty if you dont use makeSystematicsTrees
+  std::vector<pat::Jet> correctedJets_unsorted_jesup;
+  std::vector<pat::Jet> correctedJets_unsorted_jesdown;
+
+  std::vector<pat::Jet> correctedJetsForMET_jesup;
+  std::vector<pat::Jet> correctedJetsForMET_jesdown;
+  std::vector<pat::MET> correctedMETs_jesup;
+  std::vector<pat::MET> correctedMETs_jesdown;
+
+  std::vector<pat::Jet> selectedJets_unsorted_jesup;
+  std::vector<pat::Jet> selectedJets_unsorted_jesdown;
+  std::vector<pat::Jet> selectedJets_unsorted_uncorrected;
+  std::vector<pat::Jet> selectedJetsLoose_unsorted_jesup;
+  std::vector<pat::Jet> selectedJetsLoose_unsorted_jesdown;
+  std::vector<pat::Jet> selectedJetsLoose_unsorted_uncorrected;
+
+  std::vector<pat::Jet> selectedJets_jesup;
+  std::vector<pat::Jet> selectedJets_jesdown;
+  std::vector<pat::Jet> selectedJets_uncorrected;
+  std::vector<pat::Jet> selectedJetsLoose_jesup;
+  std::vector<pat::Jet> selectedJetsLoose_jesdown;
+  std::vector<pat::Jet> selectedJetsLoose_uncorrected;
+  
+  if(doSystematics){
+    correctedJets_unsorted_jesup = helper.GetCorrectedJets(cleanJets, iEvent, iSetup, sysType::JESup);
+    correctedJets_unsorted_jesdown = helper.GetCorrectedJets(cleanJets, iEvent, iSetup, sysType::JESdown);
+ 
+    correctedJetsForMET_jesup = helper.GetCorrectedJets(rawJetsForMET, iEvent, iSetup, sysType::JESup);
+    correctedJetsForMET_jesdown = helper.GetCorrectedJets(rawJetsForMET, iEvent, iSetup, sysType::JESdown);
+    correctedMETs_jesup = recorrectMET ? helper.CorrectMET(idJetsForMET,correctedJetsForMET_jesup,pfMETs) : pfMETs;
+    correctedMETs_jesdown = recorrectMET ? helper.CorrectMET(idJetsForMET,correctedJetsForMET_jesdown,pfMETs) : pfMETs;
+
+    selectedJets_unsorted_jesup = helper.GetSelectedJets(correctedJets_unsorted_jesup, jetptcut, jetetacut, jetID::none, '-' );
+    selectedJets_unsorted_jesdown = helper.GetSelectedJets(correctedJets_unsorted_jesdown, jetptcut, jetetacut, jetID::none, '-' );
+    selectedJets_unsorted_uncorrected = helper.GetSelectedJets(cleanJets, jetptcut, jetetacut, jetID::none, '-' );
+    selectedJetsLoose_unsorted_jesup = helper.GetSelectedJets(correctedJets_unsorted_jesup, jetptcut_loose, jetetacut_loose, jetID::none, '-' ); 
+    selectedJetsLoose_unsorted_jesdown = helper.GetSelectedJets(correctedJets_unsorted_jesdown, jetptcut_loose,jetetacut_loose, jetID::none, '-' ); 
+    selectedJetsLoose_unsorted_uncorrected = helper.GetSelectedJets(cleanJets, jetptcut_loose, jetetacut_loose, jetID::none, '-' ); 
+
+    selectedJets_jesup = helper.GetSortedByPt(selectedJets_unsorted_jesup);
+    selectedJets_jesdown = helper.GetSortedByPt(selectedJets_unsorted_jesdown);
+    selectedJets_uncorrected = helper.GetSortedByPt(selectedJets_unsorted_uncorrected);
+    selectedJetsLoose_jesup = helper.GetSortedByPt(selectedJetsLoose_unsorted_jesup);
+    selectedJetsLoose_jesdown = helper.GetSortedByPt(selectedJetsLoose_unsorted_jesdown);
+    selectedJetsLoose_uncorrected = helper.GetSortedByPt(selectedJetsLoose_unsorted_uncorrected);
+  }
+
+
+  // Apply systematically shifted jet resolution -- these vector stay empty if you dont use makeSystematicsTrees
+  std::vector<pat::Jet> correctedJets_unsorted_jerup;
+  std::vector<pat::Jet> correctedJets_unsorted_jerdown;
+
+  std::vector<pat::Jet> correctedJetsForMET_jerup;
+  std::vector<pat::Jet> correctedJetsForMET_jerdown;
+  std::vector<pat::MET> correctedMETs_jerup;
+  std::vector<pat::MET> correctedMETs_jerdown;
+
+  std::vector<pat::Jet> selectedJets_unsorted_jerup;
+  std::vector<pat::Jet> selectedJets_unsorted_jerdown;
+  std::vector<pat::Jet> selectedJetsLoose_unsorted_jerup;
+  std::vector<pat::Jet> selectedJetsLoose_unsorted_jerdown;
+
+  std::vector<pat::Jet> selectedJets_jerup;
+  std::vector<pat::Jet> selectedJets_jerdown;
+  std::vector<pat::Jet> selectedJetsLoose_jerup;
+  std::vector<pat::Jet> selectedJetsLoose_jerdown;
+
+  std::vector<pat::Jet> selectedJetsSingleTop_jerup;
+  std::vector<pat::Jet> selectedJetsSingleTop_jerdown;
+  
+  if(doSystematics && doJERsystematic){
+    correctedJets_unsorted_jerup = helper.GetCorrectedJets(cleanJets, iEvent, iSetup, sysType::JERup);
+    correctedJets_unsorted_jerdown = helper.GetCorrectedJets(cleanJets, iEvent, iSetup, sysType::JERdown);
+
+    correctedJetsForMET_jerup = helper.GetCorrectedJets(rawJetsForMET, iEvent, iSetup, sysType::JERup);
+    correctedJetsForMET_jerdown = helper.GetCorrectedJets(rawJetsForMET, iEvent, iSetup, sysType::JERdown);
+    correctedMETs_jerup = recorrectMET ? helper.CorrectMET(idJetsForMET,correctedJetsForMET_jerup,pfMETs) : pfMETs;
+    correctedMETs_jerdown = recorrectMET ? helper.CorrectMET(idJetsForMET,correctedJetsForMET_jerdown,pfMETs) : pfMETs;
+
+    selectedJets_unsorted_jerup = helper.GetSelectedJets(correctedJets_unsorted_jerup, jetptcut, jetetacut, jetID::none, '-' );
+    selectedJets_unsorted_jerdown = helper.GetSelectedJets(correctedJets_unsorted_jerdown, jetptcut, jetetacut, jetID::none, '-' );
+    selectedJetsLoose_unsorted_jerup = helper.GetSelectedJets(correctedJets_unsorted_jerup, jetptcut_loose, jetetacut_loose, jetID::none, '-' ); 
+    selectedJetsLoose_unsorted_jerdown = helper.GetSelectedJets(correctedJets_unsorted_jerdown, jetptcut_loose,jetetacut_loose, jetID::none, '-' ); 
+
+    selectedJets_jerup = helper.GetSortedByPt(selectedJets_unsorted_jerup);
+    selectedJets_jerdown = helper.GetSortedByPt(selectedJets_unsorted_jerdown);
+    selectedJetsLoose_jerup = helper.GetSortedByPt(selectedJetsLoose_unsorted_jerup);
+    selectedJetsLoose_jerdown = helper.GetSortedByPt(selectedJetsLoose_unsorted_jerdown);
+    
+  }
+
+
 
   
   /**** GET GENEVENTINFO ****/
@@ -762,11 +856,19 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   vector<string> syst_weights_id;
   vector<float> syst_weights;
   float Weight_orig=1;
-  map<string,float> weights;
   map<string,float> weights_uncorrjets;
+  map<string,float> weights;
+  map<string,float> weights_jesup;
+  map<string,float> weights_jerup;
+  map<string,float> weights_jesdown;
+  map<string,float> weights_jerdown;
   if(!isData){
-    weights = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets,selectedElectrons,selectedMuons,*h_genParticles,sysType::NA);
-    //    weights_uncorrjets = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_uncorrected,selectedElectrons,selectedMuons,*h_genParticles,sysType::NA);
+    weights       = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets,selectedElectrons,selectedMuons,*h_genParticles,sysType::NA);
+    weights_jesup = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_jesup,selectedElectrons,selectedMuons,*h_genParticles,sysType::JESup);
+    weights_jesdown = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_jesdown,selectedElectrons,selectedMuons,*h_genParticles,sysType::JESdown);
+    weights_jerup = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_jerup,selectedElectrons,selectedMuons,*h_genParticles,sysType::JERup);
+    weights_jerdown = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_jerdown,selectedElectrons,selectedMuons,*h_genParticles,sysType::JERdown);
+    weights_uncorrjets = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_uncorrected,selectedElectrons,selectedMuons,*h_genParticles,sysType::NA);
     if(useLHE){
       GetSystWeights(*h_lheeventinfo,syst_weights_id,syst_weights,Weight_orig);
     }
@@ -795,6 +897,7 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 				  rawElectrons,
 				  selectedElectrons,
 				  selectedElectronsLoose,
+				  idJets,
 				  rawJets,
 				  selectedJets,
 				  rawPuppiJets,
@@ -812,26 +915,26 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 				  );
        
   // define systematically shifted input (replace quantaties affected by jets)
-  InputCollections input_jesup( input_nominal,selectedJets_jesup,selectedJetsLoose_jesup,selectedJetsSingleTop_jesup,correctedMETs_jesup[0],weights_jesup);
-  InputCollections input_jesdown( input_nominal,selectedJets_jesdown,selectedJetsLoose_jesdown,selectedJetsSingleTop_jesdown,correctedMETs_jesdown[0],weights_jesdown);
-  InputCollections input_jerup( input_nominal,selectedJets_jerup,selectedJetsLoose_jerup,selectedJetsSingleTop_jerup,correctedMETs_jerup[0],weights_jerup);
-  InputCollections input_jerdown( input_nominal,selectedJets_jerdown,selectedJetsLoose_jerdown,selectedJetsSingleTop_jerdown,correctedMETs_jerdown[0],weights_jerdown);
-  InputCollections input_uncorrjets( input_nominal,selectedJets_uncorrected,selectedJetsLoose_uncorrected,selectedJetsSingleTop_uncorrected,pfMETs[0],weights_uncorrjets);
+  InputCollections input_jesup( input_nominal,selectedJets_jesup,selectedJetsLoose_jesup,correctedMETs_jesup[0],weights_jesup);
+  InputCollections input_jesdown( input_nominal,selectedJets_jesdown,selectedJetsLoose_jesdown,correctedMETs_jesdown[0],weights_jesdown);
+  InputCollections input_jerup( input_nominal,selectedJets_jerup,selectedJetsLoose_jerup,correctedMETs_jerup[0],weights_jerup);
+  InputCollections input_jerdown( input_nominal,selectedJets_jerdown,selectedJetsLoose_jerdown,correctedMETs_jerdown[0],weights_jerdown);
+  InputCollections input_uncorrjets( input_nominal,selectedJets_uncorrected,selectedJetsLoose_uncorrected,pfMETs[0],weights_uncorrjets);
 
 
   // DO SELECTION
   cutflow.EventSurvivedStep("all");
   bool selected=true;
   for(size_t i=0; i<selections.size() && selected; i++){
-    if(!selections.at(i)->IsSelected(input,cutflow)) selected=false;
+    if(!selections.at(i)->IsSelected(input_nominal,cutflow)) selected=false;
   }
   if(!selected) return;    
 
-  selectedElectrons = ElectronSelection(selectedElectrons,input.selectedPVs);
-  selectedMuons = MuonSelection(selectedMuons,input.selectedPVs);
-  selectedJets = JetSelection(selectedJets,selectedElectrons, selectedMuons, input);
+  selectedElectrons = ElectronSelection(selectedElectrons,input_nominal.selectedPVs);
+  selectedMuons = MuonSelection(selectedMuons,input_nominal.selectedPVs);
+  selectedJets = JetSelection(selectedJets,selectedElectrons, selectedMuons, input_nominal);
   // WRITE TREE
-  treewriter_nominal.Process(input);  
+  treewriter_nominal.Process(input_nominal);  
   if (doSystematics) {
     treewriter_jesup.Process(input_jesup);
     treewriter_jesdown.Process(input_jesdown);
@@ -1284,6 +1387,26 @@ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventIn
   cout << "PV weight :" << weights["Weight_PV"] << endl;
   cout << "CSV weight :" << weights["Weight_CSV"] << endl;
   
+  if(systype != sysType::JESup && systype != sysType::JESup && systype != sysType::JERup && systype != sysType::JERdown) {
+
+    weights["Weight_CSVLFup"] = csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,9, csvWgtHF, csvWgtLF, csvWgtCF)/csvweight;
+    weights["Weight_CSVLFdown"] = csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,10, csvWgtHF, csvWgtLF, csvWgtCF)/csvweight;
+    weights["Weight_CSVHFup"] = csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,11, csvWgtHF, csvWgtLF, csvWgtCF)/csvweight;
+    weights["Weight_CSVHFdown"] = csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,12, csvWgtHF, csvWgtLF, csvWgtCF)/csvweight;
+    weights["Weight_CSVHFStats1up"] = csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,13, csvWgtHF, csvWgtLF, csvWgtCF)/csvweight;
+    weights["Weight_CSVHFStats1down"] = csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,14, csvWgtHF, csvWgtLF, csvWgtCF)/csvweight;
+    weights["Weight_CSVLFStats1up"] = csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,17, csvWgtHF, csvWgtLF, csvWgtCF)/csvweight;
+    weights["Weight_CSVLFStats1down"] = csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,18, csvWgtHF, csvWgtLF, csvWgtCF)/csvweight;
+    weights["Weight_CSVHFStats2up"] = csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,15, csvWgtHF, csvWgtLF, csvWgtCF)/csvweight;
+    weights["Weight_CSVHFStats2down"] = csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,16, csvWgtHF, csvWgtLF, csvWgtCF)/csvweight;
+    weights["Weight_CSVLFStats2up"] = csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,19, csvWgtHF, csvWgtLF, csvWgtCF)/csvweight;
+    weights["Weight_CSVLFStats2down"] = csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,20, csvWgtHF, csvWgtLF, csvWgtCF)/csvweight;
+    weights["Weight_CSVCErr1up"] = csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,21, csvWgtHF, csvWgtLF, csvWgtCF)/csvweight;
+    weights["Weight_CSVCErr1down"] = csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,22, csvWgtHF, csvWgtLF, csvWgtCF)/csvweight;
+    weights["Weight_CSVCErr2up"] = csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,23, csvWgtHF, csvWgtLF, csvWgtCF)/csvweight;
+    weights["Weight_CSVCErr2down"] = csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,24, csvWgtHF, csvWgtLF, csvWgtCF)/csvweight;
+  }
+
   // set optional additional PU weights
   for(std::vector<PUWeights::Weight>::const_iterator it = puWeights_.additionalWeightsBegin();
       it != puWeights_.additionalWeightsEnd(); ++it) {

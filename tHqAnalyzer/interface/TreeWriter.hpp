@@ -33,10 +33,15 @@ class TreeWriter{
     void Init(std::string fileName);
     bool Process(const InputCollections& input);
     void AddTreeProcessor(TreeProcessor* processor);
+    void AddTreeProcessor(TreeProcessor* processor,string name);
     void AddSampleInformation();
     void FillProcessorMap();
     void RemoveTreeProcessor(string name);
     void FillProcessorName(string name);
+
+    std::vector<TreeProcessor*> GetTreeProcessors() const;
+    std::vector<std::string> GetTreeProcessorNames() const;
+
 
   private:
   
