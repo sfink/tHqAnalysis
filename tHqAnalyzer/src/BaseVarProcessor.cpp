@@ -128,8 +128,6 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVar("sumHtTotal" ,"F");
   vars.InitVar("sumHt" ,"F");
  
-  vars.InitVars( "jtcsvt","njt" );
- 
   vars.InitVar( "aplanarity" ,"F");
   vars.InitVar( "sphericity" ,"F");
    

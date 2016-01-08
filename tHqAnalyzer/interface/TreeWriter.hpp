@@ -38,17 +38,19 @@ class TreeWriter{
     void FillProcessorMap();
     void RemoveTreeProcessor(string name);
     void FillProcessorName(string name);
-
+    void SetTreeName(std::string name);
+    std::string GetTreeName();
     std::vector<TreeProcessor*> GetTreeProcessors() const;
     std::vector<std::string> GetTreeProcessorNames() const;
 
 
   private:
-  
+    
     void Init();
     void FillTree();
     bool initialized;
     TTree* tree;
+    std::string treename;
     TDirectory* dir;
     TFile* outFile;
     VariableContainer vars;

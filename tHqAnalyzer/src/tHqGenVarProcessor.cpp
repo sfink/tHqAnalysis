@@ -88,7 +88,8 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
     Wdau=input.gentHqEvt.GetWDecayProducts();
   }
 
-  /*  
+  assert(Hdau.size()!=0);
+
   std::cout << "Higgs pt" << H.pt() << endl;
   std::cout << "#Hdaus: " << Hdau.size() << endl;
   std::cout << "Hdau eta: " << Hdau[0].eta() << endl;
@@ -96,7 +97,7 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
   std::cout << "Hdau pt: " << Hdau[0].pt() << endl;
   std::cout << "Hdau pt: " << Hdau[1].pt() << endl;
   std::cout << "#Wdaus: " << Wdau.size() << endl;
-  */
+  
   
   vector<math::XYZTLorentzVector> jetvecs = tHqUtils::GetJetVecs(input.selectedJets);
 

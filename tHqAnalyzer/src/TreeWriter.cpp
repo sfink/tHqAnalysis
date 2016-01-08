@@ -3,15 +3,13 @@
 using namespace std;
 
 TreeWriter::TreeWriter(){
+  tree=0;
   initialized=false;
   outFile=0;
-  cout << "Tree initialized." << endl;
 }
 
 TreeWriter::~TreeWriter(){
-  for(uint i=0; i<stopwatches.size(); i++){
-    cout << "time spent in " << processorNames[i] << " -- real time: " << stopwatches[i].RealTime() << ", cpu time: " << stopwatches[i].CpuTime() << endl;
-  }
+
   if(outFile!=0){
     outFile->cd();
   }
@@ -29,13 +27,16 @@ TreeWriter::~TreeWriter(){
 }
 
 void TreeWriter::Init( std::string fileName){
-  
+  cout << treename << " Tree initialized." << endl;
+    
   outFile = new TFile( (fileName+"_Tree.root").c_str(), "RECREATE" );
   outFile->cd();
-      
+  cout << "Created File named " << fileName<<"_Tree.root" << endl;
+  
   dir = (TDirectory*) outFile->mkdir("utm");
   dir->cd();
   tree = new TTree("t","t");
+  vars = VariableContainer();
 }
 
 std::vector<TreeProcessor*> TreeWriter::GetTreeProcessors() const{
@@ -46,8 +47,13 @@ std::vector<std::string> TreeWriter::GetTreeProcessorNames() const{
   return processorNames;
 }
 
+void TreeWriter::SetTreeName(std::string name){
+  treename = name;
+}
 
-
+std::string TreeWriter::GetTreeName(){
+  return treename;
+}
 
 void TreeWriter::AddTreeProcessor(TreeProcessor* processor){
   processors.push_back(processor);
@@ -69,13 +75,15 @@ void TreeWriter::FillProcessorName(string name){
 
 void TreeWriter::FillProcessorMap(){
   assert(processors.size() == processorNames.size());
-  for (size_t i = 0; i < processorNames.size(); ++i)
+  for (size_t i = 0; i < processorNames.size(); ++i){
     ProcessorMap[processorNames[i]] = processors[i];
+  }
 }
 
 void TreeWriter::RemoveTreeProcessor(string name){
   auto it = ProcessorMap.find(name);
   if (it != ProcessorMap.end()){
+    cout << "Found Processor and removing it: " << name << endl;
     ProcessorMap.erase (it);
     std::vector<TreeProcessor*> processors_temp;
     std::vector<std::string> processorNames_temp;
@@ -84,7 +92,6 @@ void TreeWriter::RemoveTreeProcessor(string name){
     while (it_map != ProcessorMap.end()) {
       processors_temp.push_back(it_map->second);
       processorNames_temp.push_back(it_map->first);
-      cout << it_map->first << endl;
       ++it_map;
     }
     processors=processors_temp;

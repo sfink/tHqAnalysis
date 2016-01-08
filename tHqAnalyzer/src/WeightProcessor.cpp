@@ -10,8 +10,8 @@ void WeightProcessor::Init(const InputCollections& input,VariableContainer& vars
   for (auto it=input.weights.begin(); it!=input.weights.end(); ++it){
     vars.InitVar(it->first);  
   }
-
-  cout << "Init new Weights" << endl;
+  
+  cout << "Init new Weights at the WeightProcessor" << endl;
   vars.InitVar( "Weight_orig",1.,"F" );
   vars.InitVar( "nweights",-9, "I");
   vars.InitVars( "weights_syst","nweights" );

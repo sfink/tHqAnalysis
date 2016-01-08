@@ -64,7 +64,6 @@
 #include "tHqAnalysis/tHqAnalyzer/interface/GenTopEvent.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/GentHqEvent.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/tHqGenVarProcessor.hpp"
-#include "tHqAnalysis/tHqAnalyzer/interface/ObjectSelections.hpp"
 
 
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
@@ -161,10 +160,10 @@ private:
   vector<std::string> relevantTriggers;
 
   /** calculate and store systematic weights? */
-  bool doSystematics;
+  bool doSystematics = 1;
 
   /** calculate JER systematics **/
-  bool doJERsystematic;
+  bool doJERsystematic =1;
   
   /** use GenBmatching info? this is only possible if the miniAOD contains them */
   bool useGenHadronMatch;
@@ -175,6 +174,8 @@ private:
   /** jet systematic that is applied (the outher systematics are done at a different place with reweighting)*/
   sysType::sysType jsystype;
       
+  /** SampleType needed to see what gen variables need to be filled */
+  SampleType sampleType = SampleType::nonttbkg;
       
   /** pu summary data access token **/
   edm::EDGetTokenT< std::vector<PileupSummaryInfo> > EDMPUInfoToken;
@@ -288,7 +289,13 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelp
   recorrectMET = iConfig.getParameter<bool>("recorrectMET");
 
   //  useFatJets = iConfig.getParameter<bool>("useFatJets");
-  
+    
+  treewriter_nominal.SetTreeName("Nominal");
+  treewriter_jesup.SetTreeName("JESup");
+  treewriter_jesdown.SetTreeName("JESdown");
+  treewriter_jerup.SetTreeName("JERup");
+  treewriter_jerdown.SetTreeName("JERdown");
+
   outfileName = iConfig.getParameter<std::string>("outfileName");
   outfileName_nominal=outfileName;
   outfileNameJESup=outfileName_nominal;
@@ -304,7 +311,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelp
     outfileNameJERdown.replace(stringIndex,7,"JERDOWN");
   }
   else{
-    outfileName=outfileName+"_nominal";
+    outfileName_nominal=outfileName+"_nominal";
     outfileNameJESup=outfileName+"_JESUP";
     outfileNameJESdown=outfileName+"_JESDOWN";
     outfileNameJERup=outfileName+"_JERUP";
@@ -380,30 +387,29 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelp
   treewriter_nominal.Init(outfileName_nominal);
   // in case of systematics
   if(doSystematics){
-    // this is are the usual tree names
+  //   // this is are the usual tree names
     treewriter_jesup.Init(outfileNameJESup);
     treewriter_jesdown.Init(outfileNameJESdown);
-    if(doJERsystematic){
-      treewriter_jerup.Init(outfileNameJERup);
-      treewriter_jerdown.Init(outfileNameJERdown);
-    }
+    //   if(doJERsystematic){
+    treewriter_jerup.Init(outfileNameJERup);
+    treewriter_jerdown.Init(outfileNameJERdown);
   }
+  
+  //  }
 
   std::vector<std::string> processorNames = iConfig.getParameter< std::vector<std::string> >("processorNames");
   for(vector<string>::const_iterator itPro = processorNames.begin();itPro != processorNames.end();++itPro) {
-    //    cout << "This is Processor " << *itPro << endl;
     treewriter_nominal.FillProcessorName(*itPro);
     if(*itPro == "WeightProcessor") treewriter_nominal.AddTreeProcessor(new WeightProcessor());    
     else if(*itPro == "BaseVarProcessor") treewriter_nominal.AddTreeProcessor(new BaseVarProcessor());
     else if(*itPro == "RecoVarProcessor") treewriter_nominal.AddTreeProcessor(new RecoVarProcessor());
-    else if(*itPro == "MVAVarProcessor") treewriter_nominal.AddTreeProcessor(new MVAVarProcessor());
     else if(*itPro == "TopGenVarProcessor") treewriter_nominal.AddTreeProcessor(new TopGenVarProcessor());
     else if(*itPro == "tHqGenVarProcessor") treewriter_nominal.AddTreeProcessor(new tHqGenVarProcessor());
     else cout << "No matching processor found for: " << *itPro << endl;    
-    } 
+  } 
   treewriter_nominal.FillProcessorMap();
 
-  // the systematics tree writers use the same processors that are used for the nominal trees
+  //the systematics tree writers use the same processors that are used for the nominal trees
   // it might improve the performance to turn some of them off
   if(doSystematics){
     std::vector<TreeProcessor*> tps = treewriter_nominal.GetTreeProcessors();
@@ -411,14 +417,16 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelp
     for(uint i=0; i<tps.size();i++){
       treewriter_jesup.AddTreeProcessor(tps[i],tpsn[i]);
       treewriter_jesdown.AddTreeProcessor(tps[i],tpsn[i]);
-      if(doJERsystematic){
-	treewriter_jerup.AddTreeProcessor(tps[i],tpsn[i]);
-	treewriter_jerdown.AddTreeProcessor(tps[i],tpsn[i]);
-      }
+      treewriter_jerup.AddTreeProcessor(tps[i],tpsn[i]);
+      treewriter_jerdown.AddTreeProcessor(tps[i],tpsn[i]);
     }
+    treewriter_jesup.FillProcessorMap();
+    treewriter_jesdown.FillProcessorMap();
+    treewriter_jerup.FillProcessorMap();
+    treewriter_jerdown.FillProcessorMap();
+    
   }
-
-
+  //}
 }
 
 
@@ -438,9 +446,10 @@ tHqAnalyzer::~tHqAnalyzer()
 // ------------ method called for each event  ------------
 void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-  //cout << "########### NEW EVENT ##################" << endl;
   if(eventcount<10||eventcount%1000==0){
-    cout << "Analyzing event " << eventcount << endl;
+    cout << "----------------------------------------" << endl;
+    cout << "-           Analyzing event " << eventcount << "          -" << endl;
+    cout << "----------------------------------------" << endl;
     watch.Print();
     watch.Continue();
   }
@@ -652,7 +661,7 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   std::vector<pat::Jet> selectedJetsLoose_jerup;
   std::vector<pat::Jet> selectedJetsLoose_jerdown;
   
-  if(doSystematics && doJERsystematic){
+  if(doSystematics){
     correctedJets_unsorted_jerup = helper.GetCorrectedJets(cleanJets, iEvent, iSetup, sysType::JERup);
     correctedJets_unsorted_jerdown = helper.GetCorrectedJets(cleanJets, iEvent, iSetup, sysType::JERdown);
 
@@ -747,6 +756,7 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       }
     }
   }
+  
   GenTopEvent genTopEvt;
   GentHqEvent gentHqEvt;
   int ttid=-1;
@@ -798,21 +808,30 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			     *genCHadBHadronId,
 			     15,4.7); 
   }
+
+
   /*** FIGURE OUT SAMPLETYPE ***/
-  SampleType sampleType= SampleType::nonttbkg;
-  if(isData) sampleType = SampleType::data;
-  else if(foundT&&foundTbar&&foundHiggs) sampleType = SampleType::tth;
-  else if(foundT&&foundTbar){ 
-    sampleType =SampleType::ttl;
-    //if(ttid==51||ttid==52) sampleType = SampleType::ttb;
-    if(ttid==51) sampleType = SampleType::ttb;
-    else if(ttid==52) sampleType = SampleType::tt2b;
-    else if(ttid==53||ttid==54||ttid==55) sampleType = SampleType::ttbb;
-    else if(ttid==41||ttid==42) sampleType = SampleType::ttcc;
-    else if(ttid==43||ttid==44||ttid==45) sampleType = SampleType::ttcc;    
+  if(eventcount==1){
+    if(isData) sampleType = SampleType::data;
+    else if(foundT&&foundTbar&&foundHiggs) sampleType = SampleType::tth;
+    else if(foundT&&foundTbar){ 
+      sampleType =SampleType::ttl;
+      //if(ttid==51||ttid==52) sampleType = SampleType::ttb;
+      if(ttid==51) sampleType = SampleType::ttb;
+      else if(ttid==52) sampleType = SampleType::tt2b;
+      else if(ttid==53||ttid==54||ttid==55) sampleType = SampleType::ttbb;
+      else if(ttid==41||ttid==42) sampleType = SampleType::ttcc;
+      else if(ttid==43||ttid==44||ttid==45) sampleType = SampleType::ttcc;    
+    }
+    else if (((foundT&&!foundTbar)||(!foundT&&foundTbar))&&foundHiggs){
+      sampleType = SampleType::thq;
+      cout << "### SampleType ---> SingleTop + Higgs " << endl;
+    } 
+    else if (((foundT&&!foundTbar)||(!foundT&&foundTbar))&&!foundHiggs){
+      sampleType = SampleType::st;
+      cout << "### SampleType ---> SingleTop " << endl;
+    }
   }
-  else if(((foundT&&!foundTbar)||(!foundT&&foundTbar))&&foundHiggs) sampleType = SampleType::thq;
-  else if(((foundT&&!foundTbar)||(!foundT&&foundTbar))&&!foundHiggs) sampleType = SampleType::st;
 
   /**** GET LHEINFO ****/
   edm::Handle<LHEEventProduct> h_lheeventinfo;
@@ -821,21 +840,24 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     else iEvent.getByToken( EDMLHEEventToken_alt, h_lheeventinfo);
   }
   
+  if(eventcount==1){
   /*** KICK OUT WRONG PROCESSORS ***/
-  if(sampleType!=SampleType::thq) {
-    treewriter_nominal.RemoveTreeProcessor("tHqGenVarProcessor"); 
-    treewriter_jesup.RemoveTreeProcessor("tHqGenVarProcessor"); 
-    treewriter_jesdown.RemoveTreeProcessor("tHqGenVarProcessor"); 
-    treewriter_jerup.RemoveTreeProcessor("tHqGenVarProcessor"); 
-    treewriter_jerdown.RemoveTreeProcessor("tHqGenVarProcessor"); 
+    if(sampleType!=SampleType::thq) {
+      treewriter_nominal.RemoveTreeProcessor("tHqGenVarProcessor"); 
+      treewriter_jesup.RemoveTreeProcessor("tHqGenVarProcessor"); 
+      treewriter_jesdown.RemoveTreeProcessor("tHqGenVarProcessor"); 
+      treewriter_jerup.RemoveTreeProcessor("tHqGenVarProcessor"); 
+      treewriter_jerdown.RemoveTreeProcessor("tHqGenVarProcessor"); 
+    }
+    if(sampleType==SampleType::thq || sampleType == SampleType::nonttbkg || sampleType==SampleType::data || sampleType==SampleType::st){
+      treewriter_nominal.RemoveTreeProcessor("TopGenVarProcessor");
+      treewriter_jesup.RemoveTreeProcessor("TopGenVarProcessor");
+      treewriter_jesdown.RemoveTreeProcessor("TopGenVarProcessor");
+      treewriter_jerup.RemoveTreeProcessor("TopGenVarProcessor");
+      treewriter_jerdown.RemoveTreeProcessor("TopGenVarProcessor");
+    }
   }
-  if(sampleType==SampleType::thq || sampleType == SampleType::nonttbkg || sampleType==SampleType::data || sampleType==SampleType::st){
-    treewriter_nominal.RemoveTreeProcessor("TopGenVarProcessor");
-    treewriter_jesup.RemoveTreeProcessor("TopGenVarProcessor");
-    treewriter_jesdown.RemoveTreeProcessor("TopGenVarProcessor");
-    treewriter_jerup.RemoveTreeProcessor("TopGenVarProcessor");
-    treewriter_jerdown.RemoveTreeProcessor("TopGenVarProcessor");
-  }
+
   if(!isData&&foundT&&foundTbar) {
     // fill genTopEvt with tt(H) information
     genTopEvt.Fill(*h_genParticles,ttid_full);
@@ -914,7 +936,7 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   InputCollections input_jesdown( input_nominal,selectedJets_jesdown,selectedJetsLoose_jesdown,correctedMETs_jesdown[0],weights_jesdown);
   InputCollections input_jerup( input_nominal,selectedJets_jerup,selectedJetsLoose_jerup,correctedMETs_jerup[0],weights_jerup);
   InputCollections input_jerdown( input_nominal,selectedJets_jerdown,selectedJetsLoose_jerdown,correctedMETs_jerdown[0],weights_jerdown);
-  InputCollections input_uncorrjets( input_nominal,selectedJets_uncorrected,selectedJetsLoose_uncorrected,pfMETs[0],weights_uncorrjets);
+  //  InputCollections input_uncorrjets( input_nominal,selectedJets_uncorrected,selectedJetsLoose_uncorrected,pfMETs[0],weights_uncorrjets);
 
 
   // DO SELECTION
@@ -930,10 +952,8 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   if (doSystematics) {
     treewriter_jesup.Process(input_jesup);
     treewriter_jesdown.Process(input_jesdown);
-    if (doJERsystematic){
-      treewriter_jerup.Process(input_jerup);
-      treewriter_jerdown.Process(input_jerdown);
-    }
+    treewriter_jerup.Process(input_jerup);
+    treewriter_jerdown.Process(input_jerdown);
   }
 }
 
@@ -993,10 +1013,13 @@ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventIn
   weights["Weight_PU"] = puweight;
 
   weights["Weight_PV"] = pvWeight.GetWeight(selectedPVs.size());
+
+    
   cout << "PU weight :" << weights["Weight_PU"] << endl;
   cout << "PV weight :" << weights["Weight_PV"] << endl;
   cout << "CSV weight :" << weights["Weight_CSV"] << endl;
   
+
   if(systype != sysType::JESup && systype != sysType::JESup && systype != sysType::JERup && systype != sysType::JERdown) {
 
     weights["Weight_CSVLFup"] = csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,9, csvWgtHF, csvWgtLF, csvWgtCF)/csvweight;
@@ -1016,12 +1039,11 @@ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventIn
     weights["Weight_CSVCErr2up"] = csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,23, csvWgtHF, csvWgtLF, csvWgtCF)/csvweight;
     weights["Weight_CSVCErr2down"] = csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,24, csvWgtHF, csvWgtLF, csvWgtCF)/csvweight;
   }
-
+  
   // set optional additional PU weights
   for(std::vector<PUWeights::Weight>::const_iterator it = puWeights_.additionalWeightsBegin();
       it != puWeights_.additionalWeightsEnd(); ++it) {
     weights[it->name()] = it->value();
-    cout << "Additional PU weight :" <<  it->value() << endl;
   }
 
 
@@ -1076,7 +1098,14 @@ void
 tHqAnalyzer::endJob() 
 {
   std::cout << "Original File had " << eventcount << " Entries." << std::endl;
+ 
+  
   treewriter_nominal.AddSampleInformation();
+  treewriter_jesup.AddSampleInformation();
+  treewriter_jesdown.AddSampleInformation();
+  treewriter_jerup.AddSampleInformation();
+  treewriter_jerdown.AddSampleInformation();
+  
   cutflow.Print();
 }
 // ------------ method called when starting to processes a run ------------
