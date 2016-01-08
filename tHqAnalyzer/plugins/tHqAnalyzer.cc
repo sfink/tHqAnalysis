@@ -287,37 +287,42 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelp
   useLHE = iConfig.getParameter<bool>("useLHE");
   useGenHadronMatch = iConfig.getParameter<bool>("useGenHadronMatch");
   recorrectMET = iConfig.getParameter<bool>("recorrectMET");
+  
+  if(isData) doSystematics = false;
 
+  
   //  useFatJets = iConfig.getParameter<bool>("useFatJets");
-    
-  treewriter_nominal.SetTreeName("Nominal");
-  treewriter_jesup.SetTreeName("JESup");
-  treewriter_jesdown.SetTreeName("JESdown");
-  treewriter_jerup.SetTreeName("JERup");
-  treewriter_jerdown.SetTreeName("JERdown");
-
   outfileName = iConfig.getParameter<std::string>("outfileName");
   outfileName_nominal=outfileName;
-  outfileNameJESup=outfileName_nominal;
-  outfileNameJESdown=outfileName_nominal;
-  outfileNameJERup=outfileName_nominal;
-  outfileNameJERdown=outfileName_nominal;
+  treewriter_nominal.SetTreeName("Nominal");
+
+  if(doSystematics){
+    treewriter_jesup.SetTreeName("JESup");
+    treewriter_jesdown.SetTreeName("JESdown");
+    treewriter_jerup.SetTreeName("JERup");
+    treewriter_jerdown.SetTreeName("JERdown");
+
+    outfileNameJESup=outfileName_nominal;
+    outfileNameJESdown=outfileName_nominal;
+    outfileNameJERup=outfileName_nominal;
+    outfileNameJERdown=outfileName_nominal;
   
-  size_t stringIndex = outfileName.find("nominal");
-  if(stringIndex!=std::string::npos){
-    outfileNameJESup.replace(stringIndex,7,"JESUP");
-    outfileNameJESdown.replace(stringIndex,7,"JESDOWN");
-    outfileNameJERup.replace(stringIndex,7,"JERUP");
-    outfileNameJERdown.replace(stringIndex,7,"JERDOWN");
-  }
-  else{
-    outfileName_nominal=outfileName+"_nominal";
-    outfileNameJESup=outfileName+"_JESUP";
-    outfileNameJESdown=outfileName+"_JESDOWN";
-    outfileNameJERup=outfileName+"_JERUP";
-    outfileNameJERdown=outfileName+"_JERDOWN";
-  }
   
+    size_t stringIndex = outfileName.find("nominal");
+    if(stringIndex!=std::string::npos){
+      outfileNameJESup.replace(stringIndex,7,"JESUP");
+      outfileNameJESdown.replace(stringIndex,7,"JESDOWN");
+      outfileNameJERup.replace(stringIndex,7,"JERUP");
+      outfileNameJERdown.replace(stringIndex,7,"JERDOWN");
+    }
+    else{
+      outfileName_nominal=outfileName+"_nominal";
+      outfileNameJESup=outfileName+"_JESUP";
+      outfileNameJESdown=outfileName+"_JESDOWN";
+      outfileNameJERup=outfileName+"_JERUP";
+      outfileNameJERdown=outfileName+"_JERDOWN";
+    }
+  }
   std::cout << "Outfile Name: " << outfileName_nominal << std::endl;
   
   // REGISTER DATA ACCESS
@@ -387,15 +392,12 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelp
   treewriter_nominal.Init(outfileName_nominal);
   // in case of systematics
   if(doSystematics){
-  //   // this is are the usual tree names
     treewriter_jesup.Init(outfileNameJESup);
     treewriter_jesdown.Init(outfileNameJESdown);
-    //   if(doJERsystematic){
     treewriter_jerup.Init(outfileNameJERup);
     treewriter_jerdown.Init(outfileNameJERdown);
   }
   
-  //  }
 
   std::vector<std::string> processorNames = iConfig.getParameter< std::vector<std::string> >("processorNames");
   for(vector<string>::const_iterator itPro = processorNames.begin();itPro != processorNames.end();++itPro) {
@@ -1101,11 +1103,13 @@ tHqAnalyzer::endJob()
  
   
   treewriter_nominal.AddSampleInformation();
-  treewriter_jesup.AddSampleInformation();
-  treewriter_jesdown.AddSampleInformation();
-  treewriter_jerup.AddSampleInformation();
-  treewriter_jerdown.AddSampleInformation();
-  
+  if(doSystematics){
+    treewriter_jesup.AddSampleInformation();
+    treewriter_jesdown.AddSampleInformation();
+    treewriter_jerup.AddSampleInformation();
+    treewriter_jerdown.AddSampleInformation();
+  }
+
   cutflow.Print();
 }
 // ------------ method called when starting to processes a run ------------
