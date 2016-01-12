@@ -29,7 +29,6 @@ void WeightProcessor::Process(const InputCollections& input,VariableContainer& v
   
   vars.FillVar("Weight_orig",input.Weight_orig);
   vars.FillVar("nweights",input.syst_weights.size());
-   
   for(std::vector<float>::const_iterator itWeight = input.syst_weights.begin() ; itWeight != input.syst_weights.end(); ++itWeight){
     int iWeight = itWeight - input.syst_weights.begin();
     vars.FillVars( "weights_syst",iWeight,input.syst_weights[iWeight] );

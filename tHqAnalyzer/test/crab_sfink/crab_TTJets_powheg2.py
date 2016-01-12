@@ -15,7 +15,7 @@ config.General.workArea = 'crab_projects'
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = '/afs/desy.de/user/f/fink/xxl/af-cms/13TeV/CMSSW_7_4_15_patch1/src/tHqAnalysis/tHqAnalyzer/test/tHqAnalysis_cfg.py'
-config.JobType.outputFiles = ['tHqAnalyzed_Tree.root']
+#config.JobType.outputFiles = ['tHqAnalyzed_Tree.root']
 
 config.section_("Data")
 config.Data.inputDataset = '/TT_TuneCUETP8M1_13TeV-powheg-pythia8/RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2_ext3-v1/MINIAODSIM'
@@ -34,3 +34,4 @@ config.section_("Site")
 config.Site.storageSite = 'T2_DE_DESY'
 config.Site.blacklist = ['T2_US_Florida']
 os.environ['RECORRECTMET'] = "1"
+config.JobType.outputFiles = [tHqAnalyzed_JERDOWN_Tree.root, tHqAnalyzed_JERUP_Tree.root, tHqAnalyzed_JESDOWN_Tree.root, tHqAnalyzed_JESUP_Tree.root, tHqAnalyzed_nominal_Tree.root]

@@ -1007,14 +1007,16 @@ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventIn
   puWeights_.compute(eventInfo);
   puweight = puWeights_.nominalWeight();
 
-  weight *= xsweight*csvweight*puweight*topptweight;
+  
+  //weight *= xsweight*csvweight*puweight*topptweight;
+ 
   weights["Weight"] = weight;
   weights["Weight_XS"] = xsweight;
   weights["Weight_CSV"] = csvweight;
   weights["Weight_TopPt"] = topptweight;
   weights["Weight_PU"] = puweight;
 
-  weights["Weight_PV"] = pvWeight.GetWeight(selectedPVs.size());
+  //  weights["Weight_PV"] = pvWeight.GetWeight(selectedPVs.size());
 
     
   cout << "PU weight :" << weights["Weight_PU"] << endl;
