@@ -4,7 +4,7 @@ config = Configuration()
 
 os.environ['GLOBALTAG'] = '74X_mcRun2_asymptotic_v4'
 os.environ['ISDATA'] = "0"
-os.environ['USELHE'] = "1"
+os.environ['USELHE'] = "0"
 os.environ['USEGENHADRONMATCH'] = "0"
 os.environ['RECORRECTMET'] = "1"
 
@@ -33,4 +33,4 @@ config.General.transferOutputs = True
 config.section_("Site")
 config.Site.storageSite = 'T2_DE_DESY'
 
-config.JobType.outputFiles = [tHqAnalyzed_JERDOWN_Tree.root, tHqAnalyzed_JERUP_Tree.root, tHqAnalyzed_JESDOWN_Tree.root, tHqAnalyzed_JESUP_Tree.root, tHqAnalyzed_nominal_Tree.root]
+config.JobType.outputFiles = ['tHqAnalyzed_JERDOWN_Tree.root', 'tHqAnalyzed_JERUP_Tree.root', 'tHqAnalyzed_JESDOWN_Tree.root', 'tHqAnalyzed_JESUP_Tree.root', 'tHqAnalyzed_nominal_Tree.root']

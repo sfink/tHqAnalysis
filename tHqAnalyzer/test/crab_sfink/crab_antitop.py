@@ -33,4 +33,4 @@ config.General.transferOutputs = True
 config.section_("Site")
 config.Site.storageSite = 'T2_DE_DESY'
 os.environ['RECORRECTMET'] = "1"
-config.JobType.outputFiles = [tHqAnalyzed_JERDOWN_Tree.root, tHqAnalyzed_JERUP_Tree.root, tHqAnalyzed_JESDOWN_Tree.root, tHqAnalyzed_JESUP_Tree.root, tHqAnalyzed_nominal_Tree.root]
+config.JobType.outputFiles = ['tHqAnalyzed_JERDOWN_Tree.root', 'tHqAnalyzed_JERUP_Tree.root', 'tHqAnalyzed_JESDOWN_Tree.root', 'tHqAnalyzed_JESUP_Tree.root', 'tHqAnalyzed_nominal_Tree.root']

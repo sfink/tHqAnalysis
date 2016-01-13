@@ -25,6 +25,7 @@
 #include "TStopwatch.h"
 
 // user include files
+#include "FWCore/Framework/interface/TriggerNamesService.h"
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 
@@ -64,7 +65,7 @@
 #include "tHqAnalysis/tHqAnalyzer/interface/GenTopEvent.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/GentHqEvent.hpp"
 #include "tHqAnalysis/tHqAnalyzer/interface/tHqGenVarProcessor.hpp"
-
+#include "tHqAnalysis/tHqAnalyzer/interface/TriggerVarProcessor.hpp"
 
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 
@@ -187,12 +188,17 @@ private:
   /** hcal noise data access token **/
   edm::EDGetTokenT< HcalNoiseSummary > EDMHcalNoiseToken;
       
+
+
+  edm::EDGetTokenT<edm::TriggerResults> triggerBitsToken;
+  edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> triggerObjectsToken;
+  edm::EDGetTokenT<pat::PackedTriggerPrescales> triggerPrescalesToken;
   /** selected trigger data access token **/
-  edm::EDGetTokenT< pat::TriggerObjectStandAloneCollection > EDMSelectedTriggerToken;
+  //  edm::EDGetTokenT< pat::TriggerObjectStandAloneCollection > EDMSelectedTriggerToken;
       
   /** trigger results data access token **/
-  edm::EDGetTokenT< edm::TriggerResults > EDMTriggerResultToken;
-  HLTConfigProvider hlt_config;
+  //  edm::EDGetTokenT< edm::TriggerResults > EDMTriggerResultToken;
+  // HLTConfigProvider hlt_config;
 
   /** beam spot data access token **/
   edm::EDGetTokenT< reco::BeamSpot > EDMBeamSpotToken;
@@ -260,6 +266,7 @@ private:
   edm::EDGetTokenT<std::vector<int> > genCHadIndexToken;
   edm::EDGetTokenT<std::vector<reco::GenParticle> > genCHadPlusMothersToken;
   edm::EDGetTokenT<int> genTtbarIdToken;
+
 };
 
 //
@@ -287,7 +294,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelp
   useLHE = iConfig.getParameter<bool>("useLHE");
   useGenHadronMatch = iConfig.getParameter<bool>("useGenHadronMatch");
   recorrectMET = iConfig.getParameter<bool>("recorrectMET");
-  
+
   if(isData) doSystematics = false;
 
   
@@ -295,6 +302,9 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelp
   outfileName = iConfig.getParameter<std::string>("outfileName");
   outfileName_nominal=outfileName;
   treewriter_nominal.SetTreeName("Nominal");
+  
+  size_t stringIndex = outfileName.find("nominal");
+  if(stringIndex==std::string::npos) outfileName_nominal=outfileName+"_nominal";
 
   if(doSystematics){
     treewriter_jesup.SetTreeName("JESup");
@@ -307,8 +317,6 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelp
     outfileNameJERup=outfileName_nominal;
     outfileNameJERdown=outfileName_nominal;
   
-  
-    size_t stringIndex = outfileName.find("nominal");
     if(stringIndex!=std::string::npos){
       outfileNameJESup.replace(stringIndex,7,"JESUP");
       outfileNameJESdown.replace(stringIndex,7,"JESDOWN");
@@ -316,7 +324,6 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelp
       outfileNameJERdown.replace(stringIndex,7,"JERDOWN");
     }
     else{
-      outfileName_nominal=outfileName+"_nominal";
       outfileNameJESup=outfileName+"_JESUP";
       outfileNameJESdown=outfileName+"_JESDOWN";
       outfileNameJERup=outfileName+"_JERUP";
@@ -329,8 +336,13 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelp
   EDMPUInfoToken          = consumes< std::vector<PileupSummaryInfo> >(edm::InputTag("slimmedAddPileupInfo","",""));
   EDMRhoToken             = consumes <double> (edm::InputTag(std::string("fixedGridRhoFastjetAll")));
   EDMHcalNoiseToken       = consumes< HcalNoiseSummary >(edm::InputTag("hcalnoise","",""));
-  EDMSelectedTriggerToken = consumes< pat::TriggerObjectStandAloneCollection > (edm::InputTag("selectedPatTrigger","",""));
-  EDMTriggerResultToken   = consumes< edm::TriggerResults > (edm::InputTag("TriggerResults","","HLT"));
+  //  EDMSelectedTriggerToken = consumes< pat::TriggerObjectStandAloneCollection > (edm::InputTag("selectedPatTrigger","",""));
+  // EDMTriggerResultToken   = consumes< edm::TriggerResults > (edm::InputTag("TriggerResults","","HLT"));
+
+  triggerBitsToken        = consumes< edm::TriggerResults>(edm::InputTag("TriggerResults","","HLT"));
+  triggerObjectsToken     = consumes< pat::TriggerObjectStandAloneCollection>(edm::InputTag("selectedPatTrigger","",""));
+  triggerPrescalesToken   = consumes< pat::PackedTriggerPrescales>(edm::InputTag("patTrigger","",""));
+
   EDMBeamSpotToken        = consumes< reco::BeamSpot > (edm::InputTag("offlineBeamSpot","",""));
   EDMVertexToken          = consumes< reco::VertexCollection > (edm::InputTag("offlineSlimmedPrimaryVertices"));
   EDMMuonsToken           = consumes< std::vector<pat::Muon> >(edm::InputTag("slimmedMuons"));
@@ -407,6 +419,7 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelp
     else if(*itPro == "RecoVarProcessor") treewriter_nominal.AddTreeProcessor(new RecoVarProcessor());
     else if(*itPro == "TopGenVarProcessor") treewriter_nominal.AddTreeProcessor(new TopGenVarProcessor());
     else if(*itPro == "tHqGenVarProcessor") treewriter_nominal.AddTreeProcessor(new tHqGenVarProcessor());
+    else if(*itPro == "TriggerVarProcessor") treewriter_nominal.AddTreeProcessor(new TriggerVarProcessor(relevantTriggers));
     else cout << "No matching processor found for: " << *itPro << endl;    
   } 
   treewriter_nominal.FillProcessorMap();
@@ -475,9 +488,9 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   //iEvent.getByToken( EDMSelectedTriggerToken,h_selectedtrigger );
   //  pat::TriggerObjectStandAloneCollection const &selectedTrigger = *h_selectedtrigger;
   
-  edm::Handle<edm::TriggerResults> h_triggerresults;
-  iEvent.getByToken( EDMTriggerResultToken,h_triggerresults );
-  edm::TriggerResults const &triggerResults = *h_triggerresults;
+  //  edm::Handle<edm::TriggerResults> h_triggerresults;
+  //iEvent.getByToken( EDMTriggerResultToken,h_triggerresults );
+  //edm::TriggerResults const &triggerResults = *h_triggerresults;
   
   /**** GET BEAMSPOT ****/
   edm::Handle<reco::BeamSpot> h_beamspot;
@@ -506,6 +519,9 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     }
   }
   if( vtxs.size()>0 ) helper.SetVertex( vtxs[0] );
+
+  TriggerInfo triggerInfo(iEvent,triggerBitsToken,triggerObjectsToken,triggerPrescalesToken);
+  if(eventcount==1) triggerInfo.ListTriggers();
   
   /**** GET LEPTONS ****/
   // MUONS
@@ -720,20 +736,23 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   
   // Fill Event Info Object
   EventInfo eventInfo(iEvent,h_beamspot,h_hcalnoisesummary,h_puinfosummary,firstVertexIsGood,*h_rho);
-
-  // Fill Trigger Info
+  
+  /*  // Fill Trigger Info
   map<string,bool> triggerMap;
   for(auto name=relevantTriggers.begin(); name!=relevantTriggers.end();name++){
+    cout << "Searching for Trigger " << *name << endl;
     unsigned int TriggerID =  hlt_config.triggerIndex(*name);
     if( TriggerID >= triggerResults.size() ) { 
       triggerMap[*name]=false;
+      cout << "Did not find Trigger " << *name << endl;
     }
     else{
       triggerMap[*name]=triggerResults.accept(TriggerID);
+      cout << "Found Trigger " << *name << endl;
     }
   }
-
-  TriggerInfo triggerInfo(triggerMap);
+  */
+  //  TriggerInfo triggerInfo(triggerMap);
 
  
   // FIGURE OUT SAMPLE
@@ -1120,12 +1139,12 @@ void
 tHqAnalyzer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
 {
 
-  std::string hltTag="HLT";
-  bool hltchanged = true;
-  if (!hlt_config.init(iRun, iSetup, hltTag, hltchanged)) {
-    std::cout << "Warning, didn't find trigger process HLT,\t" << hltTag << std::endl;
-    return;
-  }
+  // std::string hltTag="HLT";
+  //bool hltchanged = true;
+  //  if (!hlt_config.init(iRun, iSetup, hltTag, hltchanged)) {
+  //  std::cout << "Warning, didn't find trigger process HLT,\t" << hltTag << std::endl;
+  //  return;
+  // }
 }
 
 

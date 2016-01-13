@@ -14,7 +14,7 @@ config.General.workArea = 'crab_projects'
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = '/afs/desy.de/user/f/fink/xxl/af-cms/13TeV/CMSSW_7_4_15_patch1/src/tHqAnalysis/tHqAnalyzer/test/tHqAnalysis_cfg.py'
-config.JobType.outputFiles = ['tHqAnalyzed_Tree.root']
+config.JobType.outputFiles = ['tHqAnalyzed_nominal_Tree.root']
 
 config.section_("Data")
 config.Data.inputDataset = '/SingleMuon/Run2015D-PromptReco-v4/MINIAOD'
