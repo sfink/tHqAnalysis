@@ -45,7 +45,7 @@ public:
 			    const std::string& histNameDataNPUEstimated);
   
   void compute(const unsigned int npu);
-  void compute(const EventInfo& evtInfo) { compute(static_cast<unsigned int>(evtInfo.numTruePV)); }
+  void compute(const EventInfo& evtInfo) { if(evtInfo.puSummaryIsValid!=0) compute(static_cast<unsigned int>(evtInfo.numTruePV));}
 
   double nominalWeight() const { return nominalWeight_.value(); }
   std::vector<PUWeights::Weight>::const_iterator additionalWeightsBegin() const { return additionalWeights_.begin(); }

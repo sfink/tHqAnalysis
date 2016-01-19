@@ -1068,7 +1068,7 @@ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventIn
       it != puWeights_.additionalWeightsEnd(); ++it) {
     weights[it->name()] = it->value();
   }
-
+  if(eventInfo.puSummaryIsValid==0) weights["Weight_PU"]=1;
 
   return weights;
 }

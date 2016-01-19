@@ -2,7 +2,9 @@
 
 EventInfo::EventInfo(const edm::Event& iEvent, const edm::Handle<reco::BeamSpot>& beamSpot, const edm::Handle<HcalNoiseSummary>& hcalNoiseSummary, const edm::Handle< std::vector<PileupSummaryInfo> >& puSummaryInfo, bool firstVertexIsGood_, float rho_):firstVertexIsGood(firstVertexIsGood_),rho(rho_)
 {
-
+  
+  puSummaryIsValid = puSummaryInfo.isValid();
+  
   evt         = iEvent.id().event();
   run         = iEvent.id().run();
   lumiBlock   = iEvent.luminosityBlock();

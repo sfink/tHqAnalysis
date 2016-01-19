@@ -25,7 +25,7 @@ void PUWeights::init(const edm::ParameterSet& iConfig) {
   if( iConfig.existsAs<edm::VParameterSet>("additionalPUWeights",true) ) {
     const edm::VParameterSet additionalPUWeightsPS = iConfig.getParameter<edm::VParameterSet>("additionalPUWeights");
     for(edm::VParameterSet::const_iterator iPS = additionalPUWeightsPS.begin();
-      iPS != additionalPUWeightsPS.end(); ++iPS) {
+	iPS != additionalPUWeightsPS.end(); ++iPS) {
       initAdditionalWeight( iPS->getParameter<std::string>("namePUWeight"),
 			    iPS->getParameter<std::string>("fileNameMCNPU"),
 			    iPS->getParameter<std::string>("histNameMCNPU"),
