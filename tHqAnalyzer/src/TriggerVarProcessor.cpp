@@ -8,16 +8,24 @@ TriggerVarProcessor::~TriggerVarProcessor(){}
 
 void TriggerVarProcessor::Init(const InputCollections& input,VariableContainer& vars){
   for (auto it=relevantTriggers.begin(); it!=relevantTriggers.end(); ++it){
-    vars.InitVar(replaceAsterix(*it),"I");  
+    if(input.triggerInfo.Exists(*it)){
+      cout << "Initializing " << replaceAsterix(*it) << endl;
+      vars.InitVar(replaceAsterix(*it),"I");  
+    }
+    else cout << "TRIGGER DOES NOT EXIST !!!!!!!!!!!!!!!!!!!" << endl << endl;
   }
-
+  
   initialized=true;
 }
 
 void TriggerVarProcessor::Process(const InputCollections& input,VariableContainer& vars){
   if(!initialized) cerr << "tree processor not initialized" << endl;
   for (auto it=relevantTriggers.begin(); it!=relevantTriggers.end(); ++it){
-    vars.FillVar("Triggered_"+replaceAsterix(*it),int(input.triggerInfo.IsTriggered(*it)));  
+    if(input.triggerInfo.Exists(*it)){
+      vars.FillVar(replaceAsterix(*it),int(input.triggerInfo.IsTriggered(*it)));  
+      cout << replaceAsterix(*it) << " : " << int(input.triggerInfo.IsTriggered(*it)) << endl;
+    }
+    else vars.FillVar(replaceAsterix(*it),0);
   }
 }
 

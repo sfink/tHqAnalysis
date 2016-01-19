@@ -39,7 +39,7 @@ tHqAnalyzer = cms.EDAnalyzer(
     'tHqAnalyzer',
     LeptonSelectionNoTrigger,
     JetTagSelection,  
-    relevantTriggers = cms.vstring("HLT_Ele27_eta2p1_WP85_Gsf_HT200_v1","HLT_IsoMu24_eta2p1_v1","HLT_Mu20_v1","HLT_Mu27_v1"),
+    relevantTriggers = cms.vstring("HLT_Ele27_eta2p1_WP85_Gsf_HT200_v1","HLT_Ele27_WP85_Gsf_v1","HLT_Ele22_eta2p1_WP75_Gsf_v1","HLT_Ele32_eta2p1_WP75_Gsf_v1","HLT_IsoMu24_eta2p1_v1","HLT_Mu24_eta2p1_v1", "HLT_Mu20_v1","HLT_Mu27_v1","HLT_IsoMu20_v1","HLT_IsoMu20_eta2p1_v1","HLT_IsoMu17_eta2p1_v1"),
     era = cms.string("2015_74x"),
     analysisType = cms.string("LJ"),
     luminostiy = cms.double(19.7),
