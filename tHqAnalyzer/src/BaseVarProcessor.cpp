@@ -13,9 +13,8 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVar( "lbn", "I");
   vars.InitVar( "rho", "I");
 
-  vars.InitVar( "hlt_ele27_wp80", "I");
-  vars.InitVar( "hlt_isomu24_eta2p1", "I");
-  //  vars.InitVar( "hlt_isomu24", "I");
+
+  // Object Counters
 
   vars.InitVar( "njt", "I");
   vars.InitVar( "njt15", "I"); 
@@ -34,6 +33,8 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVar( "nbtagt", "I");  //
 
   vars.InitVar( "npv", "I");
+
+  // Tight Jet Collection
 
   vars.InitVars( "jte","njt" );
   vars.InitVars( "jtpt","njt" );
@@ -55,12 +56,38 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVars( "jthfhadronfrac","njt" );
   vars.InitVars( "jtjer","njt" );
 
+  //Loose Jet Collection
+
+  vars.InitVars( "jt15e","njt15" );
+  vars.InitVars( "jt15pt","njt15" );
+  vars.InitVars( "jt15phi","njt15" );
+  vars.InitVars( "jt15eta","njt15" );
+  vars.InitVars( "jt15csvt","njt15" );
+  vars.InitVars( "jt15puid","njt15" );
+
+  vars.InitVars( "jt15ntracks","njt15" );
+  vars.InitVars( "jt15area","njt15" );
+  vars.InitVars( "jt15pull","njt15" );
+  vars.InitVars( "jt15charge","njt15" );
+  vars.InitVars( "jt15id","njt15" );
+  vars.InitVars( "jt15chhadmult","njt15" ); 
+
+  vars.InitVars( "jt15ndaughters","njt15" );
+  vars.InitVars( "jt15chmult","njt15" );
+  vars.InitVars( "jt15nhadronfrac","njt15" );
+  vars.InitVars( "jt15hfhadronfrac","njt15" );
+  vars.InitVars( "jt15jer","njt15" );
+
+  // Jet Gen Collection
+
   vars.InitVars( "jtgenflv","njt" );
   vars.InitVars( "jtgenpt","njt" );
   vars.InitVars( "jtgenphi","njt" );
   vars.InitVars( "jtgeneta","njt" );
   vars.InitVars( "jtgene","njt" );
 
+  // Puppi Jets
+  
   vars.InitVars( "pupjte","npupjt" );
   vars.InitVars( "pupjtpt","npupjt" );
   vars.InitVars( "pupjtphi","npupjt" );
@@ -83,8 +110,6 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVars( "LooseLepton_Eta","N_LooseLeptons" );
   vars.InitVars( "LooseLepton_Phi","N_LooseLeptons" );
   */
-
-
 
   vars.InitVars( "lmue","nlmu" );
   vars.InitVars( "lmupt","nlmu" );
@@ -156,18 +181,6 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
   vars.FillVar( "lbn", input.eventInfo.lumiBlock);
   vars.FillVar( "rho", input.eventInfo.rho);
 
-
-  // Triggers
-
-  //Triggers not yet implemented, wait for correct triggers to get announced
-  vars.FillVar( "hlt_ele27_wp80", 1);
-  vars.FillVar( "hlt_isomu24_eta2p1", 1);            
-
-  //vars.FillVar( "hlt_ele27_wp80", input.triggerInfo.IsTriggered("HLT_Ele27_eta2p1_WPTight_Gsf_v1"));
-  //vars.FillVar( "hlt_isomu24_eta2p1", input.triggerInfo.IsTriggered("HLT_IsoMu24_eta2p1_v2"));
-  //  vars.FillVar( "hlt_isomu24", input.triggerInfo.IsTriggered("HLT_IsoMu24_eta2p1_IterTrk02_v1"));
-
-
   // Fill btagged Jets
 
   const char* btagger="pfCombinedInclusiveSecondaryVertexV2BJetTags";
@@ -228,6 +241,26 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
       } */
   }
 
+
+
+  // Loose Jets
+  for(std::vector<pat::Jet>::const_iterator itJet = input.selectedJetsLoose.begin() ; itJet != input.selectedJetsLoose.end(); ++itJet){
+    int iJet = itJet - input.selectedJetsLoose.begin();
+    vars.FillVars( "jt15e",iJet,itJet->energy() );
+    vars.FillVars( "jt15pt",iJet,itJet->pt() );
+    vars.FillVars( "jt15eta",iJet,itJet->eta() );
+    vars.FillVars( "jt15phi",iJet,itJet->phi() );
+    vars.FillVars( "jt15csvt",iJet,fmax(itJet->bDiscriminator(btagger),-.1) );        
+    vars.FillVars( "jt15puid",iJet,itJet->userFloat("pileupJetId:fullDiscriminant") );
+
+    vars.FillVars( "jt15ntracks",iJet,itJet->associatedTracks().size() );
+    vars.FillVars( "jt15area",iJet,itJet->jetArea() );
+    vars.FillVars( "jt15pull",iJet,itJet->associatedTracks().size() );  // to implement 
+    vars.FillVars( "jt15charge",iJet,itJet->jetCharge() );
+    vars.FillVars( "jt15id",iJet,itJet->associatedTracks().size() ); //to implement
+  }
+
+
   //Fill Puppi Jet variables
 
   for(std::vector<pat::Jet>::const_iterator itJet = input.selectedPuppiJets.begin() ; itJet != input.selectedPuppiJets.end(); ++itJet){
@@ -239,9 +272,6 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
     vars.FillVars( "pupjtcsvt",iJet,fmax(itJet->bDiscriminator(btagger),-.1) );        
   }
 
-
-
-  
   for(std::vector<reco::GenJet>::const_iterator itGenJet = input.selectedGenJets.begin() ; itGenJet != input.selectedGenJets.end(); ++itGenJet){
     int iGenJet = itGenJet - input.selectedGenJets.begin();
     
@@ -256,7 +286,6 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
   if(input.selectedElectrons.size()>0 || input.selectedMuons.size()>0){
     primLepVec = tHqUtils::GetPrimLepVec(input.selectedElectrons,input.selectedMuons);
   }
-
   
   // Fill Lepton Variables
   for(std::vector<pat::Electron>::const_iterator itEle = input.selectedElectrons.begin(); itEle != input.selectedElectrons.end(); ++itEle){
