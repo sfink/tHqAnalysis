@@ -48,6 +48,7 @@ bool TriggerInfo::IsTriggered(std::string triggername) const {
       triggername.pop_back();
       auto it=triggers.lower_bound(triggername);
       while(it!=triggers.end()&&it->first.find(triggername) == 0){
+	cout << it->first << "  -    " << it->second << endl;
 	if(it->second) return true;
 	it++;
       }
