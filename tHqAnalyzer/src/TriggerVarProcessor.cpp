@@ -21,13 +21,9 @@ void TriggerVarProcessor::Init(const InputCollections& input,VariableContainer& 
 void TriggerVarProcessor::Process(const InputCollections& input,VariableContainer& vars){
   if(!initialized) cerr << "tree processor not initialized" << endl;
   for (auto it=relevantTriggers.begin(); it!=relevantTriggers.end(); ++it){
-    if(input.triggerInfo.Exists(*it)){
-      vars.FillVar(replaceAsterix(*it),int(input.triggerInfo.IsTriggered(*it)));  
-      cout << replaceAsterix(*it) << " : " << int(input.triggerInfo.IsTriggered(*it)) << endl;
-    }
-    else vars.FillVar(replaceAsterix(*it),0);
+    vars.FillVar(replaceAsterix(*it),int(input.triggerInfo.IsTriggered(*it)));  
     cout << replaceAsterix(*it) << " : " << int(input.triggerInfo.IsTriggered(*it)) << endl;
-  }
+  }  
 }
 
 std::string TriggerVarProcessor::replaceAsterix(std::string triggername){
