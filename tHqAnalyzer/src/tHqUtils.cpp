@@ -520,10 +520,17 @@ vector<math::XYZTLorentzVector> tHqUtils::GetJetVecs(const std::vector<pat::Jet>
 
 bool tHqUtils::PassesCSV(const pat::Jet& jet, const char workingPoint){
   
-  float CSVLv2wp = 0.605;
-  float CSVMv2wp = 0.89;
-  float CSVTv2wp = 0.97;
-  
+  //  float CSVLv2wp = 0.605;
+  // float CSVMv2wp = 0.89;
+  // float CSVTv2wp = 0.97;
+ 
+
+  float CSVLv2wp = 0.460;
+  float CSVMv2wp = 0.800;
+  float CSVTv2wp = 0.935;
+   
+  //Adapted WP from   https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation76X
+
   float csvValue = jet.bDiscriminator("combinedInclusiveSecondaryVertexV2BJetTags");
   
   switch(workingPoint){
