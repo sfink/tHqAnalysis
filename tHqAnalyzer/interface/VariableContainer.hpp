@@ -51,6 +51,10 @@ class VariableContainer{
     std::map<TString,int> intMap;
     std::map<TString,int> intMapDefaults;
     std::map<TString,bool> intMapFilled;
+    std::map<TString,Long64_t> longMap;
+    std::map<TString,Long64_t> longMapDefaults;
+    std::map<TString,bool> longMapFilled;
+
     std::map<TString,Float_t*> arrayMap;
     std::map<TString,Float_t> arrayMapDefaults;
     std::map<TString,bool> arrayMapFilled;

@@ -8,7 +8,7 @@ BaseVarProcessor::~BaseVarProcessor(){}
 
 void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& vars){
 
-  vars.InitVar( "evt", "I");
+  vars.InitVar( "evt", "L");
   vars.InitVar( "run", "I"); 
   vars.InitVar( "lbn", "I");
   vars.InitVar( "rho", "I");
