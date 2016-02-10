@@ -26,6 +26,12 @@ void VariableContainer::InitVar( TString name,float defaultValue, std::string ty
     intMapDefaults[name] = defaultValue;
     intMapFilled[name] = false;
   }
+  else if(type=="L"){
+    longMap[name] = 0;
+    longMapDefaults[name] = defaultValue;
+    longMapFilled[name] = false;
+  }
+
   else
     cout << "unknown type " << type << endl;
 }
@@ -95,7 +101,7 @@ void VariableContainer::InitIntVars( TString name, int defaultValue, int nEntrie
 
 
 void VariableContainer::FillVar( TString name, float value ) {
-  if(intMap.count(name)==0&&floatMap.count(name)==0){
+  if(intMap.count(name)==0&&floatMap.count(name)==0&&longMap.count(name)==0){
     cerr << name << " does not exist!" << endl;
   }
   if(floatMap.count(name)!=0){
@@ -111,6 +117,14 @@ void VariableContainer::FillVar( TString name, float value ) {
     }
     intMap[name] = value;
     intMapFilled[name] = true;
+  }
+
+  if(longMap.count(name)!=0){
+    if(longMapFilled[name]){
+      cerr << name << " already filled!" << endl;
+    }
+    longMap[name] = value;
+    longMapFilled[name] = true;
   }
 //     std::cout << "filling variable " << name << " with " << value << std::endl;
 }
@@ -173,6 +187,17 @@ void VariableContainer::SetDefaultValues(){
     ++itI;
     ++itIdefault;
     ++itIfilled;
+  }
+
+  auto itL= longMap.begin();
+  auto itLdefault = longMapDefaults.begin();
+  auto itLfilled = longMapFilled.begin();
+  while (itL != longMap.end()) {
+    itL->second = itLdefault->second;
+    itLfilled->second=false;
+    ++itL;
+    ++itLdefault;
+    ++itLfilled;
   }
 
   auto itS= stringMap.begin();
@@ -244,6 +269,11 @@ void VariableContainer::ConnectTree(TTree* tree){
   while (itI != intMap.end()) {
     tree->Branch(itI->first, &(itI->second), itI->first+"/I" );
     itI++;
+  }
+  auto itL= longMap.begin();
+  while (itL != longMap.end()) {
+    tree->Branch(itL->first, &(itL->second), itL->first+"/L" );
+    itL++;
   }
   auto itS= stringMap.begin();
   while (itS != stringMap.end()) {

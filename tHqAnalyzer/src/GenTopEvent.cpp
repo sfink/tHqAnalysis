@@ -13,6 +13,11 @@ bool GenTopEvent::IsFilled() const{
 bool GenTopEvent::TTxIsFilled() const{
   return ttxIsFilled;
 }
+bool GenTopEvent::IsTTbar() const{
+  return isTTbar;
+}
+
+
 
 void GenTopEvent::FillTTxDetails(const std::vector<reco::GenJet>& customGenJets, 
 				 const std::vector<int>& genBHadIndex, const std::vector<int>& genBHadJetIndex, 

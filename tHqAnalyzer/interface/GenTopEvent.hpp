@@ -131,7 +131,9 @@ public:
   bool IsAllHadron() const;
   bool IsDiLepton() const;
   bool IsSemiLepton() const;
+  bool IsTTbar() const;
   
+
   void Print() const;
   void PrintTTX() const;
 private:
@@ -185,6 +187,7 @@ private:
 
   bool topIsHadronic;
   bool topbarIsHadronic;
+  bool isTTbar;
   bool isFilled;
   bool ttxIsFilled;
   int ttXid;

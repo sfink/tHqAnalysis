@@ -8,7 +8,7 @@ BaseVarProcessor::~BaseVarProcessor(){}
 
 void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& vars){
 
-  vars.InitVar( "evt", "I");
+  vars.InitVar( "evt", "L");
   vars.InitVar( "run", "I"); 
   vars.InitVar( "lbn", "I");
   vars.InitVar( "rho", "I");
@@ -41,7 +41,7 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVars( "jtphi","njt" );
   vars.InitVars( "jteta","njt" );
   vars.InitVars( "jtcsvt","njt" );
-  vars.InitVars( "jtpuid","njt" );
+  //  vars.InitVars( "jtpuid","njt" );
 
   vars.InitVars( "jtntracks","njt" );
   vars.InitVars( "jtarea","njt" );
@@ -63,7 +63,7 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVars( "jt15phi","njt15" );
   vars.InitVars( "jt15eta","njt15" );
   vars.InitVars( "jt15csvt","njt15" );
-  vars.InitVars( "jt15puid","njt15" );
+  //  vars.InitVars( "jt15puid","njt15" );
 
   vars.InitVars( "jt15ntracks","njt15" );
   vars.InitVars( "jt15area","njt15" );
@@ -222,7 +222,7 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
     vars.FillVars( "jteta",iJet,itJet->eta() );
     vars.FillVars( "jtphi",iJet,itJet->phi() );
     vars.FillVars( "jtcsvt",iJet,fmax(itJet->bDiscriminator(btagger),-.1) );        
-    vars.FillVars( "jtpuid",iJet,itJet->userFloat("pileupJetId:fullDiscriminant") );
+    //    vars.FillVars( "jtpuid",iJet,itJet->userFloat("pileupJetId:fullDiscriminant") );
 
     vars.FillVars( "jtntracks",iJet,itJet->associatedTracks().size() );
     vars.FillVars( "jtarea",iJet,itJet->jetArea() );
@@ -251,7 +251,7 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
     vars.FillVars( "jt15eta",iJet,itJet->eta() );
     vars.FillVars( "jt15phi",iJet,itJet->phi() );
     vars.FillVars( "jt15csvt",iJet,fmax(itJet->bDiscriminator(btagger),-.1) );        
-    vars.FillVars( "jt15puid",iJet,itJet->userFloat("pileupJetId:fullDiscriminant") );
+    //    vars.FillVars( "jt15puid",iJet,itJet->userFloat("pileupJetId:fullDiscriminant") );
 
     vars.FillVars( "jt15ntracks",iJet,itJet->associatedTracks().size() );
     vars.FillVars( "jt15area",iJet,itJet->jetArea() );

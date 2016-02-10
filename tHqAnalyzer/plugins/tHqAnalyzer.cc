@@ -90,7 +90,7 @@ private:
 
   map<string,float> GetWeights(const GenEventInfoProduct& genEventInfo, const EventInfo& eventInfo, const reco::VertexCollection& selectedPVs, const std::vector<pat::Jet>& selectedJets, const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon>& selectedMuons, const std::vector<reco::GenParticle>& genParticles, sysType::sysType systype=sysType::NA);//, edm::Run const& iRun);
   void GetSystWeights(const LHEEventProduct& LHEEvent, vector<string> &weight_syst_id, vector<float> &weight_syst, float &Weight_orig);
-      
+  float GetTopPtWeight(float toppt1, float toppt2);
       
       
   // ----------member data ---------------------------
@@ -280,7 +280,7 @@ private:
 //
 // constructors and destructor
 //
-tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelper("../../MiniAOD/MiniAODHelper/data/csv_rwt_fit_hf_2015_11_20.root","../../MiniAOD/MiniAODHelper/data/csv_rwt_fit_lf_2015_11_20.root",5)),pvWeight((tHqUtils::GetAnalyzerPath()+"/data/pvweights/data.root").c_str(),"data",(tHqUtils::GetAnalyzerPath()+"/data/pvweights/mc.root").c_str(),"mc"){
+tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelper("MiniAOD/MiniAODHelper/data/csv_rwt_fit_hf_2015_11_20.root","MiniAOD/MiniAODHelper/data/csv_rwt_fit_lf_2015_11_20.root",5)),pvWeight((tHqUtils::GetAnalyzerPath()+"/data/pvweights/data.root").c_str(),"data",(tHqUtils::GetAnalyzerPath()+"/data/pvweights/mc.root").c_str(),"mc"){
   std::string era = iConfig.getParameter<std::string>("era");
   string analysisType = iConfig.getParameter<std::string>("analysisType");
   analysisType::analysisType iAnalysisType = analysisType::LJ;
@@ -546,8 +546,11 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   helper.AddElectronRelIso(electrons,coneSize::R03, corrType::rhoEA,effAreaType::spring15,"relIso");
   std::vector<pat::Electron> rawElectrons = electrons;
-  std::vector<pat::Electron> selectedElectrons = helper.GetSelectedElectrons( electrons, 15., electronID::electronEndOf15NonTrigMVA80iso0p15 );
-  std::vector<pat::Electron> selectedElectronsLoose = helper.GetSelectedElectrons( electrons, 10., electronID::electronEndOf15NonTrigMVA80iso0p15 );
+  //  std::vector<pat::Electron> selectedElectrons = helper.GetSelectedElectrons( electrons, 15., electronID::electronEndOf15NonTrigMVA80iso0p15 );
+  //  std::vector<pat::Electron> selectedElectronsLoose = helper.GetSelectedElectrons( electrons, 10., electronID::electronEndOf15NonTrigMVA80iso0p15 );
+
+  std::vector<pat::Electron> selectedElectrons = helper.GetSelectedElectrons( electrons, 15., electronID::electronSpring15T );
+  std::vector<pat::Electron> selectedElectronsLoose = helper.GetSelectedElectrons( electrons, 10., electronID::electronSpring15T );
 
 
   /**** GET MET ****/
@@ -712,7 +715,7 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   edm::Handle< std::vector<reco::GenParticle> > h_genParticles;
   if(!isData){
     iEvent.getByToken( EDMGenParticlesToken,h_genParticles );
-    std::vector<reco::GenParticle> const &genParticles = *h_genParticles;
+    //    std::vector<reco::GenParticle> const &genParticles = *h_genParticles;
   }
   
   /**** GET GENJETS ****/
@@ -1007,6 +1010,10 @@ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventIn
   float puweight = 1.;
   float topptweight = 1.;
   
+  //Calculate TopPt Weight
+
+  topptweight = (foundT&&foundTbar) ? GetTopPtWeight(genTopEvt.GetTop().pt(),genTopEvt.GetTopBar().pt()) : 1.;
+
 
   //get vectors of jet properties
   std::vector<double> jetPts;
@@ -1112,6 +1119,14 @@ void tHqAnalyzer::GetSystWeights(const LHEEventProduct&  LHEEvent, vector<string
   return;
 
 }
+
+float tHqAnalyzer::GetTopPtWeight(float toppt1, float toppt2){
+  float sf1=exp(0.156-0.00137*toppt1);
+  float sf2=exp(0.156-0.00137*toppt2);
+  return sqrt(sf1*sf2);
+}
+
+
 
 
 // ------------ method called once each job just before starting event loop  ------------
