@@ -97,7 +97,7 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVars( "pupjtcsvt","npupjt" );
   vars.InitVars( "pupjtcsvt_mvav2","npupjt" );
 
-
+  
 
   /*
   vars.InitVar( "Evt_E_PrimaryLepton" );
@@ -295,6 +295,7 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
   math::XYZTLorentzVector primLepVec = math::XYZTLorentzVector();
   if(input.selectedElectrons.size()>0 || input.selectedMuons.size()>0){
     primLepVec = tHqUtils::GetPrimLepVec(input.selectedElectrons,input.selectedMuons);
+    cout << "Primary Lepton   -->   Pt :" << primLepVec.Pt() << "   Eta: " << primLepVec.Eta()  << endl;
   }
   
   // Fill Lepton Variables

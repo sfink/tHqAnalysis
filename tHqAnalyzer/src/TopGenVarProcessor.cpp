@@ -271,7 +271,7 @@ void TopGenVarProcessor::Process(const InputCollections& input,VariableContainer
   }
         
 
-  std::cout << "IsFilled: "<< input.genTopEvt.IsFilled() << " | TTxIsFilled: " << input.genTopEvt.TTxIsFilled() << " | IsSemiLepton: " << input.genTopEvt.IsSemiLepton() << endl;
+  std::cout << "IsFilled: "<< input.genTopEvt.IsFilled() << " | TTxIsFilled: " << input.genTopEvt.TTxIsFilled() << " | IsSemiLepton: " << input.genTopEvt.IsSemiLepton() << " | IsHadronic: " << input.genTopEvt.IsAllHadron() << " | IsDiLepton: " << input.genTopEvt.IsDiLepton() << endl;
 
   if(input.genTopEvt.IsFilled()&&input.genTopEvt.TTxIsFilled()&&input.genTopEvt.IsSemiLepton()){
     std::vector<reco::GenJet> bhad_genjet=input.genTopEvt.GetAllTopHadBGenJets();

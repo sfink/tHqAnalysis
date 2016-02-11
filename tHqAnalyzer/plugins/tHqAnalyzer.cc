@@ -365,8 +365,8 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelp
 
   // electron MVA info
   // TODO: these (and many of the names above) shouldn't be hard coded but set in python cfg
-  EDMeleMVAvaluesToken           = consumes<edm::ValueMap<float> >(edm::InputTag("electronMVAValueMapProducer","ElectronMVAEstimatorRun2Spring15NonTrig25nsV1Values",""));
-  EDMeleMVAcategoriesToken       = consumes<edm::ValueMap<int> >(edm::InputTag("electronMVAValueMapProducer","ElectronMVAEstimatorRun2Spring15NonTrig25nsV1Categories",""));
+  EDMeleMVAvaluesToken           = consumes<edm::ValueMap<float> >(edm::InputTag("electronMVAValueMapProducer","ElectronMVAEstimatorRun2Spring15Trig25nsV1Values",""));
+  EDMeleMVAcategoriesToken       = consumes<edm::ValueMap<int> >(edm::InputTag("electronMVAValueMapProducer","ElectronMVAEstimatorRun2Spring15Trig25nsV1Categories",""));
 
   if(useLHE){
     EDMLHEEventToken      = consumes< LHEEventProduct >(edm::InputTag("source"));
@@ -560,8 +560,8 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   //  std::vector<pat::Electron> selectedElectrons = helper.GetSelectedElectrons( electrons, 15., electronID::electronEndOf15NonTrigMVA80iso0p15 );
   //  std::vector<pat::Electron> selectedElectronsLoose = helper.GetSelectedElectrons( electrons, 10., electronID::electronEndOf15NonTrigMVA80iso0p15 );
 
-  std::vector<pat::Electron> selectedElectrons = helper.GetSelectedElectrons( electrons, 15., electronID::electronSpring15T );
-  std::vector<pat::Electron> selectedElectronsLoose = helper.GetSelectedElectrons( electrons, 10., electronID::electronSpring15T );
+  std::vector<pat::Electron> selectedElectrons = helper.GetSelectedElectrons( electrons, 20., electronID::electronEndOf15MVA80iso0p15, 2.1 );
+  std::vector<pat::Electron> selectedElectronsLoose = helper.GetSelectedElectrons( electrons, 15., electronID::electronEndOf15MVA80iso0p15, 2.4 );
 
 
   /**** GET MET ****/
