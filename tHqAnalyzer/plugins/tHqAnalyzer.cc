@@ -88,7 +88,18 @@ private:
   virtual void beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup) override;
   
 
-  map<string,float> GetWeights(const GenEventInfoProduct& genEventInfo, const EventInfo& eventInfo, const reco::VertexCollection& selectedPVs, const std::vector<pat::Jet>& selectedJets, const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon>& selectedMuons, const std::vector<reco::GenParticle>& genParticles, sysType::sysType systype=sysType::NA);//, edm::Run const& iRun);
+  map<string,float> GetWeights(const GenEventInfoProduct& genEventInfo, 
+			       const EventInfo& eventInfo, 
+			       const reco::VertexCollection& selectedPVs, 
+			       const std::vector<pat::Jet>& selectedJets, 
+			       const std::vector<pat::Electron>& selectedElectrons, 
+			       const std::vector<pat::Muon>& selectedMuons, 
+			       const std::vector<reco::GenParticle>& genParticles, 
+			       const GenTopEvent& genTopEvt,
+			       const sysType::sysType systype=sysType::NA, 
+			       const SampleType sampletype=SampleType::nonttbkg
+			       );
+
   void GetSystWeights(const LHEEventProduct& LHEEvent, vector<string> &weight_syst_id, vector<float> &weight_syst, float &Weight_orig);
   float GetTopPtWeight(float toppt1, float toppt2);
       
@@ -740,24 +751,6 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   // Fill Event Info Object
   EventInfo eventInfo(iEvent,h_beamspot,h_hcalnoisesummary,h_puinfosummary,firstVertexIsGood,*h_rho);
   
-  /*  // Fill Trigger Info
-  map<string,bool> triggerMap;
-  for(auto name=relevantTriggers.begin(); name!=relevantTriggers.end();name++){
-    cout << "Searching for Trigger " << *name << endl;
-    unsigned int TriggerID =  hlt_config.triggerIndex(*name);
-    if( TriggerID >= triggerResults.size() ) { 
-      triggerMap[*name]=false;
-      cout << "Did not find Trigger " << *name << endl;
-    }
-    else{
-      triggerMap[*name]=triggerResults.accept(TriggerID);
-      cout << "Found Trigger " << *name << endl;
-    }
-  }
-  */
-  //  TriggerInfo triggerInfo(triggerMap);
-
- 
   // FIGURE OUT SAMPLE
   
   bool foundT=false;
@@ -904,12 +897,12 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   map<string,float> weights_jesdown;
   map<string,float> weights_jerdown;
   if(!isData){
-    weights       = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_nominal,selectedElectrons,selectedMuons,*h_genParticles,sysType::NA);
-    weights_jesup = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_jesup,selectedElectrons,selectedMuons,*h_genParticles,sysType::JESup);
-    weights_jesdown = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_jesdown,selectedElectrons,selectedMuons,*h_genParticles,sysType::JESdown);
-    weights_jerup = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_jerup,selectedElectrons,selectedMuons,*h_genParticles,sysType::JERup);
-    weights_jerdown = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_jerdown,selectedElectrons,selectedMuons,*h_genParticles,sysType::JERdown);
-    weights_uncorrjets = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_uncorrected,selectedElectrons,selectedMuons,*h_genParticles,sysType::NA);
+    weights       = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_nominal,selectedElectrons,selectedMuons,*h_genParticles,genTopEvt,sysType::NA,sampleType);
+    weights_jesup = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_jesup,selectedElectrons,selectedMuons,*h_genParticles,genTopEvt,sysType::JESup,sampleType);
+    weights_jesdown = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_jesdown,selectedElectrons,selectedMuons,*h_genParticles,genTopEvt,sysType::JESdown,sampleType);
+    weights_jerup = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_jerup,selectedElectrons,selectedMuons,*h_genParticles,genTopEvt,sysType::JERup,sampleType);
+    weights_jerdown = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_jerdown,selectedElectrons,selectedMuons,*h_genParticles,genTopEvt,sysType::JERdown,sampleType);
+    weights_uncorrjets = GetWeights(*h_geneventinfo,eventInfo,selectedPVs,selectedJets_uncorrected,selectedElectrons,selectedMuons,*h_genParticles,genTopEvt,sysType::NA,sampleType);
     if(useLHE){
       GetSystWeights(*h_lheeventinfo,syst_weights_id,syst_weights,Weight_orig);
     }
@@ -981,7 +974,18 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   }
 }
 
-map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventInfo,const EventInfo& eventInfo, const reco::VertexCollection& selectedPVs, const std::vector<pat::Jet>& selectedJets, const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon>& selectedMuons, const std::vector<reco::GenParticle>& genParticles, sysType::sysType systype){//, edm::Run const& iRun){
+
+map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventInfo,
+					  const EventInfo& eventInfo, 
+					  const reco::VertexCollection& selectedPVs, 
+					  const std::vector<pat::Jet>& selectedJets, 
+					  const std::vector<pat::Electron>& selectedElectrons, 
+					  const std::vector<pat::Muon>& selectedMuons, 
+					  const std::vector<reco::GenParticle>& genParticles, 
+					  const GenTopEvent& genTopEvt,
+					  const sysType::sysType systype, 
+					  const SampleType sampletype
+					  ){
   
   map<string,float> weights;
   
@@ -1011,8 +1015,9 @@ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventIn
   float topptweight = 1.;
   
   //Calculate TopPt Weight
-
-  topptweight = (foundT&&foundTbar) ? GetTopPtWeight(genTopEvt.GetTop().pt(),genTopEvt.GetTopBar().pt()) : 1.;
+  bool isTTbar;
+  isTTbar = (sampletype == SampleType::ttl || sampletype == SampleType::ttb || sampletype == SampleType::ttbb ||sampletype == SampleType::ttcc || sampletype == SampleType::tt2b) ? true : false;
+  topptweight = (isTTbar) ? GetTopPtWeight(genTopEvt.GetTop().pt(),genTopEvt.GetTopBar().pt()) : 1.;
 
 
   //get vectors of jet properties
@@ -1054,9 +1059,8 @@ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventIn
 
     
   cout << "PU weight :" << weights["Weight_PU"] << endl;
-  cout << "PV weight :" << weights["Weight_PV"] << endl;
   cout << "CSV weight :" << weights["Weight_CSV"] << endl;
-  
+  cout << "TopPt weight :" << weights["Weight_TopPt"] << endl;
 
   if(systype != sysType::JESup && systype != sysType::JESup && systype != sysType::JERup && systype != sysType::JERdown) {
 
