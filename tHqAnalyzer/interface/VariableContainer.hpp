@@ -38,7 +38,7 @@ class VariableContainer{
     void SetDefaultValues();
     void PrintArrayValue( TString name );
     void Dump();
-
+    void DumpBasic();
 
   private:
   

@@ -423,16 +423,18 @@ bool tHqUtils::IsAnyTriggerBitFired(const std::vector<string> & targetTriggers, 
 std::vector<math::XYZTLorentzVector> tHqUtils::GetLepVecs(const std::vector<pat::Electron>& selectedElectrons, const std::vector<pat::Muon> selectedMuons){
   
   std::vector<math::XYZTLorentzVector> leptonVecs;
-  
-  for(std::vector<pat::Electron>::const_iterator itEle = selectedElectrons.begin(); itEle != selectedElectrons.end(); ++itEle){
-    leptonVecs.push_back(itEle->p4());
-  }
+    for(std::vector<pat::Electron>::const_iterator itEle = selectedElectrons.begin(); itEle != selectedElectrons.end(); ++itEle){
+      leptonVecs.push_back(itEle->p4());
+    }
   for(std::vector<pat::Muon>::const_iterator itMu = selectedMuons.begin(); itMu != selectedMuons.end(); ++itMu){
     leptonVecs.push_back(itMu->p4());
   }
   
-  std::sort(leptonVecs.begin(), leptonVecs.end(),tHqUtils::FirstIsHarder);
   
+  std::sort(leptonVecs.begin(), leptonVecs.end(),tHqUtils::FirstIsHarder);
+
+
+
   return leptonVecs;
   
 } 
@@ -518,20 +520,44 @@ vector<math::XYZTLorentzVector> tHqUtils::GetJetVecs(const std::vector<pat::Jet>
 }
 
 
-bool tHqUtils::PassesCSV(const pat::Jet& jet, const char workingPoint){
-  
-  //  float CSVLv2wp = 0.605;
-  // float CSVMv2wp = 0.89;
-  // float CSVTv2wp = 0.97;
+std::vector<pat::Jet> tHqUtils::GetForwardJets(const std::vector<pat::Jet>& jets ){
  
+  const float maxEta = 2.4;
+  std::vector<pat::Jet> fwdJets;
 
-  float CSVLv2wp = 0.460;
-  float CSVMv2wp = 0.800;
-  float CSVTv2wp = 0.935;
-   
-  //Adapted WP from   https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation76X
+  for(std::vector<pat::Jet>::const_iterator itJet=jets.begin();itJet!=jets.end();++itJet){
+    if(itJet->eta() >= maxEta ) fwdJets.push_back(*itJet);
+  }
 
-  float csvValue = jet.bDiscriminator("combinedInclusiveSecondaryVertexV2BJetTags");
+  
+  return fwdJets;
+}
+
+
+bool tHqUtils::PassesCSV(const pat::Jet& jet, const char workingPoint, const std::string btagger){
+  
+  float CSVLv2wp = 0.;
+  float CSVMv2wp = 0.;
+  float CSVTv2wp = 0.;
+ 
+  if(btagger=="pfCombinedInclusiveSecondaryVertexV2BJetTags"){
+    CSVLv2wp = 0.460;
+    CSVMv2wp = 0.800;
+    CSVTv2wp = 0.935;
+  }   
+  else if (btagger=="pfCombinedMVAV2BJetTags"){
+    CSVLv2wp = -0.715;
+    CSVMv2wp = 0.185;
+    CSVTv2wp = 0.875;
+  } 
+  else {
+    cerr << "Unknown BTagger specified" << endl;
+    return 1;
+  }
+
+  //Adapted WP from   https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation76X (rev21)
+
+  float csvValue = jet.bDiscriminator(btagger);
   
   switch(workingPoint){
     case 'L': if(csvValue > CSVLv2wp){ return true; } break;
@@ -692,9 +718,7 @@ bool tHqUtils::GetTriggerResponse(const std::string& targetTrigger, const edm::T
   //  bool hasTriggered=false;
 
   //  unsigned int TriggerID =  triggerResults.find(targetTrigger);
-  std::cout << targetTrigger << std::endl;
   if(targetTrigger == "None") std::cout << "Not found" << std::endl;
-  std::cout<< triggerResults.size()<<" " <<std::endl;
   //if( TriggerID >= triggerResults.size() ) std::cout << "ERROR" << std::endl;
   //std::cout<< triggerResults.accept(TriggerID)<<std::endl;
   //if( triggerResults.accept(TriggerID)) hasTriggered=true;

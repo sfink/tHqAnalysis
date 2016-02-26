@@ -21,7 +21,7 @@ void GentHqEvent::Fill(const std::vector<reco::GenParticle>& prunedGenParticles)
   for(auto p=prunedGenParticles.begin(); p!=prunedGenParticles.end(); p++){
 
     
-    GentHqEvent::PrintParticle(*p);
+    //    GentHqEvent::PrintParticle(*p);
     // top quark
     if (abs(p->pdgId())==6 && p->isLastCopy()){
       top=*p;
@@ -181,18 +181,18 @@ void GentHqEvent::Fill(const std::vector<reco::GenParticle>& prunedGenParticles)
     //    if (p->pdgId()*(-1)==top_decay_quark.pdgId() && p->statusFlags().isLastCopy() && p->statusFlags().fromHardProcess()){
     if (p->pdgId()*(-1)==top_decay_quark.pdgId() ){//&& p->statusFlags().isLastCopy() && p->statusFlags().fromHardProcess()){
 
-      std::cout << "Status of second b: " << p->status() << std::endl;
+      //      std::cout << "Status of second b: " << p->status() << std::endl;
       if (p->pt()!=higgs_decay_products[0].pt() && p->pt()!=higgs_decay_products[1].pt())
 	secondb=*p;
       
     }
   }
 
-  std::cout << "Top decay quark id: " << top_decay_quark.pdgId() << std::endl;
+  /*  std::cout << "Top decay quark id: " << top_decay_quark.pdgId() << std::endl;
   std::cout << "Second b pt: " << secondb.pt() << std::endl;
   std::cout << "Higgs energy: " << higgs.energy() << std::endl;
   std::cout << "W energy: " << wboson.energy() << std::endl;
-  std::cout << "W id: " << wboson.pdgId() << std::endl;
+  std::cout << "W id: " << wboson.pdgId() << std::endl; */
 
   if(w_decay_products.size()!=2) std::cerr << "GentHqEvent: error 2"<<std::endl;
   if(top.energy()<1||wboson.energy()<1) std::cerr << "GentHqEvent: error 3"<<std::endl;

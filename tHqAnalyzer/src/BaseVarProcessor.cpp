@@ -22,15 +22,21 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVar( "nlmu", "I");
   vars.InitVar( "nlel", "I");
   vars.InitVar( "nmu", "I");
+  vars.InitVar( "nlep", "I");
   vars.InitVar( "nel", "I");
   vars.InitVar( "nvetomu", "I");
   vars.InitVar( "nvetoel", "I");
   vars.InitVar( "nlepw", "I" );
+  vars.InitVar( "nfwdjt", "I");
 
 
   vars.InitVar( "nbtagl", "I");  //New btag multiplicity variables
   vars.InitVar( "nbtagm", "I");  //
   vars.InitVar( "nbtagt", "I");  //
+  vars.InitVar( "nbtagt_mva", "I");  //
+  vars.InitVar( "nbtagm_mva", "I");  //
+  vars.InitVar( "nbtagl_mva", "I");  //
+
 
   vars.InitVar( "npv", "I");
 
@@ -141,6 +147,13 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVars( "leliso","nlel" );
   vars.InitVars( "lelcharge","nlel" );
   
+  vars.InitVars( "lepe","nlep" );
+  vars.InitVars( "leppt","nlep" );
+  vars.InitVars( "lepeta","nlep" );
+  vars.InitVars( "lepphi","nlep" );
+  vars.InitVars( "lepiso","nlep" );
+  vars.InitVars( "lepcharge","nlep" );
+
   vars.InitVar( "lepwpt" ,"F");
   vars.InitVar( "lepweta" ,"F");
   vars.InitVar( "lepwphi" ,"F");
@@ -185,18 +198,20 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
 
   // Fill btagged Jets
 
-  const char* btagger="pfCombinedInclusiveSecondaryVertexV2BJetTags";
-  const char* btagger2="pfCombinedMVAV2BJetTags";
+  const string btagger="pfCombinedInclusiveSecondaryVertexV2BJetTags";
+  const string btagger2="pfCombinedMVAV2BJetTags";
   std::vector<pat::Jet> selectedTaggedJets;
   std::vector<pat::Jet> selectedTaggedJetsT;
   std::vector<pat::Jet> selectedTaggedJetsL;
+
+  std::vector<pat::Jet> selectedMVATaggedJetsM;
+  std::vector<pat::Jet> selectedMVATaggedJetsT;
+  std::vector<pat::Jet> selectedMVATaggedJetsL;
+
   std::vector<pat::Jet> selectedUntaggedJets;
   for(std::vector<pat::Jet>::const_iterator itJet = input.selectedJets.begin(); itJet != input.selectedJets.end(); ++itJet){
     if(tHqUtils::PassesCSV(*itJet, 'M')){
       selectedTaggedJets.push_back(*itJet);
-    }
-    else{
-      selectedUntaggedJets.push_back(*itJet);
     }
     if(tHqUtils::PassesCSV(*itJet, 'L')){
       selectedTaggedJetsL.push_back(*itJet);
@@ -204,7 +219,20 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
     if(tHqUtils::PassesCSV(*itJet, 'T')){
       selectedTaggedJetsT.push_back(*itJet);
     }
+    else selectedUntaggedJets.push_back(*itJet);
+    if(tHqUtils::PassesCSV(*itJet, 'T', btagger2)){
+      selectedMVATaggedJetsT.push_back(*itJet);
+    }
+    if(tHqUtils::PassesCSV(*itJet, 'M', btagger2)){
+      selectedMVATaggedJetsM.push_back(*itJet);
+    }
+    if(tHqUtils::PassesCSV(*itJet, 'L', btagger2)){
+      selectedMVATaggedJetsL.push_back(*itJet);
+    }
   }
+
+  std::vector<pat::Jet> selectedForwardJets = tHqUtils::GetForwardJets(input.selectedJets);
+
   
   // Fill Multiplicity Variables
   vars.FillVar( "npv",input.selectedPVs.size());  
@@ -215,6 +243,18 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
   vars.FillVar( "nlel",input.selectedElectronsLoose.size());  
   vars.FillVar( "nmu",input.selectedMuons.size());  
   vars.FillVar( "nlmu",input.selectedMuonsLoose.size());  
+  vars.FillVar( "nfwdjt",selectedForwardJets.size());
+
+  // Fill Number of b Tags
+  
+  vars.FillVar( "nbtagm",selectedTaggedJets.size() );  
+  vars.FillVar( "nbtagl",selectedTaggedJetsL.size() );  
+  vars.FillVar( "nbtagt",selectedTaggedJetsT.size() );
+
+  vars.FillVar( "nbtagm_mva",selectedMVATaggedJetsM.size() );  
+  vars.FillVar( "nbtagl_mva",selectedMVATaggedJetsL.size() );  
+  vars.FillVar( "nbtagt_mva",selectedMVATaggedJetsT.size() );
+  
   
   // Fill Jet Variables
   // All Jets
@@ -295,9 +335,7 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
   math::XYZTLorentzVector primLepVec = math::XYZTLorentzVector();
   if(input.selectedElectrons.size()>0 || input.selectedMuons.size()>0){
     primLepVec = tHqUtils::GetPrimLepVec(input.selectedElectrons,input.selectedMuons);
-    cout << "Primary Lepton   -->   Pt :" << primLepVec.Pt() << "   Eta: " << primLepVec.Eta()  << endl;
   }
-  
   // Fill Lepton Variables
   for(std::vector<pat::Electron>::const_iterator itEle = input.selectedElectrons.begin(); itEle != input.selectedElectrons.end(); ++itEle){
     int iEle = itEle - input.selectedElectrons.begin();
@@ -308,6 +346,16 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
     vars.FillVars( "eliso",iEle,tHqUtils::GetElectronIso(*itEle) ); //FIXME
     vars.FillVars( "elcharge",iEle,itEle->charge() );
   }
+
+
+  std::vector<math::XYZTLorentzVector> selectedLeptons = tHqUtils::GetLepVecs(input.selectedElectrons,input.selectedMuons);
+  for(std::vector<math::XYZTLorentzVector>::const_iterator itLep = selectedLeptons.begin(); itLep != selectedLeptons.end(); ++itLep){
+    int iLep = itLep - selectedLeptons.begin();
+    vars.FillVars( "leppt",iLep,itLep->pt() );
+    vars.FillVars( "lepeta",iLep,itLep->eta() );
+    vars.FillVars( "lepphi",iLep,itLep->phi() ); 
+  }
+
 
   // Fill Lepton Variables
   for(std::vector<pat::Electron>::const_iterator itEle = input.selectedElectronsLoose.begin(); itEle != input.selectedElectronsLoose.end(); ++itEle){
@@ -411,12 +459,6 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
   vars.FillVar("sumHtTotal",ht);
   vars.FillVar("sumHt",htjets);
    
-  // Fill Number of b Tags
-  
-  vars.FillVar( "nbtagm",selectedTaggedJets.size() );  
-  vars.FillVar( "nbtagl",selectedTaggedJetsL.size() );  
-  vars.FillVar( "nbtagt",selectedTaggedJetsT.size() );
-  
   // Fill CSV Variables
   // All Jets
   std::vector<float> csvJets;
@@ -448,8 +490,8 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
   vars.FillVar( "aplanarity", aplanarity );
   vars.FillVar( "sphericity", sphericity );
 
-  //  input.Dump();
-  //  vars.Dump();
+
+  vars.DumpBasic();
 
 
   /*

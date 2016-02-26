@@ -1,4 +1,6 @@
 #include "tHqAnalysis/tHqAnalyzer/interface/VariableContainer.hpp"
+#include <iostream>
+#include <iomanip>
 
 using namespace std;
 
@@ -139,13 +141,20 @@ void VariableContainer::FillVars( TString name, int index, float value ) {
     if(maxEntriesArrays[name]<index){
       cerr << "array " << name << " is shorter than " << index << endl;
     }
-    else arrayMap[name][index]=value;
+    else {
+      arrayMap[name][index]=value;
+      arrayMapFilled[name]=true;
+    }
   }
   else if(arrayIntMap.count(name)==1){
     if(maxEntriesArraysInt[name]<index){
       cerr << "array " << name << " is shorter than " << index << endl;
     }
-    else arrayIntMap[name][index]=value;
+    else{
+      arrayIntMap[name][index]=value;
+      arrayIntMapFilled[name]=true;
+    }
+    
   }
 }
 
@@ -335,6 +344,94 @@ void VariableContainer::Dump(){
     ++itSdefault;
   }
 }
+
+
+void VariableContainer::DumpBasic(){
+  cout << "#######################################" << endl;
+  cout << "#########     DUMP BASIC  #############" << endl;
+  cout << "#######################################" << endl << endl;
+  
+  cout << "Eventinfo : " << endl;
+  if(intMapFilled["run"]) cout << setw(25) << "Run" << setw(10) << intMap["run"] << endl;
+  if(intMapFilled["lbn"])  cout << setw(25) << "Lumi" << setw(10) << intMap["lbn"] << endl;
+  if(longMapFilled["evt"])  cout << setw(25) << "Evt" << setw(10) << longMap["evt"] << endl<< endl;
+  
+  if(intMapFilled["nmu"] && intMapFilled["nel"] ) cout << setw(25) << "# of Leptons"  << setw(10) << intMap["nmu"] << endl;
+  if(intMapFilled["njt"])  cout << setw(25) << "# of Jets"  << setw(10) << intMap["njt"] << endl;
+
+  if(intMapFilled["nbtagl"]) cout << setw(25) << "# of btagged(CSVL) Jets"  << setw(10) << intMap["nbtagl"] << endl;
+  if(intMapFilled["nbtagm"]) cout << setw(25) << "# of btagged(CSVM) Jets"  << setw(10) << intMap["nbtagm"] << endl;
+  if(intMapFilled["nbtagt"]) cout << setw(25) << "# of btagged(CSVT) Jets"  << setw(10) << intMap["nbtagt"] << endl;
+  
+  if(intMapFilled["nbtagl_mva"]) cout << setw(25) << "# of btagged(MVAL) Jets"  << setw(10) << intMap["nbtagl_mva"] << endl;
+  if(intMapFilled["nbtagm_mva"]) cout << setw(25) << "# of btagged(MVAM) Jets"  << setw(10) << intMap["nbtagm_mva"] << endl;  
+  if(intMapFilled["nbtagt_mva"]) cout << setw(25) << "# of btagged(MVAT) Jets"  << setw(10) << intMap["nbtagt_mva"] << endl;
+  
+  if(intMapFilled["nfwdjt"])   cout << setw(25) << "# of forward Jets"  << setw(10) << intMap["nfwdjt"] << endl << endl;
+
+  cout << "Leptons : " << endl;
+  if(intMapFilled["nel"]) cout << setw(25) << "# of Electrons" << setw(10) << intMap["nel"] << endl;
+  if(intMapFilled["nmu"]) cout << setw(25) << "# of Muons" << setw(10) << intMap["nmu"] << endl << endl;
+  
+  if(arrayMapFilled["leppt"]) cout << setw(25) << "Lep1 Pt" << setw(10) << arrayMap["leppt"][0] << endl;
+  if(arrayMapFilled["lepeta"]) cout << setw(25) << "Lep1 Eta" << setw(10) << arrayMap["lepeta"][0] << endl;
+  if(arrayMapFilled["lepphi"]) cout << setw(25) << "Lep1 Phi" << setw(10) << arrayMap["lepphi"][0] << endl<< endl;
+  
+  if(intMap["nmu"]+intMap["nel"]>1){
+    if(arrayMapFilled["leppt"]) cout << setw(25) << "Lep2 Pt" << setw(10) << arrayMap["leppt"][1] << endl;
+    if(arrayMapFilled["lepeta"]) cout << setw(25) << "Lep2 Eta" << setw(10) << arrayMap["lepeta"][1] << endl;
+    if(arrayMapFilled["lepphi"]) cout << setw(25) << "Lep2 Phi" << setw(10) << arrayMap["lepphi"][1] << endl<< endl;
+  }
+
+  cout << "Jets : " << endl;
+  if(intMap["njt"]>0){
+    if(arrayMapFilled["jtpt"])  cout << setw(25) << "Jet1 Pt" << setw(10) << arrayMap["jtpt"][0] << endl;
+    if(arrayMapFilled["jteta"])  cout << setw(25) << "Jet1 Eta"<< setw(10) << arrayMap["jteta"][0] << endl;
+    if(arrayMapFilled["jtphi"])  cout << setw(25) << "Jet1 Phi" << setw(10) << arrayMap["jtphi"][0]<< endl;
+    if(arrayMapFilled["jtcsvt"])  cout << setw(25) << "Jet1 CSV" << setw(10) << arrayMap["jtcsvt"][0]<< endl << endl;
+  }
+
+  if(intMap["njt"]>1){
+    if(arrayMapFilled["jtpt"])  cout << setw(25) << "Jet2 Pt" << setw(10) << arrayMap["jtpt"][1] << endl;
+    if(arrayMapFilled["jteta"])  cout << setw(25) << "Jet2 Eta" << setw(10) << arrayMap["jteta"][1] << endl;
+    if(arrayMapFilled["jtphi"])  cout << setw(25) << "Jet2 Phi" << setw(10) << arrayMap["jtphi"][1] << endl;
+    if(arrayMapFilled["jtcsvt"])  cout << setw(25) << "Jet2 CSV" << setw(10) << arrayMap["jtcsvt"][1] << endl<< endl;
+  }
+
+  if(intMap["njt"]>2){
+    if(arrayMapFilled["jtpt"])  cout << setw(25) << "Jet3 Pt" << setw(10) << arrayMap["jtpt"][2] << endl;
+    if(arrayMapFilled["jteta"])  cout << setw(25) << "Jet3 Eta" << setw(10) << arrayMap["jteta"][2] << endl;
+    if(arrayMapFilled["jtphi"])  cout << setw(25) << "Jet3 Phi" << setw(10) << arrayMap["jtphi"][2] << endl;
+    if(arrayMapFilled["jtcsvt"])  cout << setw(25) << "Jet3 CSV" << setw(10) << arrayMap["jtcsvt"][2] << endl<< endl;
+  }
+  
+  /*  if(arrayMapFilled["jpt"])  cout << setw(25) << "Jet1 JecSF" << setw(10) << arrayMap["jtpt"][0] << endl;
+  if(arrayMapFilled["jpt"])  cout << setw(25) << "Jet1 JecSF" << setw(10) << arrayMap["jtpt"][0] << endl;
+  if(arrayMapFilled["jpt"])  cout << setw(25) << "Jet1 JecSF" << setw(10) << arrayMap["jtpt"][0] << endl;
+  
+  if(arrayMapFilled["jpt"])  cout << setw(25) << "Jet1 JerSF" << setw(10) << arrayMap["jtpt"][0] << endl;
+  if(arrayMapFilled["jpt"])  cout << setw(25) << "Jet1 JerSF" << setw(10) << arrayMap["jtpt"][0] << endl;
+  if(arrayMapFilled["jpt"])  cout << setw(25) << "Jet1 JerSF" << setw(10) << arrayMap["jtpt"][0] << endl << endl;
+  */
+
+  cout << "MET : " << endl;
+  if(floatMapFilled["met"])  cout << setw(25) << "MET" << setw(10) << floatMap["met"] << endl;
+  if(floatMapFilled["metphi"])  cout << setw(25) << "METphi" <<  setw(10) <<  floatMap["metphi"] <<endl << endl;
+  /*  
+       cout << "Weights : " << endl;
+  if(floatMapFilled["met"])  cout << setw(25) << "Trigger Weight" << endl;
+  if(floatMapFilled["met"])  cout << setw(25) << "Trigger Weight_up" << endl;
+  if(floatMapFilled["met"])  cout << setw(25) << "Trigger Weight_down" << endl;
+  if(floatMapFilled["met"])  cout << setw(25) << "Pileup Weight" << endl;
+  if(floatMapFilled["met"])  cout << setw(25) << "CSV Weight" << endl;
+  if(floatMapFilled["met"])  cout << setw(25) << "Lep1 Weight" << endl;
+  if(floatMapFilled["met"])  cout << setw(25) << "Lep2 Weight" << endl;
+  if(floatMapFilled["met"])  cout << setw(25) << "TopPt Weight" << endl;
+  */
+}
+
+
+
 
 
 float* VariableContainer::GetFloatVarPointer(TString name){

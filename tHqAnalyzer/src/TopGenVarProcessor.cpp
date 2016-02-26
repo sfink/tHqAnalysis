@@ -94,14 +94,10 @@ void TopGenVarProcessor::Init(const InputCollections& input,VariableContainer& v
 
 void TopGenVarProcessor::Process(const InputCollections& input,VariableContainer& vars){
   
-  if(!initialized) cerr << "tree processor not initialized" << endl;
-  cout << "Starting the TopGenVarProcessor for ttbar samples..." << endl;  
-  
+  if(!initialized) cerr << "tree processor not initialized" << endl;  
   int iBB = 0;
   int iCC = 0;
   
-  std::cout << "Before filling ttx" << std::endl;
-
   if(input.sampleType == SampleType::ttbb) iBB = 3;
   if(input.sampleType == SampleType::ttb) iBB = 1;
   if(input.sampleType == SampleType::tt2b) iBB = 2;
@@ -153,14 +149,10 @@ void TopGenVarProcessor::Process(const InputCollections& input,VariableContainer
    
   }
 
-  std::cout << "#W from top daughters: " << topwdau.size() << endl;
-  std::cout << "#W from topbar daughters: " << topbarwdau.size() << endl;
-
   vars.FillVar("n_tophad", tophad.size());
   vars.FillVar("n_toplep", toplep.size());
   
   vars.FillVar("top_lepcharge", toplep_lep.charge());
-  cout << "LepCharge: " << toplep_lep.charge() << endl;
 
   vector<math::XYZTLorentzVector> jetvecs = tHqUtils::GetJetVecs(input.selectedJets);
   
@@ -170,8 +162,6 @@ void TopGenVarProcessor::Process(const InputCollections& input,VariableContainer
   vars.FillVars( "top_twdaupt",0,topwdau[0].pt());
   vars.FillVars( "top_twdaupt",1,topwdau[1].pt()); //Fix 
   
-  cout << "Pt of TopDaughters: " << topwdau[0].pt() << "     "   << topwdau[1].pt() << endl;
-
   vars.FillVar( "top_teta",top.eta());  
   vars.FillVar( "top_tweta",topw.eta());
   vars.FillVar( "top_tbeta",topb.eta());
@@ -266,7 +256,7 @@ void TopGenVarProcessor::Process(const InputCollections& input,VariableContainer
       vars.FillVar( "tophadq1idx",idxq1);
     }
     if(minDrTopHadQ2<.25){
-      vars.FillVar( "tophadq2dx",idxq2);
+      vars.FillVar( "tophadq2idx",idxq2);
     }
   }
         

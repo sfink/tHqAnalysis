@@ -74,7 +74,9 @@ class tHqUtils{
     
     static std::vector<math::XYZTLorentzVector> GetJetVecs(const std::vector<pat::Jet>& jets);
     
-    static bool PassesCSV(const pat::Jet& jet, const char workingPoint);
+  static bool PassesCSV(const pat::Jet& jet, const char workingPoint,  const std::string btagger = "pfCombinedInclusiveSecondaryVertexV2BJetTags");
+
+    static std::vector<pat::Jet> GetForwardJets(const std::vector<pat::Jet>& jets );
     
     static float GetClosestJetIDs(int& idJet1, int& idJet2, const std::vector<pat::Jet>& jets);
     static float GetClosestLepJetID(int& idJet, const math::XYZTLorentzVector& lepVec, const std::vector<pat::Jet>& jets);

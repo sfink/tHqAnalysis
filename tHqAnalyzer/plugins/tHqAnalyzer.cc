@@ -172,10 +172,10 @@ private:
   vector<std::string> relevantTriggers;
 
   /** calculate and store systematic weights? */
-  bool doSystematics = 1;
+  bool doSystematics = 0;
 
   /** calculate JER systematics **/
-  bool doJERsystematic =1;
+  bool doJERsystematic =0;
   
   /** use GenBmatching info? this is only possible if the miniAOD contains them */
   bool useGenHadronMatch;
@@ -472,7 +472,10 @@ tHqAnalyzer::~tHqAnalyzer()
 // ------------ method called for each event  ------------
 void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-  if(eventcount<10||eventcount%1000==0){
+  if(eventcount<100||eventcount%1000==0){
+    cout << endl << "=============================================" <<endl;
+    cout << "=============================================" <<endl;
+    cout << endl;
     cout << "----------------------------------------" << endl;
     cout << "-           Analyzing event " << eventcount << "          -" << endl;
     cout << "----------------------------------------" << endl;
@@ -781,7 +784,6 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   if(!isData&&useGenHadronMatch&&foundT&&foundTbar){
 
-    std::cout << "Doing tt+X categorization" << endl;
     /**** tt+X categorization ****/
     // Reading gen jets from the event
     // Reading B hadrons related information
@@ -1057,11 +1059,7 @@ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventIn
 
   //  weights["Weight_PV"] = pvWeight.GetWeight(selectedPVs.size());
 
-    
-  cout << "PU weight :" << weights["Weight_PU"] << endl;
-  cout << "CSV weight :" << weights["Weight_CSV"] << endl;
-  cout << "TopPt weight :" << weights["Weight_TopPt"] << endl;
-
+  
   if(systype != sysType::JESup && systype != sysType::JESup && systype != sysType::JERup && systype != sysType::JERdown) {
 
     weights["Weight_CSVLFup"] = csvReweighter.getCSVWeight(jetPts,jetEtas,jetCSVs,jetFlavors,9, csvWgtHF, csvWgtLF, csvWgtCF)/csvweight;

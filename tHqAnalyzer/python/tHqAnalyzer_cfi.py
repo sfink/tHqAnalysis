@@ -34,43 +34,30 @@ else:
     var_recorrectMET=False
     print "Recorrect MET: %s (To activate use : \"export RECORRECTMET=1\")" % var_recorrectMET
 
-Trigger_data = cms.vstring("HLT_Ele22_eta2p1_WPLoose_Gsf_v*",
-                           "HLT_Ele22_eta2p1_WPTight_Gsf_v*",
-                           "HLT_Ele27_WPLoose_Gsf_v*",
-                           "HLT_Ele27_eta2p1_WPLoose_Gsf_v*",
-                           "HLT_Ele27_eta2p1_WPTight_Gsf_v*",
-                           "HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v*",
-                           "HLT_Ele32_eta2p1_WPLoose_Gsf_v*",
-                           "HLT_Ele32_eta2p1_WPTight_Gsf_v*",
-                           "HLT_Mu17_v*",
-                           "HLT_Mu20_v*",
-                           "HLT_Mu24_eta2p1_v*",
-                           "HLT_Mu27_v*",
-                           "HLT_IsoMu17_eta2p1_v*",
-                           "HLT_IsoMu18_v*",
-                           "HLT_IsoMu20_v*",
-                           "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v*",
-                           "HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v*",
-                           "HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v*",
-                           "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v*",
-                           "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v*")
 
-Trigger_mc = cms.vstring("HLT_Ele22_eta2p1_WP75_Gsf_v*",
-                         "HLT_Ele27_eta2p1_WP85_Gsf_HT200_v*",
-                         "HLT_Ele27_WP85_Gsf_v*",
-                         "HLT_Ele32_eta2p1_WP75_Gsf_v*",
+Trigger_data = cms.vstring("HLT_IsoMu18_v*",
+                         "HLT_Ele23_WPLoose_Gsf_v*",
                          "HLT_Mu20_v*",
-                         "HLT_Mu27_v*",
-                         "HLT_IsoMu17_eta2p1_v*",
+                         "HLT_Ele27_eta2p1_WPLoose_Gsf_v*",
                          "HLT_IsoMu20_v*",
-                         "HLT_IsoMu20_eta2p1_v*",
-                         "HLT_IsoMu24_eta2p1_v*",
+                         "HLT_IsoTkMu20_v*",
                          "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v*",
                          "HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v*",
                          "HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v*",
                          "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v*",
                          "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v*")
 
+Trigger_mc = cms.vstring("HLT_IsoMu18_v*",
+                         "HLT_Ele23_WPLoose_Gsf_v*",
+                         "HLT_Mu20_v*",
+                         "HLT_Ele27_eta2p1_WPLoose_Gsf_v*",
+                         "HLT_IsoMu20_v*",
+                         "HLT_IsoTkMu20_v*",
+                         "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v*",
+                         "HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v*",
+                         "HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v*",
+                         "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v*",
+                         "HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v*")
 
 if(var_isData):
     var_relevantTrigger = Trigger_data

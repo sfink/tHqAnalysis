@@ -67,8 +67,7 @@ void tHqGenVarProcessor::Init(const InputCollections& input,VariableContainer& v
 void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer& vars){
   
   if(!initialized) cerr << "tree processor not initialized" << endl;
-  cout << "Starting the tHqProcessor ..." << endl;
-  
+    
   reco::GenParticle H;
   reco::GenParticle W;
   reco::GenParticle t;
@@ -90,14 +89,6 @@ void tHqGenVarProcessor::Process(const InputCollections& input,VariableContainer
 
   assert(Hdau.size()!=0);
 
-  std::cout << "Higgs pt" << H.pt() << endl;
-  std::cout << "#Hdaus: " << Hdau.size() << endl;
-  std::cout << "Hdau eta: " << Hdau[0].eta() << endl;
-  std::cout << "Hdau eta: " << Hdau[1].eta() << endl;
-  std::cout << "Hdau pt: " << Hdau[0].pt() << endl;
-  std::cout << "Hdau pt: " << Hdau[1].pt() << endl;
-  std::cout << "#Wdaus: " << Wdau.size() << endl;
-  
   
   vector<math::XYZTLorentzVector> jetvecs = tHqUtils::GetJetVecs(input.selectedJets);
 
