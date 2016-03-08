@@ -11,16 +11,10 @@ options = VarParsing ('analysis')
 # The following variables are already defined in VarParsing class:
 # maxEvents: singleton, int; default = -1
 # inputFiles: (comma separated, no spaces!) list, string: default empty
-options.register( "outName", "testrun", VarParsing.multiplicity.singleton, VarParsing.varType.string, "name and path of the output files (without extension)" )
-options.register( "weight", 0.01, VarParsing.multiplicity.singleton, VarParsing.varType.float, "xs*lumi/(nPosEvents-nNegEvents)" )
+options.register( "outName", "tHqAnalyzed", VarParsing.multiplicity.singleton, VarParsing.varType.string, "name and path of the output files (without extension)" )
 options.register( "skipEvents", 0, VarParsing.multiplicity.singleton, VarParsing.varType.int, "Number of events to skip" )
 options.register( "isData", False, VarParsing.multiplicity.singleton, VarParsing.varType.bool, "is it data or MC?" )
-options.register( "isBoostedMiniAOD", True, VarParsing.multiplicity.singleton, VarParsing.varType.bool, "has the file been prepared with the BoostedProducer ('custom' MiniAOD)?" )
-options.register( "makeSystematicsTrees", True, VarParsing.multiplicity.singleton, VarParsing.varType.bool, "do you need all systematics (e.g. to calculate limits)?" )
-options.register( "generatorName", "notSpecified", VarParsing.multiplicity.singleton, VarParsing.varType.string, "'POWHEG','aMC', 'MadGraph' or 'pythia8'" )
-options.register( "analysisType", "SL", VarParsing.multiplicity.singleton, VarParsing.varType.string, "'SL' or 'DL'" )
 options.register( "globalTag", "76X_mcRun2_asymptotic_RunIIFall15DR76_v0", VarParsing.multiplicity.singleton, VarParsing.varType.string, "global tag" )
-options.register( "useJson",False, VarParsing.multiplicity.singleton, VarParsing.varType.bool, "apply the json filter (on the grid there are better ways to do this)" )
 options.parseArguments()
 
 # re-set some defaults
@@ -32,10 +26,6 @@ if not options.inputFiles:
 NIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/00000/0AA8FC13-75C7-E511-B2D8-38EAA78E2C94.root']
 
 # checks for correct values and consistency
-if options.analysisType not in ["SL","DL"]:
-    print "\n\nConfig ERROR: unknown analysisType '"+options.analysisType+"'"
-    print "Options are 'SL' or 'DL'\n\n"
-    sys.exit()
 if "data" in options.globalTag.lower() and not options.isData:
     print "\n\nConfig ERROR: GT contains seems to be for data but isData==False\n\n"
     sys.exit()
@@ -125,16 +115,11 @@ if options.isData:
 
 # load and run the boosted analyzer
 if options.isData:
-    if options.analysisType=='SL':
-        process.load("tHqAnalysis.tHqAnalyzer.tHqAnalyzer_cfi")
-    if options.analysisType=='DL':
-        process.load("BoostedTTH.BoostedAnalyzer.BoostedAnalyzer_dilepton_data_cfi")        
+    
+    process.load("tHqAnalysis.tHqAnalyzer.tHqAnalyzer_cfi")
 else:
-    if options.analysisType=='SL':
-        process.load("tHqAnalysis.tHqAnalyzer.tHqAnalyzer_cfi")
-    if options.analysisType=='DL':
-        process.load("BoostedTTH.BoostedAnalyzer.BoostedAnalyzer_dilepton_cfi")
-
+    process.load("tHqAnalysis.tHqAnalyzer.tHqAnalyzer_cfi")
+    
 
     # Supplies PDG ID to real name resolution of MC particles
     process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
@@ -144,13 +129,7 @@ else:
 process.tHqAnalyzer.outfileName=options.outName
 #if not options.isData:
 #    process.tHqAnalyzer.eventWeight = options.weight
-#process.BoostedAnalyzer.makeSystematicsTrees=options.makeSystematicsTrees
 #process.BoostedAnalyzer.generatorName=options.generatorName
-
-
-if options.isData and options.useJson:
-    import FWCore.PythonUtilities.LumiList as LumiList
-    process.source.lumisToProcess = LumiList.LumiList(filename = '/afs/desy.de/user/h/hmildner/CMSSW_7_4_14/src/BoostedTTH/BoostedAnalyzer/data/json/Cert_246908-258750_13TeV_PromptReco_Collisions15_25ns_JSON.txt').getVLuminosityBlockRange()
 
 #process.BoostedAnalyzer.doJERsystematic = False
 

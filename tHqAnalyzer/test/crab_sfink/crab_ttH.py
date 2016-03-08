@@ -2,7 +2,7 @@ from WMCore.Configuration import Configuration
 import os
 config = Configuration()
 
-os.environ['GLOBALTAG'] = '74X_mcRun2_asymptotic_v4'
+os.environ['GLOBALTAG'] = '76X_mcRun2_asymptotic_RunIIFall15DR76_v0'
 os.environ['ISDATA'] = "0"
 os.environ['USELHE'] = "1"
 
@@ -12,17 +12,17 @@ config.General.workArea = 'crab_projects'
 
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = '/afs/desy.de/user/f/fink/xxl/af-cms/13TeV/CMSSW_7_4_15_patch1/src/tHqAnalysis/tHqAnalyzer/test/tHqAnalysis_cfg.py'
+config.JobType.psetName = '/afs/desy.de/user/f/fink/xxl/af-cms/13TeV/CMSSW_7_6_3/src/tHqAnalysis/tHqAnalyzer/test/tHqAnalysis_cfg.py'
 #config.JobType.outputFiles = ['tHqAnalyzed_Tree.root']
 
 config.section_("Data")
-config.Data.inputDataset = '/ttHTobb_M125_13TeV_powheg_pythia8/RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/MINIAODSIM'
+config.Data.inputDataset = '/ttHTobb_M125_13TeV_powheg_pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_RunIIFall15DR76_v0-v1/MINIAODSIM'
 
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 5
 config.Data.publication = False
-#config.Data.totalUnits = 5
+config.Data.totalUnits = 2
 #config.Data.publishDbsUrl = 'phys03'
 config.Data.outputDatasetTag = 'tHqAnalysis_MiniAOD'
 
