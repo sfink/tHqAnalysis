@@ -311,9 +311,9 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelp
   useLHE = iConfig.getParameter<bool>("useLHE");
   useGenHadronMatch = iConfig.getParameter<bool>("useGenHadronMatch");
   recorrectMET = iConfig.getParameter<bool>("recorrectMET");
+  doSystematics = iConfig.getParameter<bool>("doSystematics");
 
   if(isData) doSystematics = false;
-
   
   //  useFatJets = iConfig.getParameter<bool>("useFatJets");
   outfileName = iConfig.getParameter<std::string>("outfileName");

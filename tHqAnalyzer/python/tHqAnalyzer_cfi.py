@@ -64,6 +64,8 @@ if(var_isData):
 else:
     var_relevantTrigger = Trigger_mc
 
+
+
 tHqAnalyzer = cms.EDAnalyzer(
     'tHqAnalyzer',
     LeptonSelectionNoTrigger,
@@ -76,11 +78,11 @@ tHqAnalyzer = cms.EDAnalyzer(
     sampleID = cms.int32(9125),
     xs = cms.double(248),
     nMCEvents = cms.int32(25000000),
-
+#    doSystematics = options.doSystematics,
     # PU weights, defined in Weights_cff
     nominalPUWeight = cms.PSet(NominalPUWeight),
     additionalPUWeights = cms.VPSet(AdditionalPUWeights),
-
+    doSystematics = cms.bool(False),
 
     useFatJets = cms.bool(False),
     useLHE = cms.bool(var_useLHE),

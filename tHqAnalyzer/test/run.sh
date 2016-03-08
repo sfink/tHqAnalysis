@@ -1,1 +1,1 @@
-cmsRun tHqAnalysis_cfg.py isData=False outputFile=BeepBoop maxEvents=100 $1
+cmsRun tHqAnalysis_cfg.py isData=False outName=BeepBoop maxEvents=100 $1

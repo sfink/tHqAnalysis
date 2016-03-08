@@ -15,6 +15,8 @@ options.register( "outName", "tHqAnalyzed", VarParsing.multiplicity.singleton, V
 options.register( "skipEvents", 0, VarParsing.multiplicity.singleton, VarParsing.varType.int, "Number of events to skip" )
 options.register( "isData", False, VarParsing.multiplicity.singleton, VarParsing.varType.bool, "is it data or MC?" )
 options.register( "globalTag", "76X_mcRun2_asymptotic_RunIIFall15DR76_v0", VarParsing.multiplicity.singleton, VarParsing.varType.string, "global tag" )
+options.register( "doSystematics", True, VarParsing.multiplicity.singleton, VarParsing.varType.bool, "Produce different files for JES and JER systematics?" )
+
 options.parseArguments()
 
 # re-set some defaults
@@ -24,6 +26,7 @@ if not options.inputFiles:
 #    options.inputFiles=['file:/pnfs/desy.de/cms/tier2/store/user/hmildner/ttHTobb_M125_13TeV_powheg_pythia8/Boostedv3MiniAOD/151120_183808/0000/BoostedTTH_MiniAOD_10.root']
     options.inputFiles=['root://cmsxrootd.fnal.gov///store/mc/RunIIFall15MiniAODv2/THQ_Hincl_13TeV-madgraph-pythia8_TuneCUETP8M1/MI\
 NIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/00000/0AA8FC13-75C7-E511-B2D8-38EAA78E2C94.root']
+
 
 # checks for correct values and consistency
 if "data" in options.globalTag.lower() and not options.isData:
@@ -127,6 +130,7 @@ else:
     process.load("tHqAnalysis.tHqProducer.genHadronMatching_cfi")
 
 process.tHqAnalyzer.outfileName=options.outName
+process.tHqAnalyzer.doSystematics=options.doSystematics
 #if not options.isData:
 #    process.tHqAnalyzer.eventWeight = options.weight
 #process.BoostedAnalyzer.generatorName=options.generatorName
