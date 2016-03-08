@@ -115,6 +115,8 @@ private:
   HistoReweighter pvWeight;
   PUWeights puWeights_;
   
+  HistoReweighter njetWeight;
+
   /** writes flat trees for MVA analysis */
   TreeWriter treewriter_nominal;
   
@@ -291,7 +293,11 @@ private:
 //
 // constructors and destructor
 //
-tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelper("MiniAOD/MiniAODHelper/data/csv_rwt_fit_hf_2015_11_20.root","MiniAOD/MiniAODHelper/data/csv_rwt_fit_lf_2015_11_20.root",5)),pvWeight((tHqUtils::GetAnalyzerPath()+"/data/pvweights/data.root").c_str(),"data",(tHqUtils::GetAnalyzerPath()+"/data/pvweights/mc.root").c_str(),"mc"){
+tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelper("/tHqAnalysis/tHqAnalyzer/data/csvweights/csv_rwt_fit_hf_76x_2016_02_08.root","/tHqAnalysis/tHqAnalyzer/data/csvweights/csv_rwt_fit_lf_76x_2016_02_08.root",5))
+							  ,pvWeight((tHqUtils::GetAnalyzerPath()+"/data/pvweights/data.root").c_str(),"data",
+								    (tHqUtils::GetAnalyzerPath()+"/data/pvweights/mc.root").c_str(),"mc"),
+							   njetWeight((tHqUtils::GetAnalyzerPath()+"/data/njetweights/NJEThistos.root").c_str(),"data","mc")
+{
   std::string era = iConfig.getParameter<std::string>("era");
   string analysisType = iConfig.getParameter<std::string>("analysisType");
   analysisType::analysisType iAnalysisType = analysisType::LJ;
@@ -1056,6 +1062,8 @@ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventIn
   weights["Weight_CSV"] = csvweight;
   weights["Weight_TopPt"] = topptweight;
   weights["Weight_PU"] = puweight;
+  weights["Weight_NJets"] = njetWeight.GetWeight(selectedJets.size());
+
 
   //  weights["Weight_PV"] = pvWeight.GetWeight(selectedPVs.size());
 

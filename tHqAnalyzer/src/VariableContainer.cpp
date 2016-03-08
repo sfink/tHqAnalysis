@@ -405,29 +405,21 @@ void VariableContainer::DumpBasic(){
     if(arrayMapFilled["jtcsvt"])  cout << setw(25) << "Jet3 CSV" << setw(10) << arrayMap["jtcsvt"][2] << endl<< endl;
   }
   
-  /*  if(arrayMapFilled["jpt"])  cout << setw(25) << "Jet1 JecSF" << setw(10) << arrayMap["jtpt"][0] << endl;
-  if(arrayMapFilled["jpt"])  cout << setw(25) << "Jet1 JecSF" << setw(10) << arrayMap["jtpt"][0] << endl;
-  if(arrayMapFilled["jpt"])  cout << setw(25) << "Jet1 JecSF" << setw(10) << arrayMap["jtpt"][0] << endl;
-  
-  if(arrayMapFilled["jpt"])  cout << setw(25) << "Jet1 JerSF" << setw(10) << arrayMap["jtpt"][0] << endl;
-  if(arrayMapFilled["jpt"])  cout << setw(25) << "Jet1 JerSF" << setw(10) << arrayMap["jtpt"][0] << endl;
-  if(arrayMapFilled["jpt"])  cout << setw(25) << "Jet1 JerSF" << setw(10) << arrayMap["jtpt"][0] << endl << endl;
-  */
-
-  cout << "MET : " << endl;
+    cout << "MET : " << endl;
   if(floatMapFilled["met"])  cout << setw(25) << "MET" << setw(10) << floatMap["met"] << endl;
   if(floatMapFilled["metphi"])  cout << setw(25) << "METphi" <<  setw(10) <<  floatMap["metphi"] <<endl << endl;
-  /*  
-       cout << "Weights : " << endl;
-  if(floatMapFilled["met"])  cout << setw(25) << "Trigger Weight" << endl;
-  if(floatMapFilled["met"])  cout << setw(25) << "Trigger Weight_up" << endl;
-  if(floatMapFilled["met"])  cout << setw(25) << "Trigger Weight_down" << endl;
-  if(floatMapFilled["met"])  cout << setw(25) << "Pileup Weight" << endl;
-  if(floatMapFilled["met"])  cout << setw(25) << "CSV Weight" << endl;
-  if(floatMapFilled["met"])  cout << setw(25) << "Lep1 Weight" << endl;
-  if(floatMapFilled["met"])  cout << setw(25) << "Lep2 Weight" << endl;
-  if(floatMapFilled["met"])  cout << setw(25) << "TopPt Weight" << endl;
-  */
+
+  
+  cout << "Weights : " << endl;
+  if(floatMapFilled["Weight_CSV"])  cout << setw(25) << "CSV Weight" << setw(10) << floatMap["Weight_CSV"] << endl;
+  if(floatMapFilled["Weight_TopPt"])  cout << setw(25) << "TopPt Weight" << setw(10) << floatMap["Weight_TopPt"] << endl;
+  if(floatMapFilled["Weight_PU"])  cout << setw(25) << "Pileup Weight" << setw(10) << floatMap["Weight_PU"] << endl;
+  if(floatMapFilled["Weight_CSVLFup"])  cout << setw(25) << "CSV LFup" << setw(10) << floatMap["Weight_CSVLFup"] << endl;
+  if(floatMapFilled["Weight_CSVLFdown"])  cout << setw(25) << "CSV LFdown" << setw(10) << floatMap["Weight_CSVLFdown"] << endl;
+  if(floatMapFilled["Weight_CSVHFup"])  cout << setw(25) << "CSV HFup" << setw(10) << floatMap["Weight_CSVHFup"] << endl;
+  if(floatMapFilled["Weight_CSVHFdown"])  cout << setw(25) << "CSV HFdown" << setw(10) << floatMap["Weight_CSVHFdown"] << endl;
+  if(arrayMapFilled["weight_syst"])  cout << setw(25) << "syst weight[0]" << setw(10) << arrayMap["weight_syst"][0] << endl;
+  if(floatMapFilled["Weight_NJets"])  cout << setw(25) << "NJet Weight" << setw(10) << floatMap["Weight_NJets"] << endl;
 }
 
 

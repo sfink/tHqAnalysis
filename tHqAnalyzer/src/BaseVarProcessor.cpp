@@ -245,6 +245,8 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
   vars.FillVar( "nlmu",input.selectedMuonsLoose.size());  
   vars.FillVar( "nfwdjt",selectedForwardJets.size());
 
+ 
+
   // Fill Number of b Tags
   
   vars.FillVar( "nbtagm",selectedTaggedJets.size() );  
@@ -355,7 +357,8 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
     vars.FillVars( "lepeta",iLep,itLep->eta() );
     vars.FillVars( "lepphi",iLep,itLep->phi() ); 
   }
-
+  vars.FillVar( "nlep",selectedLeptons.size());
+  
 
   // Fill Lepton Variables
   for(std::vector<pat::Electron>::const_iterator itEle = input.selectedElectronsLoose.begin(); itEle != input.selectedElectronsLoose.end(); ++itEle){
@@ -491,7 +494,7 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
   vars.FillVar( "sphericity", sphericity );
 
 
-  vars.DumpBasic();
+  //  vars.DumpBasic();
 
 
   /*
