@@ -452,6 +452,30 @@ math::XYZTLorentzVector tHqUtils::GetPrimLepVec(const std::vector<pat::Electron>
   return leptonVecs[0];
 }
 
+int tHqUtils::GetLepPdg(const math::XYZTLorentzVector& lepvec, const std::vector<pat::Electron>& selectedElectrons,const std::vector<pat::Muon> selectedMuons){
+
+  float leppt = lepvec.pt();
+  int pdg_id=-99;
+  
+  for(std::vector<pat::Electron>::const_iterator itEle = selectedElectrons.begin(); itEle != selectedElectrons.end(); ++itEle){
+    if(itEle->pt()==leppt){
+      pdg_id=11;
+      if(itEle->charge()==-1) pdg_id= -11;
+    }
+  }
+
+  for(std::vector<pat::Muon>::const_iterator itMu = selectedMuons.begin(); itMu != selectedMuons.end(); ++itMu){
+    if(itMu->pt()==leppt){
+      pdg_id=13;
+      if(itMu->charge()==-1) pdg_id= -13;
+    }
+  }
+    
+  cout << "Returning PDF id: " << pdg_id << endl;
+  return pdg_id;
+}
+
+
 
 void tHqUtils::GetNuVec(const math::XYZTLorentzVector& lepvec, const TVector2& metvec, math::XYZTLorentzVector& nuvec, math::XYZTLorentzVector& lepwvec){
   

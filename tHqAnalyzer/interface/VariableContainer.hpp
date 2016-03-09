@@ -21,7 +21,7 @@ class VariableContainer{
     void InitVars( TString name, float defaultValue, TString nEntryVariable, int maxentries =999 );
     void InitVars( TString name, TString nEntryVariable, int maxentries=999 );
     void InitStrings( TString name, TString defaultValue, TString nEntryVariable, int maxentries =999 );
-    void InitIntVars( TString name, int defaulValue, int nEntries=999 );
+    void InitIntVars( TString name, int defaultValue, int nEntries=999 );
     void FillVars( TString name, int index, float value ); 
     void FillStrings( TString name, int index, TString value ); 
     float* GetFloatVarPointer( TString name); 

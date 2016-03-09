@@ -153,6 +153,7 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVars( "lepphi","nlep" );
   vars.InitVars( "lepiso","nlep" );
   vars.InitVars( "lepcharge","nlep" );
+  vars.InitVars( "leppdg", -99, "nlep" );
 
   vars.InitVar( "lepwpt" ,"F");
   vars.InitVar( "lepweta" ,"F");
@@ -356,6 +357,7 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
     vars.FillVars( "leppt",iLep,itLep->pt() );
     vars.FillVars( "lepeta",iLep,itLep->eta() );
     vars.FillVars( "lepphi",iLep,itLep->phi() ); 
+    vars.FillVars( "leppdg",iLep,tHqUtils::GetLepPdg(*itLep, input.selectedElectrons, input.selectedMuons));
   }
   vars.FillVar( "nlep",selectedLeptons.size());
   

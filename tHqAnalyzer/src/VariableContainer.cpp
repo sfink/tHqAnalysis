@@ -92,7 +92,7 @@ void VariableContainer::InitIntVars( TString name, int defaultValue, int nEntrie
   if(intMap.count(name)>0 || floatMap.count(name)>0 || arrayMap.count(name)>0 || arrayIntMap.count(name)>0){
     cerr << name << " already initialized!" << endl;
   }
-
+  
   arrayIntMap[name] = new int[nEntries];
   arrayIntMapDefaults[name] = defaultValue;
   arrayIntMapFilled[name] = false;
@@ -376,11 +376,14 @@ void VariableContainer::DumpBasic(){
   if(arrayMapFilled["leppt"]) cout << setw(25) << "Lep1 Pt" << setw(10) << arrayMap["leppt"][0] << endl;
   if(arrayMapFilled["lepeta"]) cout << setw(25) << "Lep1 Eta" << setw(10) << arrayMap["lepeta"][0] << endl;
   if(arrayMapFilled["lepphi"]) cout << setw(25) << "Lep1 Phi" << setw(10) << arrayMap["lepphi"][0] << endl<< endl;
+  if(arrayMapFilled["leppdg"]) cout << setw(25) << "Lep1 PDG" << setw(10) << arrayMap["leppdg"][0] << endl<< endl;
+
   
   if(intMap["nmu"]+intMap["nel"]>1){
     if(arrayMapFilled["leppt"]) cout << setw(25) << "Lep2 Pt" << setw(10) << arrayMap["leppt"][1] << endl;
     if(arrayMapFilled["lepeta"]) cout << setw(25) << "Lep2 Eta" << setw(10) << arrayMap["lepeta"][1] << endl;
     if(arrayMapFilled["lepphi"]) cout << setw(25) << "Lep2 Phi" << setw(10) << arrayMap["lepphi"][1] << endl<< endl;
+    if(arrayMapFilled["leppdg"]) cout << setw(25) << "Lep2 PDG" << setw(10) << arrayMap["leppdg"][1] << endl<< endl;
   }
 
   cout << "Jets : " << endl;
