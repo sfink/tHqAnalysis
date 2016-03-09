@@ -391,23 +391,39 @@ void VariableContainer::DumpBasic(){
     if(arrayMapFilled["jtpt"])  cout << setw(25) << "Jet1 Pt" << setw(10) << arrayMap["jtpt"][0] << endl;
     if(arrayMapFilled["jteta"])  cout << setw(25) << "Jet1 Eta"<< setw(10) << arrayMap["jteta"][0] << endl;
     if(arrayMapFilled["jtphi"])  cout << setw(25) << "Jet1 Phi" << setw(10) << arrayMap["jtphi"][0]<< endl;
-    if(arrayMapFilled["jtcsvt"])  cout << setw(25) << "Jet1 CSV" << setw(10) << arrayMap["jtcsvt"][0]<< endl << endl;
-    if(arrayMapFilled["jtCvsL"])  cout << setw(25) << "Jet1 CvsL" << setw(10) << arrayMap["jtCvsL"][0]<< endl <<endl;
-    if(arrayMapFilled["jtCvsB"])  cout << setw(25) << "Jet1 CvsB" << setw(10) << arrayMap["jtCvsB"][0]<< endl <<endl;
+    if(arrayMapFilled["jtcsvt"])  cout << setw(25) << "Jet1 CSV" << setw(10) << arrayMap["jtcsvt"][0]<<  endl;
+    if(arrayMapFilled["jtCvsL"])  cout << setw(25) << "Jet1 CvsL" << setw(10) << arrayMap["jtCvsL"][0]<< endl;
+    if(arrayMapFilled["jtCvsB"])  cout << setw(25) << "Jet1 CvsB" << setw(10) << arrayMap["jtCvsB"][0]<< endl;
+    if(arrayMapFilled["jtcostheta_l"])  cout << setw(25) << "Jet1 CosTheta_L" << setw(10) << arrayMap["jtcostheta_l"][0]<< endl;
+    if(arrayMapFilled["jtcostheta_j1"])  cout << setw(25) << "Jet1 CosTheta_j1" << setw(10) << arrayMap["jtcostheta_j1"][0]<< endl;
+    if(arrayMapFilled["jtcostheta_cm"])  cout << setw(25) << "Jet1 CosTheta_CM" << setw(10) << arrayMap["jtcostheta_cm"][0]<< endl << endl;
+
   }
 
   if(intMap["njt"]>1){
     if(arrayMapFilled["jtpt"])  cout << setw(25) << "Jet2 Pt" << setw(10) << arrayMap["jtpt"][1] << endl;
     if(arrayMapFilled["jteta"])  cout << setw(25) << "Jet2 Eta" << setw(10) << arrayMap["jteta"][1] << endl;
     if(arrayMapFilled["jtphi"])  cout << setw(25) << "Jet2 Phi" << setw(10) << arrayMap["jtphi"][1] << endl;
-    if(arrayMapFilled["jtcsvt"])  cout << setw(25) << "Jet2 CSV" << setw(10) << arrayMap["jtcsvt"][1] << endl<< endl;
+    if(arrayMapFilled["jtcsvt"])  cout << setw(25) << "Jet2 CSV" << setw(10) << arrayMap["jtcsvt"][1] << endl;
+    if(arrayMapFilled["jtCvsL"])  cout << setw(25) << "Jet2 CvsL" << setw(10) << arrayMap["jtCvsL"][1]<< endl;
+    if(arrayMapFilled["jtCvsB"])  cout << setw(25) << "Jet2 CvsB" << setw(10) << arrayMap["jtCvsB"][1]<< endl;
+    if(arrayMapFilled["jtcostheta_l"])  cout << setw(25) << "Jet2 CosTheta_L" << setw(10) << arrayMap["jtcostheta_l"][1]<< endl;
+    if(arrayMapFilled["jtcostheta_j1"])  cout << setw(25) << "Jet2 CosTheta_j1" << setw(10) << arrayMap["jtcostheta_j1"][1]<< endl;
+    if(arrayMapFilled["jtcostheta_cm"])  cout << setw(25) << "Jet2 CosTheta_CM" << setw(10) << arrayMap["jtcostheta_cm"][1]<< endl << endl;
+
   }
 
   if(intMap["njt"]>2){
     if(arrayMapFilled["jtpt"])  cout << setw(25) << "Jet3 Pt" << setw(10) << arrayMap["jtpt"][2] << endl;
     if(arrayMapFilled["jteta"])  cout << setw(25) << "Jet3 Eta" << setw(10) << arrayMap["jteta"][2] << endl;
     if(arrayMapFilled["jtphi"])  cout << setw(25) << "Jet3 Phi" << setw(10) << arrayMap["jtphi"][2] << endl;
-    if(arrayMapFilled["jtcsvt"])  cout << setw(25) << "Jet3 CSV" << setw(10) << arrayMap["jtcsvt"][2] << endl<< endl;
+    if(arrayMapFilled["jtcsvt"])  cout << setw(25) << "Jet3 CSV" << setw(10) << arrayMap["jtcsvt"][2] << endl;
+    if(arrayMapFilled["jtCvsL"])  cout << setw(25) << "Jet3 CvsL" << setw(10) << arrayMap["jtCvsL"][2]<< endl;
+    if(arrayMapFilled["jtCvsB"])  cout << setw(25) << "Jet3 CvsB" << setw(10) << arrayMap["jtCvsB"][2]<< endl;    
+    if(arrayMapFilled["jtcostheta_l"])  cout << setw(25) << "Jet3 CosTheta_L" << setw(10) << arrayMap["jtcostheta_l"][2]<< endl;
+    if(arrayMapFilled["jtcostheta_j1"])  cout << setw(25) << "Jet3 CosTheta_j1" << setw(10) << arrayMap["jtcostheta_j1"][2]<< endl;
+    if(arrayMapFilled["jtcostheta_cm"])  cout << setw(25) << "Jet3 CosTheta_CM" << setw(10) << arrayMap["jtcostheta_cm"][2]<< endl << endl;
+
   }
   
     cout << "MET : " << endl;
