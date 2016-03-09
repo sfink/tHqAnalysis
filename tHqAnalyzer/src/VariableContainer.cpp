@@ -392,6 +392,8 @@ void VariableContainer::DumpBasic(){
     if(arrayMapFilled["jteta"])  cout << setw(25) << "Jet1 Eta"<< setw(10) << arrayMap["jteta"][0] << endl;
     if(arrayMapFilled["jtphi"])  cout << setw(25) << "Jet1 Phi" << setw(10) << arrayMap["jtphi"][0]<< endl;
     if(arrayMapFilled["jtcsvt"])  cout << setw(25) << "Jet1 CSV" << setw(10) << arrayMap["jtcsvt"][0]<< endl << endl;
+    if(arrayMapFilled["jtCvsL"])  cout << setw(25) << "Jet1 CvsL" << setw(10) << arrayMap["jtCvsL"][0]<< endl <<endl;
+    if(arrayMapFilled["jtCvsB"])  cout << setw(25) << "Jet1 CvsB" << setw(10) << arrayMap["jtCvsB"][0]<< endl <<endl;
   }
 
   if(intMap["njt"]>1){

@@ -48,6 +48,8 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVars( "jteta","njt" );
   vars.InitVars( "jtcsvt","njt" );
   vars.InitVars( "jtcsvt_mvav2","njt" );
+  vars.InitVars( "jtCvsL", "njt");
+  vars.InitVars( "jtCvsB", "njt");
   //  vars.InitVars( "jtpuid","njt" );
 
   vars.InitVars( "jtntracks","njt" );
@@ -71,6 +73,8 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVars( "jt15eta","njt15" );
   vars.InitVars( "jt15csvt","njt15" );
   vars.InitVars( "jt15csvt_mvav2","njt15" );
+
+
   //  vars.InitVars( "jt15puid","njt15" );
 
   vars.InitVars( "jt15ntracks","njt15" );
@@ -201,6 +205,8 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
 
   const string btagger="pfCombinedInclusiveSecondaryVertexV2BJetTags";
   const string btagger2="pfCombinedMVAV2BJetTags";
+
+
   std::vector<pat::Jet> selectedTaggedJets;
   std::vector<pat::Jet> selectedTaggedJetsT;
   std::vector<pat::Jet> selectedTaggedJetsL;
@@ -261,6 +267,9 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
   
   // Fill Jet Variables
   // All Jets
+  const string ctagger="pfCombinedCvsLJetTags";
+  const string ctagger2="pfCombinedCvsBJetTags";
+
   for(std::vector<pat::Jet>::const_iterator itJet = input.selectedJets.begin() ; itJet != input.selectedJets.end(); ++itJet){
     int iJet = itJet - input.selectedJets.begin();
     vars.FillVars( "jte",iJet,itJet->energy() );
@@ -270,7 +279,9 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
 
     vars.FillVars( "jtcsvt",iJet,fmin(fmax(itJet->bDiscriminator(btagger),-0.1),1.0) );        
     vars.FillVars( "jtcsvt_mvav2",iJet,fmin(fmax(itJet->bDiscriminator(btagger2),-0.1),1.0) );
-
+    
+    vars.FillVars( "jtCvsL", iJet, itJet->bDiscriminator(ctagger));
+    vars.FillVars( "jtCvsB", iJet, itJet->bDiscriminator(ctagger2));
 
     //    vars.FillVars( "jtpuid",iJet,itJet->userFloat("pileupJetId:fullDiscriminant") );
 

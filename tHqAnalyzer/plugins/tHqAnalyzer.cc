@@ -1039,8 +1039,8 @@ map<string,float> tHqAnalyzer::GetWeights(const GenEventInfoProduct&  genEventIn
     jetCSVs.push_back(helper.GetJetCSV(*itJet,"pfCombinedInclusiveSecondaryVertexV2BJetTags"));
     jetFlavors.push_back(itJet->hadronFlavour());
   }  
-
-
+  
+  
   // ADD CSV WEIGHTS HERE OR SEPARATLY?
 
 
