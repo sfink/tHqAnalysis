@@ -483,8 +483,10 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
   vars.FillVar( "met",input.pfMET.pt() );
   vars.FillVar( "metphi",input.pfMET.phi() );
 
-  vars.FillVar( "genmet",input.pfMET.genMET()->pt() );
-  vars.FillVar( "genmetphi",input.pfMET.genMET()->phi() );
+  if(input.selectedGenJets.size()>0){
+    vars.FillVar( "genmet",input.pfMET.genMET()->pt() );
+    vars.FillVar( "genmetphi",input.pfMET.genMET()->phi() );
+  }
 
   
   math::XYZTLorentzVector metvec = input.pfMET.p4();

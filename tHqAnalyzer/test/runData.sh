@@ -1,0 +1,1 @@
+cmsRun tHqAnalysis_cfg.py isData=True outName=BeepBoop maxEvents=100 inputFiles='/store/data/Run2015D/DoubleMuon/MINIAOD/16Dec2015-v1/10000/00039A2E-D7A7-E511-98EE-3417EBE64696.root' globalTag='76X_dataRun2_v15' $1
