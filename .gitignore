@@ -4,6 +4,14 @@ __pycache__/
 *.py~
 *.pyc
 
+*/*~
+*/*/*~
+*/*/*/*~
+
+*/*/*.root
+*/*/*Cutflow*
+*/*/*/crab_projects
+
 # C extensions
 *.so
 

@@ -23,7 +23,7 @@ config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 5
 config.Data.publication = False
-config.Data.totalUnits = 1
+#config.Data.totalUnits = 1
 #config.Data.publishDbsUrl = 'phys03'
 config.Data.outputDatasetTag = 'tHqAnalysis_MiniAOD'
 

@@ -26,7 +26,7 @@ config.Data.publication = False
 config.Data.lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions15/13TeV/Reprocessing/Cert_13TeV_16Dec2015ReReco_Collisions15_25ns_JSON_Silver_v2.txt'
 
 
-config.Data.totalUnits = 2
+#config.Data.totalUnits = 2
 #config.Data.publishDbsUrl = 'phys03'
 config.Data.outputDatasetTag = 'tHqAnalysis_MiniAOD'
 
