@@ -370,7 +370,9 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
     vars.FillVars( "elpt",iEle,itEle->pt() );
     vars.FillVars( "eleta",iEle,itEle->eta() );
     vars.FillVars( "elphi",iEle,itEle->phi() ); 
-    vars.FillVars( "eliso",iEle,tHqUtils::GetElectronIso(*itEle) ); //FIXME
+    if(itEle->hasUserFloat("relIso")){
+      vars.FillVars( "eliso",iEle,itEle->userFloat("relIso") );
+    }
     vars.FillVars( "elcharge",iEle,itEle->charge() );
   }
 
@@ -393,7 +395,9 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
     vars.FillVars( "lelpt",iEle,itEle->pt() );
     vars.FillVars( "leleta",iEle,itEle->eta() );
     vars.FillVars( "lelphi",iEle,itEle->phi() ); 
-    vars.FillVars( "leliso",iEle,tHqUtils::GetElectronIso(*itEle) ); //FIXME
+    if(itEle->hasUserFloat("relIso")){
+      vars.FillVars( "leliso",iEle,itEle->userFloat("relIso") );
+    }
     vars.FillVars( "lelcharge",iEle,itEle->charge() );
   }
 
@@ -403,7 +407,9 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
     vars.FillVars( "lmupt",iMu,itMu->pt() );
     vars.FillVars( "lmueta",iMu,itMu->eta() );
     vars.FillVars( "lmuphi",iMu,itMu->phi() );
-    vars.FillVars( "lmuiso",iMu,tHqUtils::GetMuondBetaIso(*itMu) );  //FIXME
+    if(itMu->hasUserFloat("relIso")){
+      vars.FillVars( "lmuiso",iMu,itMu->userFloat("relIso") );
+    }
     vars.FillVars( "lmucharge",iMu,itMu->charge() ); 
   }
 
@@ -413,7 +419,9 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
     vars.FillVars( "mupt",iMu,itMu->pt() );
     vars.FillVars( "mueta",iMu,itMu->eta() );
     vars.FillVars( "muphi",iMu,itMu->phi() );
-    vars.FillVars( "muiso",iMu,tHqUtils::GetMuondBetaIso(*itMu) );  //FIXME
+    if(itMu->hasUserFloat("relIso")){
+      vars.FillVars( "muiso",iMu,itMu->userFloat("relIso") );
+    }
     vars.FillVars( "mucharge",iMu,itMu->charge() ); 
   }
   
