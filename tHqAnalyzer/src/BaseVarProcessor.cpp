@@ -147,7 +147,8 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
 
   vars.InitVars( "ele","nel" );
   vars.InitVars( "elpt","nel" );
-  vars.InitVars( "eleta","nel" );
+  vars.InitVars( "eleta", "nel" );
+  vars.InitVars( "elsceta", -99, "nel" );
   vars.InitVars( "elphi","nel" );
   vars.InitVars( "eliso","nel" );
   vars.InitVars( "elcharge","nel" );
@@ -155,6 +156,7 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
   vars.InitVars( "lele","nlel" );
   vars.InitVars( "lelpt","nlel" );
   vars.InitVars( "leleta","nlel" );
+  vars.InitVars( "lelsceta", -99, "nlel" );
   vars.InitVars( "lelphi","nlel" );
   vars.InitVars( "leliso","nlel" );
   vars.InitVars( "lelcharge","nlel" );
@@ -369,6 +371,7 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
     vars.FillVars( "ele",iEle,itEle->energy() );
     vars.FillVars( "elpt",iEle,itEle->pt() );
     vars.FillVars( "eleta",iEle,itEle->eta() );
+    if (itEle->superCluster().isAvailable())  vars.FillVars( "elsceta",iEle,itEle->superCluster()->position().eta() );
     vars.FillVars( "elphi",iEle,itEle->phi() ); 
     if(itEle->hasUserFloat("relIso")){
       vars.FillVars( "eliso",iEle,itEle->userFloat("relIso") );
@@ -383,6 +386,7 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
     vars.FillVars( "leppt",iLep,itLep->pt() );
     vars.FillVars( "lepeta",iLep,itLep->eta() );
     vars.FillVars( "lepphi",iLep,itLep->phi() ); 
+    vars.FillVars( "lepe",iLep,itLep->energy() ); 
     vars.FillVars( "leppdg",iLep,tHqUtils::GetLepPdg(*itLep, input.selectedElectrons, input.selectedMuons));
   }
   vars.FillVar( "nlep",selectedLeptons.size());
@@ -394,6 +398,7 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
     vars.FillVars( "lele",iEle,itEle->energy() );
     vars.FillVars( "lelpt",iEle,itEle->pt() );
     vars.FillVars( "leleta",iEle,itEle->eta() );
+    if (itEle->superCluster().isAvailable()) vars.FillVars( "lelsceta",iEle,itEle->superCluster()->position().eta() );
     vars.FillVars( "lelphi",iEle,itEle->phi() ); 
     if(itEle->hasUserFloat("relIso")){
       vars.FillVars( "leliso",iEle,itEle->userFloat("relIso") );
