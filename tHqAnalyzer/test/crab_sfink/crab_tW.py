@@ -18,13 +18,13 @@ config.JobType.psetName = '/afs/desy.de/user/f/fink/xxl/af-cms/13TeV/CMSSW_7_6_3
 #config.JobType.outputFiles = ['tHqAnalyzed_Tree.root']
 
 config.section_("Data")
-config.Data.inputDataset = '/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_RunIIFall15DR76_v0-v1/MINIAODSIM'
+config.Data.inputDataset = '/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM'
 
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 5
 config.Data.publication = False
-#config.Data.totalUnits = 2
+##config.Data.totalUnits = 2
 #config.Data.publishDbsUrl = 'phys03'
 config.Data.outputDatasetTag = 'tHqAnalysis_MiniAOD'
 

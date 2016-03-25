@@ -17,14 +17,14 @@ config.JobType.psetName = '/afs/desy.de/user/f/fink/xxl/af-cms/13TeV/CMSSW_7_6_3
 config.JobType.outputFiles = ['tHqAnalyzed_nominal_Tree.root']
 
 config.section_("Data")
-config.Data.inputDataset = '/DoubleMuon/Run2015D-16Dec2015-v2/MINIAOD'
+config.Data.inputDataset = '/DoubleMuon/Run2015D-16Dec2015-v1/MINIAOD'
 
                             
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 5
 config.Data.publication = False
-config.Data.totalUnits = 2
+#config.Data.totalUnits = 2
 #config.Data.publishDbsUrl = 'phys03'
 config.Data.outputDatasetTag = 'tHqAnalysis_MiniAOD'
 config.Data.lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions15/13TeV/Reprocessing/Cert_13TeV_16Dec2015ReReco_Collisions15_25ns_JSON_Silver_v2.txt'

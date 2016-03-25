@@ -12,6 +12,8 @@ options = VarParsing ('analysis')
 # maxEvents: singleton, int; default = -1
 # inputFiles: (comma separated, no spaces!) list, string: default empty
 options.register( "outName", "tHqAnalyzed", VarParsing.multiplicity.singleton, VarParsing.varType.string, "name and path of the output files (without extension)" )
+#options.register( "inputFiles", "bla", VarParsing.multiplicity.singleton, VarParsing.varType.string, "name and path of the input file" )
+
 options.register( "skipEvents", 0, VarParsing.multiplicity.singleton, VarParsing.varType.int, "Number of events to skip" )
 options.register( "isData", False, VarParsing.multiplicity.singleton, VarParsing.varType.bool, "is it data or MC?" )
 options.register( "globalTag", "76X_mcRun2_asymptotic_RunIIFall15DR76_v0", VarParsing.multiplicity.singleton, VarParsing.varType.string, "global tag" )
@@ -116,6 +118,9 @@ if options.isData:
 #===============================================================
 
 
+#process.load('EgammaAnalysis.ElectronTools.calibratedElectronsRun2_cfi')
+#process.selectedElectrons = cms.EDFilter("PATElectronSelector", src = cms.InputTag("slimmedElectrons"), cut = cms.string("pt > 5 && abs(eta)<2.5") ) 
+
 # load and run the boosted analyzer
 if options.isData:
     
@@ -147,4 +152,5 @@ process.tHqAnalyzer.doSystematics=options.doSystematics
 process.load("RecoEgamma.ElectronIdentification.ElectronMVAValueMapProducer_cfi")
 ## check the event content 
 process.content = cms.EDAnalyzer("EventContentAnalyzer")
+#process.p = cms.Path(process.calibratedPatElectrons * process.electronMVAValueMapProducer * process.tHqAnalyzer)
 process.p = cms.Path(process.electronMVAValueMapProducer * process.tHqAnalyzer)

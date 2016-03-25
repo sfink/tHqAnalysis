@@ -9,7 +9,7 @@ os.environ['RECORRECTMET'] = "1"
 config = Configuration()
 
 config.section_("General")
-config.General.requestName = 'TT_TuneCUETP8M1_13TeV-powheg-pythia8'
+config.General.requestName = 'TT_TuneCUETP8M1_13TeV-powheg-pythia8_ext3'
 config.General.workArea = 'crab_projects'
 
 config.section_("JobType")
@@ -18,7 +18,7 @@ config.JobType.psetName = '/afs/desy.de/user/f/fink/xxl/af-cms/13TeV/CMSSW_7_6_3
 #config.JobType.outputFiles = ['tHqAnalyzed_Tree.root']
 
 config.section_("Data")
-config.Data.inputDataset = '/TT_TuneCUETP8M1_13TeV-powheg-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_RunIIFall15DR76_v0_ext3-v1/MINIAODSIM'
+config.Data.inputDataset = '/TT_TuneCUETP8M1_13TeV-powheg-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext3-v1/MINIAODSIM'
 
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'

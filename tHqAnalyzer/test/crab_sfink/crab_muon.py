@@ -17,7 +17,8 @@ config.JobType.psetName = '/afs/desy.de/user/f/fink/xxl/af-cms/13TeV/CMSSW_7_6_3
 config.JobType.outputFiles = ['tHqAnalyzed_nominal_Tree.root']
 
 config.section_("Data")
-config.Data.inputDataset = '/SingleMuon/Run2015D-05Oct2015-v1/MINIAOD'
+config.Data.inputDataset = '/SingleMuon/Run2015D-16Dec2015-v1/MINIAOD'
+
                             
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'
