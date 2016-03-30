@@ -550,7 +550,7 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   std::vector<pat::Muon> const &muons = *h_muons; 
   std::vector<pat::Muon> rawMuons = muons;
   std::vector<pat::Muon> selectedMuons = helper.GetSelectedMuons( muons, 20., muonID::muonTight );
-  std::vector<pat::Muon> selectedMuonsLoose = helper.GetSelectedMuons( muons, 15., muonID::muonLoose );
+  std::vector<pat::Muon> selectedMuonsLoose = helper.GetSelectedMuons( muons, 15., muonID::muonTightDL );
 
   // ELECTRONS
 
