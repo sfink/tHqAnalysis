@@ -40,6 +40,6 @@ void WeightProcessor::Process(const InputCollections& input,VariableContainer& v
     vars.FillStrings("weights_syst_id",iWeight,input.syst_weights_id[iWeight]);
   }
 
-  vars.DumpBasic();
+  //  vars.DumpBasic();
 }
 

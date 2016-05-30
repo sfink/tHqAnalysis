@@ -17,6 +17,7 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
   // Object Counters
 
   vars.InitVar( "njt", "I");
+  vars.InitVar( "ngenjt", "I");
   vars.InitVar( "njt15", "I"); 
   vars.InitVar( "npupjt", "I");
   vars.InitVar( "nlmu", "I");
@@ -99,12 +100,12 @@ void BaseVarProcessor::Init(const InputCollections& input,VariableContainer& var
 
   // Jet Gen Collection
 
-  vars.InitVars( "jtgenflv","njt" );
-  vars.InitVars( "jtgenhadflv", "njt" );
-  vars.InitVars( "jtgenpt","njt" );
-  vars.InitVars( "jtgenphi","njt" );
-  vars.InitVars( "jtgeneta","njt" );
-  vars.InitVars( "jtgene","njt" );
+  vars.InitVars( "jtgenflv","ngenjt" );
+  vars.InitVars( "jtgenhadflv", "ngenjt" );
+  vars.InitVars( "jtgenpt","ngenjt" );
+  vars.InitVars( "jtgenphi","ngenjt" );
+  vars.InitVars( "jtgeneta","ngenjt" );
+  vars.InitVars( "jtgene","ngenjt" );
 
   // Puppi Jets
   
@@ -257,6 +258,7 @@ void BaseVarProcessor::Process(const InputCollections& input,VariableContainer& 
   // Fill Multiplicity Variables
   vars.FillVar( "npv",input.selectedPVs.size());  
   vars.FillVar( "njt",input.selectedJets.size());
+  vars.FillVar( "ngenjt",input.selectedGenJets.size());
   vars.FillVar( "njt15",input.selectedJetsLoose.size());
   vars.FillVar( "npupjt",input.selectedPuppiJets.size());
   vars.FillVar( "nel",input.selectedElectrons.size());  
