@@ -19,10 +19,10 @@ Follow These Steps:
     wget https://twiki.cern.ch/twiki/pub/CMSPublic/GenHFHadronMatcher/GenTtbarCategorizer_cfi.py.txt
     mv GenTtbarCategorizer_cfi.py.txt GenTtbarCategorizer_cfi.py
     cd -
-    git cms-merge-topic gkasieczka:htt-v2-74X
+    git cms-merge-topic gkasieczka:htt-v2-76X
     
-    git clone git@github.com:sfink/tHqAnalysis.git
-    git clone git@github.com:sfink/MiniAOD.git
+    git clone git@github.com:sfink/tHqAnalysis.git -b CMSSW_76x
+    git clone git@github.com:sfink/MiniAOD.git -b CMSSW_76x
     
     scram b -j 12
 
