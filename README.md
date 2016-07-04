@@ -6,8 +6,8 @@ Framework of the tHq group of Karlsruhe, much credit to the ttH group
 ## Installation
 Follow These Steps:
 
-    scram project CMSSW_7_4_15_patch1
-    cd CMSSW_7_4_15_patch1/src/
+    scram project CMSSW_7_6_5
+    cd CMSSW_7_6_5/src/
     cmsenv
     git cms-addpkg PhysicsTools/JetMCAlgos/
     cd PhysicsTools/JetMCAlgos/plugins/
