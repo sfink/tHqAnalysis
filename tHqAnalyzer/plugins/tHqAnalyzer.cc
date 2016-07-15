@@ -126,6 +126,10 @@ private:
   TreeWriter treewriter_jesdown;
   TreeWriter treewriter_jerup;
   TreeWriter treewriter_jerdown;
+
+  /** Declare TreeWriters for unclustered MET systematics */
+  TreeWriter treewriter_unclusteredup;
+  TreeWriter treewriter_unclustereddown;
   
   /** store output file names */
 
@@ -135,6 +139,8 @@ private:
   std::string outfileNameJESdown;
   std::string outfileNameJERup;
   std::string outfileNameJERdown;
+  std::string outfileNameUnclusteredup;
+  std::string outfileNameUnclustereddown;
 
   /** stores cutflow*/
   Cutflow cutflow;
@@ -328,23 +334,32 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelp
     treewriter_jesdown.SetTreeName("JESdown");
     treewriter_jerup.SetTreeName("JERup");
     treewriter_jerdown.SetTreeName("JERdown");
+    treewriter_unclusteredup.SetTreeName("unclusteredup");
+    treewriter_unclustereddown.SetTreeName("unclustereddown");
+
 
     outfileNameJESup=outfileName_nominal;
     outfileNameJESdown=outfileName_nominal;
     outfileNameJERup=outfileName_nominal;
     outfileNameJERdown=outfileName_nominal;
+    outfileNameUnclusteredup=outfileName_nominal;
+    outfileNameUnclustereddown=outfileName_nominal;
   
     if(stringIndex!=std::string::npos){
       outfileNameJESup.replace(stringIndex,7,"JESUP");
       outfileNameJESdown.replace(stringIndex,7,"JESDOWN");
       outfileNameJERup.replace(stringIndex,7,"JERUP");
       outfileNameJERdown.replace(stringIndex,7,"JERDOWN");
+      outfileNameUnclusteredup.replace(stringIndex,7,"UNCLUSTEREDUP");
+      outfileNameUnclustereddown.replace(stringIndex,7,"UNCLUSTEREDDOWN");
     }
     else{
       outfileNameJESup=outfileName+"_JESUP";
       outfileNameJESdown=outfileName+"_JESDOWN";
       outfileNameJERup=outfileName+"_JERUP";
       outfileNameJERdown=outfileName+"_JERDOWN";
+      outfileNameUnclusteredup=outfileName+"_UNCLUSTEREDUP";
+      outfileNameUnclustereddown=outfileName+"_UNCLUSTEREDDOWN";
     }
   }
   std::cout << "Outfile Name: " << outfileName_nominal << std::endl;
@@ -425,6 +440,8 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelp
     treewriter_jesdown.Init(outfileNameJESdown);
     treewriter_jerup.Init(outfileNameJERup);
     treewriter_jerdown.Init(outfileNameJERdown);
+    treewriter_unclusteredup.Init(outfileNameUnclusteredup);
+    treewriter_unclustereddown.Init(outfileNameUnclustereddown);
   }
   
 
@@ -451,11 +468,15 @@ tHqAnalyzer::tHqAnalyzer(const edm::ParameterSet& iConfig):csvReweighter(CSVHelp
       treewriter_jesdown.AddTreeProcessor(tps[i],tpsn[i]);
       treewriter_jerup.AddTreeProcessor(tps[i],tpsn[i]);
       treewriter_jerdown.AddTreeProcessor(tps[i],tpsn[i]);
+      treewriter_unclusteredup.AddTreeProcessor(tps[i],tpsn[i]);
+      treewriter_unclustereddown.AddTreeProcessor(tps[i],tpsn[i]);
     }
     treewriter_jesup.FillProcessorMap();
     treewriter_jesdown.FillProcessorMap();
     treewriter_jerup.FillProcessorMap();
     treewriter_jerdown.FillProcessorMap();
+    treewriter_unclusteredup.FillProcessorMap();
+    treewriter_unclustereddown.FillProcessorMap();
     
   }
   //}
@@ -692,6 +713,11 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   std::vector<pat::MET> correctedMETs_jerup;
   std::vector<pat::MET> correctedMETs_jerdown;
 
+  std::vector<pat::MET> pfMETs_unclusteredup;
+  std::vector<pat::MET> pfMETs_unclustereddown;
+  std::vector<pat::MET> correctedMETs_unclusteredup;
+  std::vector<pat::MET> correctedMETs_unclustereddown;
+
   std::vector<pat::Jet> selectedJets_unsorted_jerup;
   std::vector<pat::Jet> selectedJets_unsorted_jerdown;
   std::vector<pat::Jet> selectedJetsLoose_unsorted_jerup;
@@ -713,13 +739,50 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
     selectedJets_unsorted_jerup = helper.GetSelectedJets(correctedJets_unsorted_jerup, jetptcut, jetetacut, jetID::none, '-' );
     selectedJets_unsorted_jerdown = helper.GetSelectedJets(correctedJets_unsorted_jerdown, jetptcut, jetetacut, jetID::none, '-' );
-    selectedJetsLoose_unsorted_jerup = helper.GetSelectedJets(correctedJets_unsorted_jerup, jetptcut_loose, jetetacut_loose, jetID::none, '-' ); 
-    selectedJetsLoose_unsorted_jerdown = helper.GetSelectedJets(correctedJets_unsorted_jerdown, jetptcut_loose,jetetacut_loose, jetID::none, '-' ); 
+    selectedJetsLoose_unsorted_jerup = helper.GetSelectedJets(correctedJets_unsorted_jerup, jetptcut_loose, jetetacut_loose, jetID::none, '-' );
+    selectedJetsLoose_unsorted_jerdown = helper.GetSelectedJets(correctedJets_unsorted_jerdown, jetptcut_loose,jetetacut_loose, jetID::none, '-' );
 
     selectedJets_jerup = helper.GetSortedByPt(selectedJets_unsorted_jerup);
     selectedJets_jerdown = helper.GetSortedByPt(selectedJets_unsorted_jerdown);
     selectedJetsLoose_jerup = helper.GetSortedByPt(selectedJetsLoose_unsorted_jerup);
     selectedJetsLoose_jerdown = helper.GetSortedByPt(selectedJetsLoose_unsorted_jerdown);
+
+
+    // create pfMETs with shifted unclustered energy
+    for(std::vector<pat::MET>::const_iterator oldMET=pfMETs.begin(); oldMET!=pfMETs.end(); ++oldMET)
+    {
+      pat::MET upshiftedMET = *oldMET;
+      pat::MET downshiftedMET = *oldMET;
+
+      if(oldMET-pfMETs.begin() == 0)
+      {
+        TLorentzVector upMETVec;
+        TLorentzVector downMETVec;
+        upMETVec.SetPxPyPzE(oldMET->p4().Px(), oldMET->p4().Py(), oldMET->p4().Pz(), oldMET->p4().E());
+        downMETVec.SetPxPyPzE(oldMET->p4().Px(), oldMET->p4().Py(), oldMET->p4().Pz(), oldMET->p4().E());
+        upMETVec.SetPx(oldMET->shiftedPx(pat::MET::UnclusteredEnUp));
+        upMETVec.SetPy(oldMET->shiftedPy(pat::MET::UnclusteredEnUp));
+        downMETVec.SetPx(oldMET->shiftedPx(pat::MET::UnclusteredEnDown));
+        downMETVec.SetPy(oldMET->shiftedPy(pat::MET::UnclusteredEnDown));
+        upshiftedMET.setP4(reco::Candidate::LorentzVector(upMETVec.Px(),upMETVec.Py(),upMETVec.Pz(),upMETVec.E()));
+        downshiftedMET.setP4(reco::Candidate::LorentzVector(downMETVec.Px(),downMETVec.Py(),downMETVec.Pz(),downMETVec.E()));
+      }
+
+      pfMETs_unclusteredup.push_back(upshiftedMET);
+      pfMETs_unclustereddown.push_back(downshiftedMET);
+    }
+
+    // recorrect pfMETs with shifted unclustered energy
+    if(recorrectMET)
+    {
+      correctedMETs_unclusteredup = helper.CorrectMET(idJetsForMET, correctedJetsForMET_nominal, pfMETs_unclusteredup);
+      correctedMETs_unclustereddown = helper.CorrectMET(idJetsForMET, correctedJetsForMET_nominal, pfMETs_unclustereddown);
+    }
+    else
+    {
+      correctedMETs_unclusteredup = pfMETs_unclusteredup;
+      correctedMETs_unclustereddown = pfMETs_unclustereddown;
+    }
     
   }
 
@@ -873,6 +936,8 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       treewriter_jesdown.RemoveTreeProcessor("tHqGenVarProcessor"); 
       treewriter_jerup.RemoveTreeProcessor("tHqGenVarProcessor"); 
       treewriter_jerdown.RemoveTreeProcessor("tHqGenVarProcessor"); 
+      treewriter_unclusteredup.RemoveTreeProcessor("tHqGenVarProcessor");
+      treewriter_unclustereddown.RemoveTreeProcessor("tHqGenVarProcessor");
     }
     if(sampleType==SampleType::thq || sampleType == SampleType::nonttbkg || sampleType==SampleType::data || sampleType==SampleType::st){
       treewriter_nominal.RemoveTreeProcessor("TopGenVarProcessor");
@@ -880,6 +945,8 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       treewriter_jesdown.RemoveTreeProcessor("TopGenVarProcessor");
       treewriter_jerup.RemoveTreeProcessor("TopGenVarProcessor");
       treewriter_jerdown.RemoveTreeProcessor("TopGenVarProcessor");
+      treewriter_unclusteredup.RemoveTreeProcessor("TopGenVarProcessor");
+      treewriter_unclustereddown.RemoveTreeProcessor("TopGenVarProcessor");
     }
   }
 
@@ -963,6 +1030,8 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   InputCollections input_jerdown( input_nominal,selectedJets_jerdown,selectedJetsLoose_jerdown,correctedMETs_jerdown[0],weights_jerdown);
   //  InputCollections input_uncorrjets( input_nominal,selectedJets_uncorrected,selectedJetsLoose_uncorrected,pfMETs[0],weights_uncorrjets);
 
+  InputCollections input_unclusteredup( input_nominal,selectedJets_nominal,selectedJetsLoose_nominal,correctedMETs_unclusteredup[0],weights);
+  InputCollections input_unclustereddown( input_nominal,selectedJets_nominal,selectedJetsLoose_nominal,correctedMETs_unclustereddown[0],weights);
 
   // DO SELECTION
   cutflow.EventSurvivedStep("all");
@@ -979,6 +1048,8 @@ void tHqAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     treewriter_jesdown.Process(input_jesdown);
     treewriter_jerup.Process(input_jerup);
     treewriter_jerdown.Process(input_jerdown);
+    treewriter_unclusteredup.Process(input_unclusteredup);
+    treewriter_unclustereddown.Process(input_unclustereddown);
   }
 }
 
@@ -1162,6 +1233,8 @@ tHqAnalyzer::endJob()
     treewriter_jesdown.AddSampleInformation();
     treewriter_jerup.AddSampleInformation();
     treewriter_jerdown.AddSampleInformation();
+    treewriter_unclusteredup.AddSampleInformation();
+    treewriter_unclustereddown.AddSampleInformation();
   }
 
   cutflow.Print();
